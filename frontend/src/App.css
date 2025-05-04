@@ -434,21 +434,30 @@ body {
     gap: 4px;
   }
   .map-section, .minimap {
-    flex: 0 0 16vh;
-    min-height: 48px;
-    max-height: 18vh;
+    flex: 0 0 22vh;
+    min-height: 110px;
+    max-height: 26vh;
     margin-bottom: 0;
-    padding: 6px 2px;
-  }
-  .room-info {
-    flex: 0 0 16vh;
-    min-height: 48px;
-    max-height: 18vh;
-    margin: 0 0 2px 0;
-    font-size: 0.97rem;
-    padding: 8px 4px;
+    padding: 2px 0;
     width: 100%;
     box-sizing: border-box;
+    overflow-x: auto;
+  }
+  .room-info {
+    flex: 0 0 22vh;
+    min-height: 110px;
+    max-height: 28vh;
+    margin: 0 0 2px 0;
+    font-size: 0.95rem;
+    padding: 4px 2px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-y: auto;
+  }
+  .room-info .room-name,
+  .room-info .room-items-title,
+  .room-info .room-monsters-title {
+    font-size: 1rem;
   }
   .chat-section {
     flex: 1 1 0;

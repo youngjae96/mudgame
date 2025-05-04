@@ -319,6 +319,22 @@ wss.on('connection', (ws) => {
           }
           await savePlayerData(targetName);
           return;
+        } else if (cmd === '텔포') {
+          // /운영자 텔포 닉네임
+          const [targetName] = args;
+          const target = players[targetName];
+          if (!target || !target.ws) {
+            ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: `[운영자] 대상 유저를 찾을 수 없습니다. (닉네임 확인)` }));
+            return;
+          }
+          // 운영자(admin) 본인을 해당 유저의 위치로 이동
+          const player = players[playerName];
+          player.position = { ...target.position };
+          player.world = target.world;
+          ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `[운영자] ${targetName}님의 위치로 순간이동했습니다.` }));
+          sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+          await savePlayerData(playerName);
+          return;
         } else if (cmd === '공지') {
           const noticeMsg = args.join(' ');
           broadcast(wss, { type: 'system', subtype: 'event', message: `[공지] ${noticeMsg}` });
