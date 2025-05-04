@@ -69,10 +69,10 @@ function AppInner() {
   } = useWebSocket(handleDisconnect);
 
   // 소켓에서 받은 상태를 context로 동기화
-  React.useEffect(() => { setInventory(wsInventory); }, [wsInventory, setInventory]);
-  React.useEffect(() => { setCharacter(wsCharacter); }, [wsCharacter, setCharacter]);
-  React.useEffect(() => { setMapInfo(wsMapInfo); }, [wsMapInfo, setMapInfo]);
-  React.useEffect(() => { setRoom(wsRoom); }, [wsRoom, setRoom]);
+  React.useEffect(() => { setInventory(wsInventory); }, [wsInventory]);
+  React.useEffect(() => { setCharacter(wsCharacter); }, [wsCharacter]);
+  React.useEffect(() => { setMapInfo(wsMapInfo); }, [wsMapInfo]);
+  React.useEffect(() => { setRoom(wsRoom); }, [wsRoom]);
   React.useEffect(() => { clearMessages(); wsMessages.forEach(addMessage); }, [wsMessages, addMessage, clearMessages]);
 
   useEffect(() => {

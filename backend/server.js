@@ -111,6 +111,18 @@ function parseChatCommand(msg) {
   if (trimmed.startsWith('/지 ')) {
     return { type: 'local', message: trimmed.replace(/^\/지 /, '') };
   }
+  if (trimmed === '/동') {
+    return { type: 'move', dx: 1, dy: 0 };
+  }
+  if (trimmed === '/서') {
+    return { type: 'move', dx: -1, dy: 0 };
+  }
+  if (trimmed === '/남') {
+    return { type: 'move', dx: 0, dy: 1 };
+  }
+  if (trimmed === '/북') {
+    return { type: 'move', dx: 0, dy: -1 };
+  }
   return { type: 'local', message: trimmed };
 }
 
@@ -257,8 +269,18 @@ wss.on('connection', (ws) => {
         }
         const [slash, cmd, ...args] = trimmed.split(' ');
         if (cmd === '아이템지급') {
-          const [targetName, itemName, countStr] = args;
-          const count = parseInt(countStr) || 1;
+          const targetName = args[0];
+          let count = 1;
+          let itemName = '';
+          // 마지막 인자가 숫자면 개수로 처리, 아니면 1개
+          if (args.length > 2 && !isNaN(Number(args[args.length - 1]))) {
+            count = parseInt(args[args.length - 1]) || 1;
+            // 아이템명은 targetName 다음부터 count 앞까지 join
+            itemName = args.slice(1, -1).join(' ');
+          } else {
+            // 아이템명은 targetName 다음부터 끝까지 join
+            itemName = args.slice(1).join(' ');
+          }
           const target = players[targetName];
           if (!target) {
             ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: `[운영자] 대상 유저를 찾을 수 없습니다.` }));
@@ -353,7 +375,7 @@ wss.on('connection', (ws) => {
           sendRoomInfo
         });
       }
-      const { type: chatType, message: chatMsg } = parseChatCommand(data.message);
+      const { type: chatType, message: chatMsg, dx, dy } = parseChatCommand(data.message);
       if (chatType === 'invalid') {
         ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: chatMsg }));
         return;
@@ -370,6 +392,42 @@ wss.on('connection', (ws) => {
             p.ws.send(JSON.stringify({ type: 'chat', chatType: 'local', name: playerName, message: chatMsg }));
           }
         });
+      }
+      if (chatType === 'move') {
+        const player = players[playerName];
+        if (!player) return;
+        const { x, y } = player.position;
+        const nx = x + dx;
+        const ny = y + dy;
+        if (
+          typeof nx === 'number' && typeof ny === 'number' &&
+          nx >= 0 && nx < MAP_SIZE && ny >= 0 && ny < MAP_SIZE
+        ) {
+          player.position = { x: nx, y: ny };
+          await savePlayerData(playerName);
+          sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+          // 자동전투 중단
+          if (battleIntervals[playerName]) {
+            clearInterval(battleIntervals[playerName]);
+            delete battleIntervals[playerName];
+            ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '이동하여 자동전투가 중단되었습니다.' }));
+          }
+          // 이동 시 HP가 부족하면 자동 물약 사용
+          const potionResult = player.autoUsePotion();
+          if (potionResult) {
+            ws.send(JSON.stringify({
+              type: 'system',
+              subtype: 'event',
+              message: `${potionResult.name}을(를) 자동으로 사용했습니다! (HP +${potionResult.healAmount}, 남은량: ${potionResult.left})`
+            }));
+            await savePlayerData(playerName);
+            sendInventory(player);
+            sendCharacterInfo(player);
+          }
+        } else {
+          ws.send(JSON.stringify({ type: 'error', message: '잘못된 좌표입니다.' }));
+        }
+        return;
       }
     } else if (data.type === 'move') {
       const { x, y } = data;
