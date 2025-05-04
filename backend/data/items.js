@@ -85,8 +85,8 @@ const SHOP_ITEMS = {
   ],
   [ITEM_TYPE.CONSUMABLE]: [
     { name: '초소형 물약', type: ITEM_TYPE.CONSUMABLE, price: 10, desc: 'HP 10 회복', total: 500, perUse: 10 },
-    { name: '소형 물약', type: ITEM_TYPE.CONSUMABLE, price: 25, desc: 'HP 25 회복', total: 1000, perUse: 25 },
-    { name: '중형 물약', type: ITEM_TYPE.CONSUMABLE, price: 60, desc: 'HP 60 회복', total: 2000, perUse: 60 }
+    { name: '소형 물약', type: ITEM_TYPE.CONSUMABLE, price: 25, desc: 'HP 15 회복', total: 1000, perUse: 15 },
+    { name: '중형 물약', type: ITEM_TYPE.CONSUMABLE, price: 60, desc: 'HP 20 회복', total: 2000, perUse: 20 }
   ]
 };
 

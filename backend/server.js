@@ -511,7 +511,12 @@ wss.on('connection', (ws) => {
         }
         // 몬스터 처치 시
         if (result.monsterDead) {
-          broadcast(wss, { type: 'system', subtype: 'event', message: `${playerName}님이 ${monster.name}을(를) 처치했습니다!` });
+          // 같은 방(좌표)에 있는 유저에게만 메시지 전송
+          Object.values(players).forEach((p) => {
+            if (p.position && p.position.x === x && p.position.y === y) {
+              p.ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `${playerName}님이 ${monster.name}을(를) 처치했습니다!` }));
+            }
+          });
           respawnMonsterWithDeps(player.world, player.position.x, player.position.y);
         } else {
           // 플레이어 사망 시
@@ -619,7 +624,13 @@ wss.on('connection', (ws) => {
           clearInterval(battleIntervals[playerName]);
           delete battleIntervals[playerName];
           if (result.monsterDead) {
-            broadcast(wss, { type: 'system', subtype: 'event', message: `${playerName}님이 ${monster.name}을(를) 처치했습니다!` });
+            // 같은 방(좌표)에 있는 유저에게만 메시지 전송
+            const { x, y } = player.position;
+            Object.values(players).forEach((p) => {
+              if (p.position && p.position.x === x && p.position.y === y) {
+                p.ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `${playerName}님이 ${monster.name}을(를) 처치했습니다!` }));
+              }
+            });
             respawnMonsterWithDeps(player.world, player.position.x, player.position.y);
           }
           if (result.playerDead) {
