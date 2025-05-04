@@ -119,10 +119,18 @@ class Player {
         if (potion.total <= 0) {
           this.inventory.splice(potionIdx, 1);
         }
+        this.removeEmptyPotions();
         return { name: potion.name, healAmount, left: Math.max(0, potion.total) };
       }
     }
+    this.removeEmptyPotions();
     return null;
+  }
+
+  removeEmptyPotions() {
+    this.inventory = this.inventory.filter(
+      (item) => !(item.type === ITEM_TYPE.CONSUMABLE && item.total !== undefined && item.total <= 0)
+    );
   }
 }
 

@@ -320,6 +320,21 @@ wss.on('connection', (ws) => {
           return;
         }
       }
+      // 전투 외에도 채팅 입력 시 HP가 부족하면 자동 물약 사용
+      const player = players[playerName];
+      if (player) {
+        const potionResult = player.autoUsePotion();
+        if (potionResult) {
+          ws.send(JSON.stringify({
+            type: 'system',
+            subtype: 'event',
+            message: `${potionResult.name}을(를) 자동으로 사용했습니다! (HP +${potionResult.healAmount}, 남은량: ${potionResult.left})`
+          }));
+          await savePlayerData(playerName);
+          sendInventory(player);
+          sendCharacterInfo(player);
+        }
+      }
       const cmd = Object.keys(commandHandlers).find(prefix => trimmed.startsWith(prefix));
       if (cmd) {
         return commandHandlers[cmd]({
@@ -371,6 +386,21 @@ wss.on('connection', (ws) => {
           delete battleIntervals[playerName];
           ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '이동하여 자동전투가 중단되었습니다.' }));
         }
+        // 이동 시 HP가 부족하면 자동 물약 사용
+        const player = players[playerName];
+        if (player) {
+          const potionResult = player.autoUsePotion();
+          if (potionResult) {
+            ws.send(JSON.stringify({
+              type: 'system',
+              subtype: 'event',
+              message: `${potionResult.name}을(를) 자동으로 사용했습니다! (HP +${potionResult.healAmount}, 남은량: ${potionResult.left})`
+            }));
+            await savePlayerData(playerName);
+            sendInventory(player);
+            sendCharacterInfo(player);
+          }
+        }
       } else {
         ws.send(JSON.stringify({ type: 'error', message: '잘못된 좌표입니다.' }));
       }
@@ -388,6 +418,18 @@ wss.on('connection', (ws) => {
         sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
         sendInventory(player);
         ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `${item.name}을(를) 획득했습니다!` }));
+        // 아이템 획득 시 HP가 부족하면 자동 물약 사용
+        const potionResult = player.autoUsePotion();
+        if (potionResult) {
+          ws.send(JSON.stringify({
+            type: 'system',
+            subtype: 'event',
+            message: `${potionResult.name}을(를) 자동으로 사용했습니다! (HP +${potionResult.healAmount}, 남은량: ${potionResult.left})`
+          }));
+          await savePlayerData(playerName);
+          sendInventory(player);
+          sendCharacterInfo(player);
+        }
       } else {
         ws.send(JSON.stringify({ type: 'error', message: '해당 아이템이 없습니다.' }));
       }
