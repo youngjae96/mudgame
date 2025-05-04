@@ -81,8 +81,10 @@ function GameMain({
 
   return (
     <>
-      <div className="mud-title">그리머드RPG</div>
-      <Button style={{ position: 'absolute', top: 16, right: 16 }} onClick={handleLogout}>로그아웃</Button>
+      <div className="mud-title" style={{position:'relative'}}>
+        그리머드RPG
+        <Button className="logout-btn" onClick={handleLogout}>로그아웃</Button>
+      </div>
       {!connected ? (
         <div className="login-box">
           <div style={{ color: '#aaa', marginTop: 16 }}>서버에 연결 중...</div>
