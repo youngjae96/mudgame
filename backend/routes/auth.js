@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const PlayerData = require('../models/PlayerData');
 const router = express.Router();
 const SECRET = 'your_jwt_secret';
 const auth = require('../middlewares/auth');
@@ -13,6 +14,31 @@ router.post('/register', async (req, res) => {
   const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip;
   try {
     const user = await User.create({ username, password: hash, createdIp: ip });
+    await PlayerData.create({
+      userId: user._id,
+      name: user.username,
+      world: 1,
+      position: { x: 4, y: 4 },
+      hp: 30,
+      maxHp: 30,
+      mp: 10,
+      maxMp: 10,
+      str: 5,
+      dex: 5,
+      int: 5,
+      atk: 3,
+      def: 1,
+      gold: 100,
+      inventory: [],
+      strExp: 0,
+      strExpMax: 10,
+      dexExp: 0,
+      dexExpMax: 10,
+      intExp: 0,
+      intExpMax: 10,
+      equipWeapon: null,
+      equipArmor: null,
+    });
     res.json({ success: true, userId: user._id });
   } catch (e) {
     res.status(400).json({ error: '이미 존재하는 닉네임입니다.' });
