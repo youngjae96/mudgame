@@ -1,12 +1,17 @@
 import axios from 'axios';
 
+// 환경변수로 API 주소를 분리 (운영: Render, 개발: 로컬)
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL || '',
+});
+
 /**
  * REST API: 플레이어 정보 조회
  * @param {string} token - JWT 토큰
  * @returns {Promise<object>}
  */
 export const getPlayerInfo = (token) =>
-  axios.get('/api/player/me', { headers: { Authorization: `Bearer ${token}` } });
+  api.get('/api/player/me', { headers: { Authorization: `Bearer ${token}` } });
 
 /**
  * REST API: 인벤토리 조회
@@ -14,7 +19,7 @@ export const getPlayerInfo = (token) =>
  * @returns {Promise<object>}
  */
 export const getInventory = (token) =>
-  axios.get('/api/player/inventory', { headers: { Authorization: `Bearer ${token}` } });
+  api.get('/api/player/inventory', { headers: { Authorization: `Bearer ${token}` } });
 
 /**
  * REST API: 상점 아이템 목록 조회
@@ -22,7 +27,7 @@ export const getInventory = (token) =>
  * @returns {Promise<object>}
  */
 export const getShopItems = (token) =>
-  axios.get('/api/shop/items', { headers: { Authorization: `Bearer ${token}` } });
+  api.get('/api/shop/items', { headers: { Authorization: `Bearer ${token}` } });
 
 /**
  * REST API: 몬스터 공격
@@ -31,7 +36,7 @@ export const getShopItems = (token) =>
  * @returns {Promise<object>}
  */
 export const attackMonster = (token, data) =>
-  axios.post('/api/battle/attack', data, { headers: { Authorization: `Bearer ${token}` } });
+  api.post('/api/battle/attack', data, { headers: { Authorization: `Bearer ${token}` } });
 
 /**
  * REST API: 로그인
@@ -40,7 +45,7 @@ export const attackMonster = (token, data) =>
  * @returns {Promise<object>}
  */
 export const login = (username, password) =>
-  axios.post('/api/auth/login', { username, password });
+  api.post('/api/auth/login', { username, password });
 
 /**
  * REST API: 회원가입
@@ -49,4 +54,4 @@ export const login = (username, password) =>
  * @returns {Promise<object>}
  */
 export const register = (username, password) =>
-  axios.post('/api/auth/register', { username, password }); 
+  api.post('/api/auth/register', { username, password }); 
