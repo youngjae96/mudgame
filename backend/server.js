@@ -542,13 +542,25 @@ wss.on('connection', (ws) => {
       const player = players[playerName];
       if (!player) return;
       let msg = '[장비 정보]\n';
+      // 무기 옵션 문자열 생성
+      function getOptionStr(item) {
+        if (!item) return '';
+        let opts = [];
+        if (item.atk) opts.push(`+공 ${item.atk}`);
+        if (item.str) opts.push(`+str ${item.str}`);
+        if (item.dex) opts.push(`+dex ${item.dex}`);
+        if (item.def) opts.push(`+def ${item.def}`);
+        return opts.length ? opts.join(', ') : '';
+      }
       if (player.equipWeapon) {
-        msg += `무기: ${player.equipWeapon.name} (${player.equipWeapon.desc || ''})\n`;
+        const opt = getOptionStr(player.equipWeapon);
+        msg += `무기: ${player.equipWeapon.name}` + (opt ? ` (${opt})` : '') + '\n';
       } else {
         msg += '무기: 없음\n';
       }
       if (player.equipArmor) {
-        msg += `방어구: ${player.equipArmor.name} (${player.equipArmor.desc || ''})\n`;
+        const opt = getOptionStr(player.equipArmor);
+        msg += `방어구: ${player.equipArmor.name}` + (opt ? ` (${opt})` : '') + '\n';
       } else {
         msg += '방어구: 없음\n';
       }
