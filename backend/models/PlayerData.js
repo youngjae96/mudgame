@@ -1,0 +1,28 @@
+const mongoose = require('mongoose');
+const PlayerDataSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  name: String,
+  world: Number,
+  position: { x: Number, y: Number },
+  hp: Number,
+  maxHp: Number,
+  mp: Number,
+  maxMp: Number,
+  str: Number,
+  dex: Number,
+  int: Number,
+  atk: Number,
+  def: Number,
+  gold: Number,
+  inventory: Array,
+  updatedAt: { type: Date, default: Date.now },
+  strExp: Number,
+  strExpMax: Number,
+  dexExp: Number,
+  dexExpMax: Number,
+  intExp: Number,
+  intExpMax: Number,
+  equipWeapon: Object,
+  equipArmor: Object,
+});
+module.exports = mongoose.model('PlayerData', PlayerDataSchema); 
