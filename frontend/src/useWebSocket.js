@@ -2,9 +2,10 @@ import { useState, useEffect, useRef } from 'react';
 import { COMMANDS, SYSTEM_MESSAGES } from './constants';
 import { jwtDecode } from 'jwt-decode';
 
-const WS_URL =
-  (window.location.protocol === 'https:' ? 'wss://' : 'ws://') +
-  window.location.hostname + ':4000';
+// 환경변수로 WebSocket 주소 분리 (운영: Render, 개발: 로컬)
+const WS_URL = process.env.REACT_APP_WS_URL || (
+  (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.hostname + ':4000'
+);
 
 /**
  * 게임 WebSocket 및 상태 관리 커스텀 훅
