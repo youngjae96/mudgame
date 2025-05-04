@@ -47,7 +47,7 @@ app.use('/api/docs', docsRouter);
 app.use(errorHandler);
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
-const PORT = 4000;
+const PORT = process.env.PORT || 4000;
 
 let players = {};
 let battleIntervals = {};
