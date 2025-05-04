@@ -80,7 +80,7 @@ function GameMain({
 
   return (
     <>
-      <div className="mud-title">세련된 온라인 MUD</div>
+      <div className="mud-title">그리머드RPG</div>
       <Button style={{ position: 'absolute', top: 16, right: 16 }} onClick={handleLogout}>로그아웃</Button>
       {!connected ? (
         <div className="login-box">

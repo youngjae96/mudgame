@@ -20,7 +20,7 @@ function AuthForm({
   return (
     <div className="auth-bg">
       <div className="auth-card">
-        <div className="auth-title">세련된 온라인 MUD</div>
+        <div className="auth-title">그리머드RPG</div>
         <div className="auth-tabs">
           <Button className={isLoginMode ? 'auth-tab active' : 'auth-tab'} onClick={() => setIsLoginMode(true)} disabled={loading} style={{marginRight: 4}}>
             로그인
