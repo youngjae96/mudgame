@@ -4,7 +4,9 @@ import { jwtDecode } from 'jwt-decode';
 
 // 환경변수로 WebSocket 주소 분리 (운영: Render, 개발: 로컬)
 const WS_URL = process.env.REACT_APP_WS_URL || (
-  (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.hostname + ':4000'
+  window.location.hostname === 'localhost'
+    ? 'ws://localhost:4000'
+    : (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.hostname
 );
 
 /**
