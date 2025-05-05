@@ -40,6 +40,7 @@ const RoomMonstersTitle = styled.div`
 `;
 
 function RoomInfo({ room, renderRoomItems, renderRoomMonsters }) {
+  if (!room) return null;
   return (
     <RoomInfoWrapper>
       <RoomName>{room.name}</RoomName>

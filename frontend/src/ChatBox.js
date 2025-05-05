@@ -13,6 +13,15 @@ const ChatBoxWrapper = styled.div`
   box-shadow: 0 2px 8px #0004;
   overflow-x: auto;
   word-break: break-all;
+  @media (max-width: 600px) {
+    height: 100%;
+    min-height: 0;
+    max-height: 100%;
+    overflow-y: auto;
+    padding: 8px 4px 0 4px;
+    margin-bottom: 0;
+    font-size: 1.12rem;
+  }
 `;
 const SystemMsg = styled.div`
   color: #7ecfff;
@@ -198,9 +207,10 @@ function getMessageComponent(msg, i) {
  * 채팅 메시지 박스 컴포넌트
  * @param {object} props - 컴포넌트 props
  * @param {Array} props.messages - 채팅 메시지 목록
+ * @param {React.RefObject} props.chatEndRef - 채팅 끝 참조 객체
  * @returns {JSX.Element}
  */
-function ChatBox({ messages }) {
+function ChatBox({ messages, chatEndRef }) {
   const wrapperRef = useRef(null);
   const [autoScroll, setAutoScroll] = useState(true);
 
@@ -221,10 +231,17 @@ function ChatBox({ messages }) {
     }
   }, [messages, autoScroll]);
 
+  useEffect(() => {
+    if (chatEndRef && chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: 'auto' });
+    }
+  }, [messages, chatEndRef]);
+
   const flatMessages = Array.isArray(messages) ? messages.flat(Infinity) : [];
   return (
     <ChatBoxWrapper ref={wrapperRef} onScroll={handleScroll}>
       {flatMessages.map((msg, i) => getMessageComponent(msg, i))}
+      <div ref={chatEndRef} />
     </ChatBoxWrapper>
   );
 }
