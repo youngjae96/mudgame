@@ -123,6 +123,7 @@ function parseChatCommand(msg) {
   if (trimmed === '/북') {
     return { type: 'move', dx: 0, dy: -1 };
   }
+  // /나가기 명령어는 여기서 처리하지 않음 (async 필요)
   return { type: 'local', message: trimmed };
 }
 
@@ -260,6 +261,38 @@ wss.on('connection', (ws) => {
       })();
     } else if (data.type === 'chat') {
       const trimmed = data.message.trim();
+      // /나가기 명령어는 async로 여기서 처리
+      if (trimmed === '/나가기') {
+        const player = players[playerName];
+        if (player && player.world === 3 && player.position.x === 0 && player.position.y === 9) {
+          player.world = 2;
+          player.position = { x: 2, y: 6 };
+          ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '[동굴] 사다리를 타고 무인도 동굴 입구로 나갑니다!' }));
+          await savePlayerData(playerName);
+          await sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+          sendInventory(player);
+          sendCharacterInfo(player);
+        } else {
+          ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '이 명령어는 동굴 입구 사다리 방에서만 사용할 수 있습니다.' }));
+        }
+        return;
+      }
+      // /입장 명령어: 무인도 동굴 입구(x=2, y=6)에서만 동작
+      if (trimmed === '/입장') {
+        const player = players[playerName];
+        if (player && player.world === 2 && player.position.x === 2 && player.position.y === 6) {
+          player.world = 3;
+          player.position = { x: 0, y: 9 };
+          ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '[동굴] 동굴로 입장합니다!' }));
+          await savePlayerData(playerName);
+          await sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+          sendInventory(player);
+          sendCharacterInfo(player);
+        } else {
+          ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '이 명령어는 무인도 동굴 입구에서만 사용할 수 있습니다.' }));
+        }
+        return;
+      }
       // 운영자 한글 명령어 처리
       if (trimmed.startsWith('/운영자')) {
         const player = players[playerName];
@@ -417,28 +450,37 @@ wss.on('connection', (ws) => {
         const ny = y + dy;
         if (
           typeof nx === 'number' && typeof ny === 'number' &&
-          nx >= 0 && nx < MAP_SIZE && ny >= 0 && ny < MAP_SIZE
+          nx >= 0 && ny >= 0
         ) {
-          player.position = { x: nx, y: ny };
-          await savePlayerData(playerName);
-          sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
-          // 자동전투 중단
-          if (battleIntervals[playerName]) {
-            clearInterval(battleIntervals[playerName]);
-            delete battleIntervals[playerName];
-            ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '이동하여 자동전투가 중단되었습니다.' }));
+          const destRoom = getRoom(player.world, nx, ny);
+          if (destRoom && destRoom.type === 'cave_wall') {
+            ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '두꺼운 암벽이 길을 막고 있습니다.' }));
+            return;
           }
-          // 이동 시 HP가 부족하면 자동 물약 사용
-          const potionResult = player.autoUsePotion();
-          if (potionResult) {
-            ws.send(JSON.stringify({
-              type: 'system',
-              subtype: 'event',
-              message: `${potionResult.name}을(를) 자동으로 사용했습니다! (HP +${potionResult.healAmount}, 남은량: ${potionResult.left})`
-            }));
+          if (nx < MAP_SIZE && ny < MAP_SIZE || (player.world === 3 && nx < 30 && ny < 30)) {
+            player.position = { x: nx, y: ny };
             await savePlayerData(playerName);
-            sendInventory(player);
-            sendCharacterInfo(player);
+            await sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+            // 자동전투 중단
+            if (battleIntervals[playerName]) {
+              clearInterval(battleIntervals[playerName]);
+              delete battleIntervals[playerName];
+              ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '이동하여 자동전투가 중단되었습니다.' }));
+            }
+            // 이동 시 HP가 부족하면 자동 물약 사용
+            const potionResult = player.autoUsePotion();
+            if (potionResult) {
+              ws.send(JSON.stringify({
+                type: 'system',
+                subtype: 'event',
+                message: `${potionResult.name}을(를) 자동으로 사용했습니다! (HP +${potionResult.healAmount}, 남은량: ${potionResult.left})`
+              }));
+              await savePlayerData(playerName);
+              sendInventory(player);
+              sendCharacterInfo(player);
+            }
+          } else {
+            ws.send(JSON.stringify({ type: 'error', message: '잘못된 좌표입니다.' }));
           }
         } else {
           ws.send(JSON.stringify({ type: 'error', message: '잘못된 좌표입니다.' }));
@@ -447,13 +489,21 @@ wss.on('connection', (ws) => {
       }
     } else if (data.type === 'move') {
       const { x, y } = data;
+      const player = players[playerName];
+      let maxSize = MAP_SIZE;
+      if (player && player.world === 3) maxSize = 30;
       if (
         typeof x === 'number' && typeof y === 'number' &&
-        x >= 0 && x < MAP_SIZE && y >= 0 && y < MAP_SIZE
+        x >= 0 && x < maxSize && y >= 0 && y < maxSize
       ) {
+        const destRoom = getRoom(player.world, x, y);
+        if (destRoom && destRoom.type === 'cave_wall') {
+          ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '두꺼운 암벽이 길을 막고 있습니다.' }));
+          return;
+        }
         players[playerName].position = { x, y };
         await savePlayerData(playerName);
-        sendRoomInfo(players[playerName], getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+        await sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
         // 자동전투 중단
         if (battleIntervals[playerName]) {
           clearInterval(battleIntervals[playerName]);
@@ -461,7 +511,6 @@ wss.on('connection', (ws) => {
           ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '이동하여 자동전투가 중단되었습니다.' }));
         }
         // 이동 시 HP가 부족하면 자동 물약 사용
-        const player = players[playerName];
         if (player) {
           const potionResult = player.autoUsePotion();
           if (potionResult) {
@@ -489,7 +538,7 @@ wss.on('connection', (ws) => {
         const [item] = room.items.splice(idx, 1);
         player.inventory.push(item);
         await savePlayerData(playerName);
-        sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+        await sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
         sendInventory(player);
         ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `${item.name}을(를) 획득했습니다!` }));
         // 아이템 획득 시 HP가 부족하면 자동 물약 사용
@@ -537,10 +586,10 @@ wss.on('connection', (ws) => {
         } else {
           // 플레이어 사망 시
           if (result.playerDead) {
-            sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+            await sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
           }
         }
-        sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+        await sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
         sendCharacterInfo(player);
       } else {
         ws.send(JSON.stringify({ type: 'error', message: '해당 몬스터가 없습니다.' }));
@@ -642,7 +691,8 @@ wss.on('connection', (ws) => {
         const monster = curRoom.monsters[curIdx];
         const result = processBattle(player, monster, curRoom, VILLAGE_POS);
         await savePlayerData(playerName);
-        sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS); // 실시간 room 정보 전송
+        await sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS); // 실시간 room 정보 전송
+        sendCharacterInfo(player); // 매 턴마다 캐릭터 상태 전송
         if (Array.isArray(result.log)) {
           ws.send(JSON.stringify({ type: 'battle', log: result.log }));
         } else {
@@ -662,9 +712,9 @@ wss.on('connection', (ws) => {
             respawnMonsterWithDeps(player.world, player.position.x, player.position.y);
           }
           if (result.playerDead) {
-            sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+            await sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
           }
-          sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+          await sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
           sendCharacterInfo(player);
         }
       }, 1200);

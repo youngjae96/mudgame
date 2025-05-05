@@ -188,6 +188,9 @@ function useWebSocket(onDisconnect) {
 
   const handleAttack = (monsterId) => {
     ws.current.send(JSON.stringify({ type: 'autobattle', monsterId }));
+    setTimeout(() => {
+      ws.current.send(JSON.stringify({ type: 'stat' }));
+    }, 200);
   };
 
   return {

@@ -105,4 +105,22 @@ const ISLAND_MONSTERS = [
   { name: '야생 코뿔소', maxHp: 260, atk: 48, def: 30, gold: 48, dropItems: [ITEM_NAME_DARK_ARMOR], dropRates: [0.01] },
 ];
 
-module.exports = { ITEM_POOL, FIELD_MONSTERS, FOREST_MONSTERS, CAVE_MONSTERS, ISLAND_MONSTERS, SHOP_ITEMS, ITEM_TYPE, ITEM_NAME_WOOD_SWORD, ITEM_NAME_BRONZE_SWORD, ITEM_NAME_IRON_SWORD, ITEM_NAME_SILVER_SWORD, ITEM_NAME_GOLD_SWORD, ITEM_NAME_MONGHWA, ITEM_NAME_CLOTH_ARMOR, ITEM_NAME_LEATHER_ARMOR, ITEM_NAME_IRON_ARMOR, ITEM_NAME_SILVER_ARMOR, ITEM_NAME_GOLD_ARMOR, ITEM_NAME_FLAME_SWORD, ITEM_NAME_FROST_SWORD, ITEM_NAME_DRAGON_SWORD, ITEM_NAME_DARK_SWORD, ITEM_NAME_SKY_SWORD, ITEM_NAME_FLAME_ARMOR, ITEM_NAME_FROST_ARMOR, ITEM_NAME_DRAGON_ARMOR, ITEM_NAME_DARK_ARMOR, ITEM_NAME_SKY_ARMOR, ITEM_STAT_ATK, ITEM_STAT_DEF, ITEM_STAT_STR, ITEM_STAT_DEX }; 
+const CAVE_BOSS_MONSTERS = [
+  { name: '지하 마왕', maxHp: 1200, atk: 210, def: 120, gold: 400 },
+  { name: '암흑 드래곤', maxHp: 1100, atk: 200, def: 110, gold: 380 },
+  { name: '동굴 히드라', maxHp: 1050, atk: 195, def: 105, gold: 360 },
+  { name: '심연의 골렘', maxHp: 1000, atk: 185, def: 100, gold: 340 },
+  { name: '지하 괴수왕', maxHp: 950, atk: 180, def: 95, gold: 320 },
+  { name: '암석 거대거미', maxHp: 900, atk: 170, def: 90, gold: 300 },
+  { name: '동굴 망령', maxHp: 850, atk: 165, def: 85, gold: 285 },
+  { name: '지하 불사자', maxHp: 800, atk: 160, def: 80, gold: 270 },
+  { name: '암흑 리치로드', maxHp: 780, atk: 155, def: 78, gold: 260 },
+  { name: '동굴 거대뱀', maxHp: 760, atk: 150, def: 76, gold: 250 },
+  { name: '심연의 박쥐왕', maxHp: 740, atk: 145, def: 74, gold: 240 },
+  { name: '지하 돌연변이', maxHp: 720, atk: 140, def: 72, gold: 230 },
+  { name: '암흑 슬라임킹', maxHp: 700, atk: 135, def: 70, gold: 220 },
+  { name: '동굴 불꽃정령', maxHp: 680, atk: 130, def: 68, gold: 210 },
+  { name: '심연의 맹독전갈', maxHp: 660, atk: 125, def: 66, gold: 200 },
+];
+
+module.exports = { ITEM_POOL, FIELD_MONSTERS, FOREST_MONSTERS, CAVE_MONSTERS, ISLAND_MONSTERS, CAVE_BOSS_MONSTERS, SHOP_ITEMS, ITEM_TYPE, ITEM_NAME_WOOD_SWORD, ITEM_NAME_BRONZE_SWORD, ITEM_NAME_IRON_SWORD, ITEM_NAME_SILVER_SWORD, ITEM_NAME_GOLD_SWORD, ITEM_NAME_MONGHWA, ITEM_NAME_CLOTH_ARMOR, ITEM_NAME_LEATHER_ARMOR, ITEM_NAME_IRON_ARMOR, ITEM_NAME_SILVER_ARMOR, ITEM_NAME_GOLD_ARMOR, ITEM_NAME_FLAME_SWORD, ITEM_NAME_FROST_SWORD, ITEM_NAME_DRAGON_SWORD, ITEM_NAME_DARK_SWORD, ITEM_NAME_SKY_SWORD, ITEM_NAME_FLAME_ARMOR, ITEM_NAME_FROST_ARMOR, ITEM_NAME_DRAGON_ARMOR, ITEM_NAME_DARK_ARMOR, ITEM_NAME_SKY_ARMOR, ITEM_STAT_ATK, ITEM_STAT_DEF, ITEM_STAT_STR, ITEM_STAT_DEX }; 

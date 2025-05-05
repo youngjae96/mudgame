@@ -45,6 +45,18 @@ function handleTeleportCommand({ ws, playerName, message, players, getRoom, getP
     } else {
       ws.send(JSON.stringify({ type: 'system', subtype: 'guide', message: '[텔레포트] 무인도 오두막에서만 마을로 이동할 수 있습니다.' }));
     }
+  } else if (dest === '동굴') {
+    if (player.world === 2 && player.position.x === 2 && player.position.y === 6) {
+      player.world = 3;
+      player.position = { x: 0, y: 0 };
+      ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '[텔레포트] 동굴로 들어갑니다!' }));
+      sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+      sendInventory(player);
+      sendCharacterInfo(player);
+    } else {
+      ws.send(JSON.stringify({ type: 'system', subtype: 'guide', message: '[텔레포트] 무인도 동굴 입구에서만 동굴로 들어갈 수 있습니다.' }));
+    }
+    return;
   } else {
     ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[텔레포트] 지원하지 않는 지역입니다. (예: /텔포 무인도, /텔포 마을)' }));
   }

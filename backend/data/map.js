@@ -1,6 +1,6 @@
 const Room = require('../models/Room');
 const Monster = require('../models/Monster');
-const { FIELD_MONSTERS, FOREST_MONSTERS, CAVE_MONSTERS, ISLAND_MONSTERS } = require('./items');
+const { FIELD_MONSTERS, FOREST_MONSTERS, CAVE_MONSTERS, ISLAND_MONSTERS, CAVE_BOSS_MONSTERS } = require('./items');
 
 const MAP_SIZE = 9;
 const VILLAGE_POS = { x: 4, y: 4 };
@@ -123,7 +123,119 @@ for (let y = 0; y < MAP_SIZE; y++) {
   }
 }
 
-const worlds = { 1: rooms, 2: roomsIsland };
+const MAP_SIZE_CAVE = 30;
+const CAVE_ZONES = [
+  { name: '동굴 입구', type: ROOM_TYPE.CAVE, yStart: 0, yEnd: 9, monsters: CAVE_MONSTERS },
+  { name: '동굴 중간', type: ROOM_TYPE.CAVE, yStart: 10, yEnd: 19, monsters: FOREST_MONSTERS },
+  { name: '동굴 심층', type: ROOM_TYPE.CAVE, yStart: 20, yEnd: 29, monsters: CAVE_MONSTERS },
+];
+
+// 동굴맵(월드3)
+const roomsCave = [];
+// 강한 몬스터 15종을 5마리씩 3구역에 배치
+const bossIdxs = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14];
+const bossEntrance = bossIdxs.slice(0,5);
+const bossMiddle = bossIdxs.slice(5,10);
+bossDeep = bossIdxs.slice(10,15);
+let bossEntrancePos = [], bossMiddlePos = [], bossDeepPos = [];
+// 입구 구역(0~9층)에서 5개 랜덤 위치 선정
+while (bossEntrancePos.length < 5) {
+  let x = Math.floor(Math.random() * MAP_SIZE_CAVE);
+  let y = Math.floor(Math.random() * 10);
+  if (!bossEntrancePos.some(p => p.x === x && p.y === y)) bossEntrancePos.push({x,y});
+}
+// 중간 구역(10~19층)에서 5개 랜덤 위치 선정
+while (bossMiddlePos.length < 5) {
+  let x = Math.floor(Math.random() * MAP_SIZE_CAVE);
+  let y = 10 + Math.floor(Math.random() * 10);
+  if (!bossMiddlePos.some(p => p.x === x && p.y === y)) bossMiddlePos.push({x,y});
+}
+// 심층 구역(20~29층)에서 5개 랜덤 위치 선정
+while (bossDeepPos.length < 5) {
+  let x = Math.floor(Math.random() * MAP_SIZE_CAVE);
+  let y = 20 + Math.floor(Math.random() * 10);
+  if (!bossDeepPos.some(p => p.x === x && p.y === y)) bossDeepPos.push({x,y});
+}
+let bossEntranceCount = 0, bossMiddleCount = 0, bossDeepCount = 0;
+// 각 구역별 추가 몬스터 위치 선정 (보스/벽 제외)
+function getRandomMonsterPositions(zoneStart, zoneEnd, count, excludePositions) {
+  const positions = [];
+  while (positions.length < count) {
+    let x = Math.floor(Math.random() * MAP_SIZE_CAVE);
+    let y = zoneStart + Math.floor(Math.random() * (zoneEnd - zoneStart + 1));
+    if (
+      !positions.some(p => p.x === x && p.y === y) &&
+      !excludePositions.some(p => p.x === x && p.y === y)
+    ) {
+      positions.push({ x, y });
+    }
+  }
+  return positions;
+}
+const extraEntrance = getRandomMonsterPositions(0, 9, 120, bossEntrancePos.concat(bossMiddlePos, bossDeepPos));
+const extraMiddle = getRandomMonsterPositions(10, 19, 130, bossEntrancePos.concat(bossMiddlePos, bossDeepPos, extraEntrance));
+const extraDeep = getRandomMonsterPositions(20, 29, 140, bossEntrancePos.concat(bossMiddlePos, bossDeepPos, extraEntrance, extraMiddle));
+for (let y = 0; y < MAP_SIZE_CAVE; y++) {
+  for (let x = 0; x < MAP_SIZE_CAVE; x++) {
+    // 보스 위치 여부
+    const isBossEntrance = bossEntrancePos.some(p => p.x === x && p.y === y);
+    const isBossMiddle = bossMiddlePos.some(p => p.x === x && p.y === y);
+    const isBossDeep = bossDeepPos.some(p => p.x === x && p.y === y);
+    // 사다리 방: 입구 왼쪽 위 모서리(x=0, y=9)에 고정 배치
+    if (x === 0 && y === 9) {
+      const room = new Room(x, y, 'ladder', '사다리', '지상으로 올라가는 사다리가 있다. 여기서 "/나가기" 명령어를 입력하면 무인도 동굴 입구로 나갈 수 있습니다.');
+      roomsCave.push(room);
+      continue;
+    }
+    // 미로 벽: 20% 확률로 벽 생성 (입구/출구/가장자리/보스 위치 제외)
+    let isWall = false;
+    if (!isBossEntrance && !isBossMiddle && !isBossDeep && !(x === 0 && y === 0) && !(x === MAP_SIZE_CAVE-1 && y === MAP_SIZE_CAVE-1) && x !== 0 && y !== 0 && x !== MAP_SIZE_CAVE-1 && y !== MAP_SIZE_CAVE-1) {
+      if (Math.random() < 0.20) isWall = true;
+    }
+    if (isWall) {
+      const room = new Room(x, y, 'cave_wall', '동굴 벽', '두꺼운 암벽이 길을 막고 있습니다.');
+      roomsCave.push(room);
+      continue;
+    }
+    // 강한 몬스터 배치
+    let monsters = [];
+    if (isBossEntrance) {
+      monsters.push(new Monster(CAVE_BOSS_MONSTERS[bossEntrance[bossEntranceCount]], x, y));
+      bossEntranceCount++;
+    } else if (isBossMiddle) {
+      monsters.push(new Monster(CAVE_BOSS_MONSTERS[bossMiddle[bossMiddleCount]], x, y));
+      bossMiddleCount++;
+    } else if (isBossDeep) {
+      monsters.push(new Monster(CAVE_BOSS_MONSTERS[bossDeep[bossDeepCount]], x, y));
+      bossDeepCount++;
+    } else if (extraEntrance.some(p => p.x === x && p.y === y)) {
+      monsters.push(new Monster(CAVE_BOSS_MONSTERS[Math.floor(Math.random()*CAVE_BOSS_MONSTERS.length)], x, y));
+    } else if (extraMiddle.some(p => p.x === x && p.y === y)) {
+      monsters.push(new Monster(CAVE_BOSS_MONSTERS[Math.floor(Math.random()*CAVE_BOSS_MONSTERS.length)], x, y));
+    } else if (extraDeep.some(p => p.x === x && p.y === y)) {
+      monsters.push(new Monster(CAVE_MONSTERS[Math.floor(Math.random()*CAVE_MONSTERS.length)], x, y));
+    }
+    // 구역 결정
+    const zone = CAVE_ZONES.find(z => y >= z.yStart && y <= z.yEnd);
+    let type = zone.type;
+    let name = zone.name;
+    let description = `${zone.name} (동굴 ${y+1}층)`;
+    const room = new Room(x, y, type, name, description);
+    for (const m of monsters) room.monsters.push(m);
+    roomsCave.push(room);
+  }
+}
+
+// 무인도맵(roomsIsland)에서 x=2, y=6 위치를 동굴 입구로 지정
+const caveEntrance = roomsIsland.find(r => r.x === 2 && r.y === 6);
+if (caveEntrance) {
+  caveEntrance.type = 'cave_entrance';
+  caveEntrance.name = '동굴 입구';
+  caveEntrance.description = '깊고 어두운 동굴로 들어가는 입구입니다. 여기서 "/입장" 명령어를 입력하면 동굴로 들어갈 수 있습니다.';
+}
+
+// worlds 객체를 모든 맵 생성 이후에 선언
+const worlds = { 1: rooms, 2: roomsIsland, 3: roomsCave };
 function getRoom(world, x, y) {
   const arr = worlds[world] || rooms;
   return arr.find(r => r.x === x && r.y === y);

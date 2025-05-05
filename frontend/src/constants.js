@@ -44,7 +44,7 @@ export const MESSAGE_SUBTYPES = {
 };
 
 export const MAP_EMOJI = {
-  field: '🌱', forest: '🌲', cave: '🪨', village: '🏠',
+  field: '🌱', forest: '🌲', cave: '🪨', cave_entrance: '🕳️', cave_wall: '🧱', village: '🏠',
   beach: '🏖️', jungle: '🌴', volcano: '🌋', sea: '🌊', islandfield: '🌾'
 };
 

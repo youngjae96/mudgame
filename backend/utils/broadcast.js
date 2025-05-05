@@ -6,8 +6,9 @@
  * - sendInventory: 인벤토리 전송
  * - sendCharacterInfo: 캐릭터 정보 전송
  */
-const { ROOM_TYPE } = require('../data/map');
+const { ROOM_TYPE, MAP_SIZE, ISLAND_VILLAGE_POS } = require('../data/map');
 const Player = require('../models/Player');
+const MAP_SIZE_CAVE = 30;
 
 /**
  * 전체 클라이언트에 메시지 전송
@@ -31,17 +32,20 @@ function sendPlayerList(wss, players) {
 /**
  * 방 정보(맵, 주변, 플레이어 등) 전송
  */
-function sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS) {
+function sendRoomInfo(player, getRoom, getPlayersInRoom, _MAP_SIZE, VILLAGE_POS) {
   const { x, y } = player.position;
   const world = player.world || 1;
   const room = getRoom(world, x, y);
   const playerList = getPlayersInRoom(x, y);
+  // 월드별 맵 크기 결정
+  let mapSize = _MAP_SIZE;
+  if (world === 3) mapSize = MAP_SIZE_CAVE;
   // 5x5 주변 방 정보
   const half = 2;
   const nearbyRooms = [];
   for (let dy = y - half; dy <= y + half; dy++) {
     for (let dx = x - half; dx <= x + half; dx++) {
-      if (dx >= 0 && dx < MAP_SIZE && dy >= 0 && dy < MAP_SIZE) {
+      if (dx >= 0 && dx < mapSize && dy >= 0 && dy < mapSize) {
         const r = getRoom(world, dx, dy);
         if (r) nearbyRooms.push({ x: dx, y: dy, type: r.type });
       }
@@ -49,9 +53,9 @@ function sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS) 
   }
   // 전체 맵 지역 정보 생성
   const regions = [];
-  for (let yy = 0; yy < MAP_SIZE; yy++) {
+  for (let yy = 0; yy < mapSize; yy++) {
     const row = [];
-    for (let xx = 0; xx < MAP_SIZE; xx++) {
+    for (let xx = 0; xx < mapSize; xx++) {
       const r = getRoom(world, xx, yy);
       row.push(r ? r.type : ROOM_TYPE.FIELD);
     }
@@ -69,7 +73,7 @@ function sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS) 
         items: room.items,
         monsters: room.monsters
       },
-      mapSize: MAP_SIZE,
+      mapSize: mapSize,
       mapInfo: {
         world,
         ...(world === 1 ? { village: VILLAGE_POS } : {}),

@@ -15,9 +15,14 @@ const MinimapRow = styled.div`
   gap: 2px;
 `;
 const MinimapCell = styled.div`
-  width: 32px;
-  height: 32px;
-  background: ${({ $cellType }) => {
+  width: ${({ $isCave }) => $isCave ? '16px' : '32px'};
+  height: ${({ $isCave }) => $isCave ? '16px' : '32px'};
+  background: ${({ $cellType, $isCave, $caveZone }) => {
+    if ($isCave) {
+      if ($caveZone === 'entrance') return '#b3d8ff'; // 밝은 파랑(입구)
+      if ($caveZone === 'middle') return '#444c5c';   // 진한 남색/회색(중간)
+      if ($caveZone === 'deep') return '#ffe066';     // 금색(심층)
+    }
     if ($cellType === 'field') return '#b6e388';
     if ($cellType === 'forest') return '#4e944f';
     if ($cellType === 'cave') return '#888';
@@ -28,10 +33,17 @@ const MinimapCell = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.3rem;
-  color: #7ecfff;
+  font-size: ${({ $isCave }) => $isCave ? '0.85rem' : '1.3rem'};
+  color: ${({ $isCave, $caveZone }) => $isCave && $caveZone === 'deep' ? '#b8860b' : $isCave && $caveZone === 'middle' ? '#ffe066' : '#181c24'};
   cursor: default;
-  border: 2px solid transparent;
+  border: 2px solid ${({ $isCave, $caveZone }) => {
+    if ($isCave) {
+      if ($caveZone === 'entrance') return '#7ecfff';
+      if ($caveZone === 'middle') return '#222a3a';
+      if ($caveZone === 'deep') return '#b8860b';
+    }
+    return 'transparent';
+  }};
   transition: border 0.15s, background 0.15s;
 `;
 
@@ -45,15 +57,24 @@ const MinimapCell = styled.div`
  */
 function MapModal({ mapSize, mapInfo, onClose }) {
   const emojiMap = MAP_EMOJI;
+  const isCave = mapInfo?.world === 3;
   const grid = [];
   for (let y = 0; y < mapSize; y++) {
     const row = [];
     for (let x = 0; x < mapSize; x++) {
       let cellType = mapInfo?.regions?.[y]?.[x] || 'field';
+      let caveZone = null;
+      if (isCave) {
+        if (y <= 9) caveZone = 'entrance';
+        else if (y <= 19) caveZone = 'middle';
+        else caveZone = 'deep';
+      }
       row.push(
         <MinimapCell
           key={x}
           $cellType={cellType}
+          $isCave={isCave}
+          $caveZone={caveZone}
           title={`(${x + 1}, ${y + 1})${cellType === 'village' ? ' - 마을' : ''}`}
         >
           {emojiMap[cellType] || ''}
