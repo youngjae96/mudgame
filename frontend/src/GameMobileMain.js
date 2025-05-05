@@ -128,7 +128,8 @@ export default function GameMobileMain({
   messages, chatEndRef, handleSend, input, setInput,
   UI_LABELS, name, character, inventory, handlePickup, handleAttack, handleLogout
 }) {
-  const [tab, setTab] = useState('info'); // info, inv
+  // 탭 상태: room(방정보), info(내정보), inv(인벤)
+  const [tab, setTab] = useState('room'); // 기본값을 'room'으로 변경
 
   // 방 아이템/몬스터 렌더 함수
   const renderRoomItems = () => <RoomItems room={room} onPickup={handlePickup} />;
@@ -143,13 +144,14 @@ export default function GameMobileMain({
       <MobileMain>
         <MobileMapRoomPanel>
           <MiniMap room={room} mapSize={mapSize} mapInfo={mapInfo} onMove={handleMove} nearbyRooms={nearbyRooms} world={mapInfo?.world} />
-          <RoomInfo room={room} renderRoomItems={renderRoomItems} renderRoomMonsters={renderRoomMonsters} />
         </MobileMapRoomPanel>
         <MobileTabs>
+          <TabButton $active={tab === 'room'} onClick={() => setTab('room')}>방정보</TabButton>
           <TabButton $active={tab === 'info'} onClick={() => setTab('info')}>내정보</TabButton>
           <TabButton $active={tab === 'inv'} onClick={() => setTab('inv')}>인벤</TabButton>
         </MobileTabs>
         <MobileContent>
+          {tab === 'room' && <RoomInfo room={room} renderRoomItems={renderRoomItems} renderRoomMonsters={renderRoomMonsters} />}
           {tab === 'info' && <CharacterInfo name={name} room={room} character={character} />}
           {tab === 'inv' && <Inventory inventory={inventory} gold={character?.gold} />}
         </MobileContent>
