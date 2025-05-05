@@ -6,6 +6,8 @@ import Inventory from './Inventory';
 import ChatBox from './ChatBox';
 import Button from './components/Button';
 import Input from './components/Input';
+import RoomItems from './RoomItems';
+import RoomMonsters from './RoomMonsters';
 
 export default function GameMobileMain({
   room, mapSize, mapInfo, handleMove, nearbyRooms,
@@ -13,6 +15,10 @@ export default function GameMobileMain({
   UI_LABELS, name, character, inventory, handlePickup, handleAttack, handleLogout
 }) {
   const [tab, setTab] = useState('map'); // map, info, inv, room
+
+  // 방 아이템/몬스터 렌더 함수
+  const renderRoomItems = () => <RoomItems room={room} onPickup={handlePickup} />;
+  const renderRoomMonsters = () => <RoomMonsters room={room} onAttack={handleAttack} />;
 
   return (
     <div className="mobile-root">
@@ -29,7 +35,7 @@ export default function GameMobileMain({
         </div>
         <div className="mobile-content">
           {tab === 'map' && <MiniMap room={room} mapSize={mapSize} mapInfo={mapInfo} onMove={handleMove} nearbyRooms={nearbyRooms} world={mapInfo?.world} />}
-          {tab === 'room' && <RoomInfo room={room} renderRoomItems={null} renderRoomMonsters={null} />}
+          {tab === 'room' && <RoomInfo room={room} renderRoomItems={renderRoomItems} renderRoomMonsters={renderRoomMonsters} />}
           {tab === 'info' && <CharacterInfo name={name} room={room} character={character} />}
           {tab === 'inv' && <Inventory inventory={inventory} gold={character?.gold} />}
         </div>

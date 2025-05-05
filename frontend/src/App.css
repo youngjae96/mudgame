@@ -817,10 +817,15 @@ body {
     overflow: auto;
     padding: 8px 4px 0 4px;
     background: #181c24;
+    min-height: 0;
+    max-height: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
   }
 
   .mobile-chat {
-    flex: 0 0 120px;
+    flex: 0 0 180px;
     display: flex;
     flex-direction: column;
     background: #232837;
@@ -866,5 +871,16 @@ body {
   /* 데스크톱 UI 숨김 */
   .container, .mud-main, .left-panel, .player-list, .chat-section {
     display: none !important;
+  }
+  .character-info, .inventory {
+    width: 100%;
+    min-height: 180px;
+    background: #232837;
+    border-radius: 10px;
+    padding: 14px 12px 10px 12px;
+    box-shadow: 0 2px 8px #0002;
+    margin-bottom: 12px;
+    overflow: auto;
+    font-size: 1.05rem;
   }
 } 
