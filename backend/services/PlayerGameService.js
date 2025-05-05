@@ -41,38 +41,62 @@ const PlayerGameService = {
       ws.send(JSON.stringify({ type: 'error', message: '잘못된 좌표입니다.' }));
     }
   },
-  async handleChat({ ws, playerName, message, PlayerManager, broadcast, getRoom, getPlayersInRoom, sendPlayerList, sendRoomInfoToAllInRoom, savePlayerData, sendInventory, sendCharacterInfo, commandHandlers, SHOP_ITEMS, MAP_SIZE, VILLAGE_POS, battleIntervals, parseChatCommand }) {
+  async handleChat({ ws, playerName, message, PlayerManager, broadcast, wss, getRoom, getPlayersInRoom, sendPlayerList, sendRoomInfoToAllInRoom, savePlayerData, sendInventory, sendCharacterInfo, commandHandlers, SHOP_ITEMS, MAP_SIZE, VILLAGE_POS, battleIntervals, parseChatCommand }) {
     const trimmed = message.trim();
-    // 운영자 명령어, /입장, /나가기 등은 server.js에서 분기 처리 후 이관 필요
-    // 여기서는 일반 채팅/명령어/이동만 처리
     const player = PlayerManager.getPlayer(playerName);
     if (!player) return;
-    const { type: chatType, message: chatMsg, dx, dy } = parseChatCommand(message);
+    const { type: chatType, message: chatMsg, dx, dy, command, args } = parseChatCommand(message);
     if (chatType === 'invalid') {
       ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: chatMsg }));
       return;
     }
     if (chatType === 'global') {
-      broadcast(ws, { type: 'chat', chatType: 'global', name: playerName, message: chatMsg });
-    } else if (chatType === 'move') {
-      await this.handleMove({ ws, playerName, dx, dy, PlayerManager, RoomManager: null, getRoom, getPlayersInRoom, sendRoomInfoToAllInRoom, savePlayerData, sendInventory, sendCharacterInfo, MAP_SIZE, VILLAGE_POS, battleIntervals });
-    } else {
-      // 지역채팅
+      broadcast(wss, { type: 'chat', chatType: 'global', name: playerName, message: chatMsg });
+      return;
+    }
+    if (chatType === 'local') {
       const { x, y } = player.position;
       Object.values(PlayerManager.getAllPlayers()).forEach((p) => {
         if (p.position && p.position.x === x && p.position.y === y) {
           p.ws.send(JSON.stringify({ type: 'chat', chatType: 'local', name: playerName, message: chatMsg }));
         }
       });
+      return;
+    }
+    if (chatType === 'command') {
+      console.log('DEBUG handleChat command:', command, args);
+      await this.handleCommand({ ws, playerName, command, args, PlayerManager, RoomManager: null, getRoom, getPlayersInRoom, sendRoomInfoToAllInRoom, savePlayerData, sendInventory, sendCharacterInfo, broadcast, SHOP_ITEMS, MAP_SIZE, VILLAGE_POS, commandHandlers, sendRoomInfo: sendRoomInfoToAllInRoom });
+      return;
+    }
+    if (chatType === 'move') {
+      await this.handleMove({ ws, playerName, dx, dy, PlayerManager, RoomManager: null, getRoom, getPlayersInRoom, sendRoomInfoToAllInRoom, savePlayerData, sendInventory, sendCharacterInfo, MAP_SIZE, VILLAGE_POS, battleIntervals });
+      return;
     }
   },
   async handleCommand({ ws, playerName, command, args, PlayerManager, RoomManager, getRoom, getPlayersInRoom, sendRoomInfoToAllInRoom, savePlayerData, sendInventory, sendCharacterInfo, broadcast, SHOP_ITEMS, MAP_SIZE, VILLAGE_POS, commandHandlers, sendRoomInfo }) {
-    // 명령어 핸들러 위임
+    console.log('DEBUG commandHandlers:', commandHandlers);
+    console.log('DEBUG command:', command);
+    console.log('DEBUG commandHandlers[command]:', commandHandlers && commandHandlers[command]);
+    if (!commandHandlers) {
+      ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '명령어 핸들러가 정의되어 있지 않습니다.' }));
+      return;
+    }
     if (commandHandlers[command]) {
+      if (command === '/여관') {
+        return commandHandlers[command]({
+          ws,
+          playerName,
+          players: PlayerManager.getAllPlayers(),
+          getRoom,
+          savePlayerData,
+          sendInventory,
+          sendCharacterInfo
+        });
+      }
       return commandHandlers[command]({
         ws,
         playerName,
-        message: args.join(' '),
+        message: [command, ...args].join(' '),
         players: PlayerManager.getAllPlayers(),
         getRoom,
         getPlayersInRoom,
@@ -219,7 +243,7 @@ const PlayerGameService = {
     const statMsg =
       `[능력치]\n` +
       `HP  : ${player.hp} / ${player.maxHp}    MP  : ${player.mp} / ${player.maxMp}\n` +
-      `STR : ${player.str} (Exp: ${player.strExp}/${player.strExpMax})   DEX: ${player.dex} (Exp: ${player.dexExp}/${player.dexExpMax})   INT: ${player.int} (Exp: ${player.intExp}/${player.intExpMax})\n` +
+      `STR : ${player.str} (Exp: ${Number(player.strExp).toFixed(2)}/${Number(player.strExpMax).toFixed(2)})   DEX: ${player.dex} (Exp: ${Number(player.dexExp).toFixed(2)}/${Number(player.dexExpMax).toFixed(2)})   INT: ${player.int} (Exp: ${Number(player.intExp).toFixed(2)}/${Number(player.intExpMax).toFixed(2)})\n` +
       `공격력: ${player.getAtk()}   방어력: ${player.getDef()}`;
     ws.send(JSON.stringify({ type: 'system', subtype: 'info', message: statMsg }));
   },

@@ -127,4 +127,41 @@ describe('commands.js', () => {
       expect(ws.send).toHaveBeenCalledWith(expect.stringContaining('지원하지 않는 지역'));
     });
   });
+
+  describe('handleInnCommand', () => {
+    let player, players, getRoom, ws, savePlayerData, sendInventory, sendCharacterInfo;
+    beforeEach(() => {
+      players = {};
+      player = { name: '유저', world: 1, position: { x: 4, y: 4 }, hp: 10, maxHp: 20, mp: 5, maxMp: 10, gold: 100 };
+      players['유저'] = player;
+      getRoom = jest.fn();
+      ws = createMockWs();
+      savePlayerData = jest.fn().mockResolvedValue();
+      sendInventory = jest.fn();
+      sendCharacterInfo = jest.fn();
+      getRoom.mockReturnValue({ type: 'village' });
+    });
+    it('마을에서 HP/MP 회복, 골드 차감', () => {
+      commands.handleInnCommand({ ws, playerName: '유저', players, getRoom, savePlayerData, sendInventory, sendCharacterInfo });
+      expect(player.hp).toBe(20);
+      expect(player.mp).toBe(10);
+      expect(player.gold).toBe(50);
+      expect(ws.send).toHaveBeenCalledWith(expect.stringContaining('회복'));
+    });
+    it('마을이 아니면 안내', () => {
+      getRoom.mockReturnValue({ type: 'field' });
+      commands.handleInnCommand({ ws, playerName: '유저', players, getRoom, savePlayerData, sendInventory, sendCharacterInfo });
+      expect(ws.send).toHaveBeenCalledWith(expect.stringContaining('마을에서만'));
+    });
+    it('골드 부족 시 에러', () => {
+      player.gold = 10;
+      commands.handleInnCommand({ ws, playerName: '유저', players, getRoom, savePlayerData, sendInventory, sendCharacterInfo });
+      expect(ws.send).toHaveBeenCalledWith(expect.stringContaining('골드가 부족'));
+    });
+    it('이미 풀피/풀마면 안내', () => {
+      player.hp = 20; player.mp = 10;
+      commands.handleInnCommand({ ws, playerName: '유저', players, getRoom, savePlayerData, sendInventory, sendCharacterInfo });
+      expect(ws.send).toHaveBeenCalledWith(expect.stringContaining('가득'));
+    });
+  });
 }); 

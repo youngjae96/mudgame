@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">63.15% </span>
+                <span class="strong">63.03% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>132/209</span>
+                <span class='fraction'>133/211</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">58.26% </span>
+                <span class="strong">58.13% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>74/127</span>
+                <span class='fraction'>75/129</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">65.94% </span>
+                <span class="strong">65.77% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>122/185</span>
+                <span class='fraction'>123/187</span>
             </div>
         
             
@@ -359,7 +359,9 @@
 <a name='L294'></a><a href='#L294'>294</a>
 <a name='L295'></a><a href='#L295'>295</a>
 <a name='L296'></a><a href='#L296'>296</a>
-<a name='L297'></a><a href='#L297'>297</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -417,6 +419,8 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
@@ -704,7 +708,7 @@ const PlayerGameService = {
     // 여기서는 일반 채팅/명령어/이동만 처리
     const player = PlayerManager.getPlayer(playerName);
     if (!player) return;
-    const { type: chatType, message: chatMsg, dx, dy } = parseChatCommand(message);
+    const { type: chatType, message: chatMsg, dx, dy, command, args } = parseChatCommand(message);
     if (chatType === 'invalid') {
       ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: chatMsg }));
       return;
@@ -713,6 +717,8 @@ const PlayerGameService = {
       broadcast(ws, { type: 'chat', chatType: 'global', name: playerName, message: chatMsg });
     } else if (chatType === 'move') {
       await this.handleMove({ ws, playerName, dx, dy, PlayerManager, RoomManager: null, getRoom, getPlayersInRoom, sendRoomInfoToAllInRoom, savePlayerData, sendInventory, sendCharacterInfo, MAP_SIZE, VILLAGE_POS, battleIntervals });
+    } else <span class="missing-if-branch" title="if path not taken" >I</span>if (chatType === 'command') {
+<span class="cstat-no" title="statement not covered" >      await this.handleCommand({ ws, playerName, command, args, PlayerManager, RoomManager: null, getRoom, getPlayersInRoom, sendRoomInfoToAllInRoom, savePlayerData, sendInventory, sendCharacterInfo, broadcast, SHOP_ITEMS, MAP_SIZE, VILLAGE_POS, commandHandlers, sendRoomInfo: sendRoomInfoToAllInRoom });</span>
     } else {
       // 지역채팅
       const { x, y } = player.position;
@@ -729,7 +735,7 @@ const PlayerGameService = {
       return commandHandlers[command]({
         ws,
         playerName,
-        message: args.join(' '),
+        message: [command, ...args].join(' '),
         players: PlayerManager.getAllPlayers(),
         getRoom,
         getPlayersInRoom,
@@ -876,7 +882,7 @@ const PlayerGameService = {
     const statMsg =
 <span class="cstat-no" title="statement not covered" >      `[능력치]\n` +</span>
       `HP  : ${player.hp} / ${player.maxHp}    MP  : ${player.mp} / ${player.maxMp}\n` +
-      `STR : ${player.str} (Exp: ${player.strExp}/${player.strExpMax})   DEX: ${player.dex} (Exp: ${player.dexExp}/${player.dexExpMax})   INT: ${player.int} (Exp: ${player.intExp}/${player.intExpMax})\n` +
+      `STR : ${player.str} (Exp: ${Number(player.strExp).toFixed(2)}/${Number(player.strExpMax).toFixed(2)})   DEX: ${player.dex} (Exp: ${Number(player.dexExp).toFixed(2)}/${Number(player.dexExpMax).toFixed(2)})   INT: ${player.int} (Exp: ${Number(player.intExp).toFixed(2)}/${Number(player.intExpMax).toFixed(2)})\n` +
       `공격력: ${player.getAtk()}   방어력: ${player.getDef()}`;
 <span class="cstat-no" title="statement not covered" >    ws.send(JSON.stringify({ type: 'system', subtype: 'info', message: statMsg }));</span>
   },
@@ -958,7 +964,7 @@ module.exports = PlayerGameService; </pre></td></tr></table></pre>
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-05T16:12:22.922Z
+                at 2025-05-05T16:57:43.858Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

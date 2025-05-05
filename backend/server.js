@@ -27,7 +27,9 @@ const {
   handleSellCommand,
   handleEquipCommand,
   handleUnequipCommand,
-  handleTeleportCommand
+  handleTeleportCommand,
+  handleInnCommand,
+  handleAdminCommand
 } = require('./commands');
 const logger = require('./middlewares/logger');
 const errorHandler = require('./middlewares/errorHandler');
@@ -58,9 +60,9 @@ const PORT = process.env.PORT || 4000;
 
 let battleIntervals = {};
 
-function getPlayersInRoom(x, y) {
+function getPlayersInRoom(world, x, y) {
   return Object.values(PlayerManager.getAllPlayers())
-    .filter((p) => p.position && p.position.x === x && p.position.y === y)
+    .filter((p) => p.world === world && p.position && p.position.x === x && p.position.y === y)
     .map((p) => p.name);
 }
 
@@ -129,6 +131,11 @@ function parseChatCommand(msg) {
   if (trimmed === '/북') {
     return { type: 'move', dx: 0, dy: -1 };
   }
+  // /로 시작하는 명령어는 명령어로 처리
+  if (trimmed.startsWith('/')) {
+    const [command, ...args] = trimmed.split(' ');
+    return { type: 'command', command, args };
+  }
   // /나가기 명령어는 여기서 처리하지 않음 (async 필요)
   return { type: 'local', message: trimmed };
 }
@@ -190,6 +197,8 @@ const commandHandlers = {
   '/장착': handleEquipCommand,
   '/해제': handleUnequipCommand,
   '/텔포': handleTeleportCommand,
+  '/여관': handleInnCommand,
+  '/운영자': handleAdminCommand,
 };
 
 // 서비스 인스턴스 생성 및 의존성 주입
@@ -291,6 +300,45 @@ wss.on('connection', (ws) => {
       })();
     } else if (data.type === 'chat') {
       // 운영자 명령어, /입장, /나가기 등은 기존 분기 유지
+      const player = PlayerManager.getPlayer(playerName);
+      if (!player) return;
+      const msg = data.message.trim();
+      // 동굴 입장
+      if (msg === '/입장') {
+        // 무인도 동굴 입구(월드2, 2,6)에서만 동굴로 입장
+        if (player.world === 2 && player.position.x === 2 && player.position.y === 6) {
+          RoomManager.removePlayerFromRoom(playerName, player.world, player.position.x, player.position.y);
+          player.world = 3;
+          player.position = { x: 0, y: 0 };
+          RoomManager.addPlayerToRoom(playerName, player.world, player.position.x, player.position.y);
+          PlayerManager.addPlayer(playerName, player);
+          sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+          sendInventory(player);
+          sendCharacterInfo(player);
+          ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '[동굴] 동굴로 입장합니다!' }));
+        } else {
+          ws.send(JSON.stringify({ type: 'system', subtype: 'guide', message: '[동굴] 무인도 동굴 입구(2,6)에서만 입장할 수 있습니다.' }));
+        }
+        return;
+      }
+      // 동굴 나가기
+      if (msg === '/나가기') {
+        // 동굴 사다리방(월드3, 0,9)에서만 무인도 동굴 입구로 나감
+        if (player.world === 3 && player.position.x === 0 && player.position.y === 9) {
+          RoomManager.removePlayerFromRoom(playerName, player.world, player.position.x, player.position.y);
+          player.world = 2;
+          player.position = { x: 2, y: 6 };
+          RoomManager.addPlayerToRoom(playerName, player.world, player.position.x, player.position.y);
+          PlayerManager.addPlayer(playerName, player);
+          sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+          sendInventory(player);
+          sendCharacterInfo(player);
+          ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '[동굴] 무인도 동굴 입구로 나갑니다!' }));
+        } else {
+          ws.send(JSON.stringify({ type: 'system', subtype: 'guide', message: '[동굴] 동굴 사다리방(0,9)에서만 나갈 수 있습니다.' }));
+        }
+        return;
+      }
       // 나머지 채팅/명령어/이동은 PlayerGameService로 위임
       await PlayerGameService.handleChat({
         ws,
@@ -298,6 +346,7 @@ wss.on('connection', (ws) => {
         message: data.message,
         PlayerManager,
         broadcast,
+        wss,
         getRoom,
         getPlayersInRoom,
         sendPlayerList,
@@ -396,8 +445,6 @@ wss.on('connection', (ws) => {
       await PlayerGameService.handleEquipInfo({ ws, playerName, PlayerManager });
     } else if (data.type === 'shop') {
       await PlayerGameService.handleShop({ ws, playerName, PlayerManager, getRoom, SHOP_ITEMS, MAP_SIZE, VILLAGE_POS });
-    } else if (data.type === 'inn') {
-      // ... 이하 기존 코드 계속 ...
     } else if (data.type === 'close') {
       await PlayerGameService.handleClose({ ws, playerName, PlayerManager, wss, sendPlayerList, broadcast, sendRoomInfoToAllInRoom, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS });
       return;
@@ -430,6 +477,7 @@ setInterval(() => {
 }, 40000); // 40초마다
 
 if (require.main === module) {
+  global.wss = wss;
   server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
   });

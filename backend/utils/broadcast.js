@@ -42,7 +42,7 @@ function sendRoomInfo(player, getRoom, getPlayersInRoom, _MAP_SIZE, VILLAGE_POS)
     console.error(`[sendRoomInfo] room not found: world=${world}, x=${x}, y=${y}`);
     return;
   }
-  const playerList = getPlayersInRoom(x, y);
+  const playerList = getPlayersInRoom(world, x, y);
   // 월드별 맵 크기 결정
   let mapSize = _MAP_SIZE;
   if (world === 3) mapSize = MAP_SIZE_CAVE;
@@ -103,7 +103,7 @@ function sendRoomInfo(player, getRoom, getPlayersInRoom, _MAP_SIZE, VILLAGE_POS)
  */
 function sendRoomInfoToAllInRoom(players, world, x, y, getRoom, getPlayersInRoom, _MAP_SIZE, VILLAGE_POS) {
   Object.values(players).forEach((p) => {
-    if (p.world === world && p.position.x === x && p.position.y === y) {
+    if (p && p.world === world && p.position && p.position.x === x && p.position.y === y) {
       sendRoomInfo(p, getRoom, getPlayersInRoom, _MAP_SIZE, VILLAGE_POS);
     }
   });

@@ -1,0 +1,814 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for backend/data/map.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">backend/data</a> map.js</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">98.59% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>211/214</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">95.83% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>161/168</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">87.5% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>14/16</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">98.8% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>165/167</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line high'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">72x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">648x</span>
+<span class="cline-any cline-yes">648x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">640x</span>
+<span class="cline-any cline-yes">216x</span>
+<span class="cline-any cline-yes">216x</span>
+<span class="cline-any cline-yes">216x</span>
+<span class="cline-any cline-yes">216x</span>
+<span class="cline-any cline-yes">216x</span>
+<span class="cline-any cline-yes">216x</span>
+<span class="cline-any cline-yes">216x</span>
+<span class="cline-any cline-yes">216x</span>
+<span class="cline-any cline-yes">424x</span>
+<span class="cline-any cline-yes">216x</span>
+<span class="cline-any cline-yes">216x</span>
+<span class="cline-any cline-yes">216x</span>
+<span class="cline-any cline-yes">216x</span>
+<span class="cline-any cline-yes">216x</span>
+<span class="cline-any cline-yes">216x</span>
+<span class="cline-any cline-yes">216x</span>
+<span class="cline-any cline-yes">216x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">208x</span>
+<span class="cline-any cline-yes">208x</span>
+<span class="cline-any cline-yes">208x</span>
+<span class="cline-any cline-yes">208x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">648x</span>
+<span class="cline-any cline-yes">648x</span>
+<span class="cline-any cline-yes">648x</span>
+<span class="cline-any cline-yes">576x</span>
+<span class="cline-any cline-yes">576x</span>
+<span class="cline-any cline-yes">576x</span>
+<span class="cline-any cline-yes">576x</span>
+<span class="cline-any cline-yes">576x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">648x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">72x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">648x</span>
+<span class="cline-any cline-yes">648x</span>
+<span class="cline-any cline-yes">256x</span>
+<span class="cline-any cline-yes">256x</span>
+<span class="cline-any cline-yes">256x</span>
+<span class="cline-any cline-yes">392x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">192x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">184x</span>
+<span class="cline-any cline-yes">184x</span>
+<span class="cline-any cline-yes">184x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">184x</span>
+<span class="cline-any cline-yes">184x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">200x</span>
+<span class="cline-any cline-yes">72x</span>
+<span class="cline-any cline-yes">72x</span>
+<span class="cline-any cline-yes">72x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">72x</span>
+<span class="cline-any cline-yes">72x</span>
+<span class="cline-any cline-yes">128x</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">104x</span>
+<span class="cline-any cline-yes">104x</span>
+<span class="cline-any cline-yes">104x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">104x</span>
+<span class="cline-any cline-yes">104x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">648x</span>
+<span class="cline-any cline-yes">648x</span>
+<span class="cline-any cline-yes">648x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-yes">80x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">41x</span>
+<span class="cline-any cline-yes">41x</span>
+<span class="cline-any cline-yes">81x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-yes">80x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-yes">4265x</span>
+<span class="cline-any cline-yes">4265x</span>
+<span class="cline-any cline-yes">4265x</span>
+<span class="cline-any cline-yes">259203x</span>
+<span class="cline-any cline-yes">452272x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3120x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">240x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">35920x</span>
+<span class="cline-any cline-yes">35920x</span>
+<span class="cline-any cline-yes">35920x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7200x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7192x</span>
+<span class="cline-any cline-yes">7192x</span>
+<span class="cline-any cline-yes">6164x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7192x</span>
+<span class="cline-any cline-yes">1266x</span>
+<span class="cline-any cline-yes">1266x</span>
+<span class="cline-any cline-yes">1266x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5926x</span>
+<span class="cline-any cline-yes">5926x</span>
+<span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-yes">5886x</span>
+<span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-yes">5846x</span>
+<span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-yes">649029x</span>
+<span class="cline-any cline-yes">797x</span>
+<span class="cline-any cline-yes">597744x</span>
+<span class="cline-any cline-yes">827x</span>
+<span class="cline-any cline-yes">521872x</span>
+<span class="cline-any cline-yes">918x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11819x</span>
+<span class="cline-any cline-yes">5926x</span>
+<span class="cline-any cline-yes">5926x</span>
+<span class="cline-any cline-yes">5926x</span>
+<span class="cline-any cline-yes">5926x</span>
+<span class="cline-any cline-yes">5926x</span>
+<span class="cline-any cline-yes">5926x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">456x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span></td><td class="text"><pre class="prettyprint lang-js">const Room = require('../utils/Room');
+const Monster = require('../models/Monster');
+const { FIELD_MONSTERS, FOREST_MONSTERS, CAVE_MONSTERS, ISLAND_MONSTERS, CAVE_BOSS_MONSTERS } = require('./items');
+&nbsp;
+const MAP_SIZE = 9;
+const VILLAGE_POS = { x: 4, y: 4 };
+&nbsp;
+const ROOM_TYPE = {
+  VILLAGE: 'village',
+  FOREST: 'forest',
+  CAVE: 'cave',
+  FIELD: 'field',
+  BEACH: 'beach',
+  SEA: 'sea',
+  JUNGLE: 'jungle',
+  VOLCANO: 'volcano',
+  ISLANDFIELD: 'islandfield',
+};
+&nbsp;
+const FIELD_TYPES = [
+  { type: ROOM_TYPE.FIELD, name: '초원 사냥터', description: '푸른 풀밭이 펼쳐진 사냥터입니다. 몬스터가 자주 출몰합니다.' },
+  { type: ROOM_TYPE.FOREST, name: '숲 사냥터', description: '울창한 숲, 강한 몬스터가 출몰합니다.' },
+  { type: ROOM_TYPE.CAVE, name: '동굴 사냥터', description: '어두운 동굴, 희귀한 몬스터가 있습니다.' }
+];
+&nbsp;
+const rooms = [];
+for (let y = 0; y &lt; MAP_SIZE; y++) {
+  for (let x = 0; x &lt; MAP_SIZE; x++) {
+    let type, name, description, monsterChance;
+    let monsters = [];
+    if (x === VILLAGE_POS.x &amp;&amp; y === VILLAGE_POS.y) {
+      type = ROOM_TYPE.VILLAGE;
+      name = '마을 광장';
+      description = '여기는 안전한 마을입니다. 몬스터가 나타나지 않습니다.';
+      monsterChance = 0;
+    } else if (y &lt;= 2) {
+      type = ROOM_TYPE.FOREST;
+      name = '숲 사냥터';
+      description = '울창한 숲, 강한 몬스터가 출몰합니다.';
+      monsterChance = 1;
+      if (y === 0 &amp;&amp; x === 2) monsters.push(new Monster(FOREST_MONSTERS[0], x, y));
+      if (y === 1 &amp;&amp; x === 6) monsters.push(new Monster(FOREST_MONSTERS[1], x, y));
+      if (y === 2 &amp;&amp; x === 4) monsters.push(new Monster(FOREST_MONSTERS[2], x, y));
+      if (y === 0 &amp;&amp; x === 7) monsters.push(new Monster(FOREST_MONSTERS[3], x, y));
+    } else if (y &gt;= 6) {
+      type = ROOM_TYPE.CAVE;
+      name = '동굴 사냥터';
+      description = '어두운 동굴, 희귀한 몬스터가 있습니다.';
+      monsterChance = 1;
+      if (y === 6 &amp;&amp; x === 2) monsters.push(new Monster(CAVE_MONSTERS[0], x, y));
+      if (y === 7 &amp;&amp; x === 5) monsters.push(new Monster(CAVE_MONSTERS[1], x, y));
+      if (y === 8 &amp;&amp; x === 4) monsters.push(new Monster(CAVE_MONSTERS[2], x, y));
+      if (y === 6 &amp;&amp; x === 7) monsters.push(new Monster(CAVE_MONSTERS[3], x, y));
+    } else {
+      type = ROOM_TYPE.FIELD;
+      name = '초원 사냥터';
+      description = '푸른 풀밭이 펼쳐진 사냥터입니다. 몬스터가 자주 출몰합니다.';
+      monsterChance = 1;
+    }
+    const room = new Room(x, y, type, name, description, 1);
+    for (const m of monsters) room.monsters.push(m);
+    if (monsters.length === 0 &amp;&amp; monsterChance) {
+      let pool = FIELD_MONSTERS;
+      if (type === ROOM_TYPE.FOREST) pool = FOREST_MONSTERS;
+      if (type === ROOM_TYPE.CAVE) pool = CAVE_MONSTERS;
+      const m = new Monster(pool[Math.floor(Math.random() * pool.length)], x, y);
+      room.monsters.push(m);
+    }
+    rooms.push(room);
+  }
+}
+&nbsp;
+// 무인도 월드(월드2)
+const roomsIsland = [];
+const ISLAND_VILLAGE_POS = { x: 4, y: 7 };
+for (let y = 0; y &lt; MAP_SIZE; y++) {
+  for (let x = 0; x &lt; MAP_SIZE; x++) {
+    let type, name, description;
+    let monsters = [];
+    if (x === 0 || x === 8 || y === 0 || y === 8) {
+      type = ROOM_TYPE.SEA;
+      name = '바다';
+      description = '끝없이 펼쳐진 푸른 바다입니다.';
+    } else if (x === 1 || x === 7 || y === 1 || y === 7) {
+      // 무인도 오두막 고정 배치
+      if (x === ISLAND_VILLAGE_POS.x &amp;&amp; y === ISLAND_VILLAGE_POS.y) {
+        type = ROOM_TYPE.VILLAGE;
+        name = '무인도 오두막';
+        description = '섬의 유일한 오두막입니다.';
+      } else {
+        type = ROOM_TYPE.BEACH;
+        name = '무인도 해변';
+        description = '파도가 밀려오는 고요한 해변입니다.';
+        // 해변 몬스터 배치
+        if (Math.random() &lt; 0.7) monsters.push(new Monster(ISLAND_MONSTERS[0], x, y));
+        if (Math.random() &lt; 0.3) monsters.push(new Monster(ISLAND_MONSTERS[1], x, y));
+      }
+    } else if (x &gt;= 3 &amp;&amp; x &lt;= 5 &amp;&amp; y &gt;= 3 &amp;&amp; y &lt;= 5) {
+      type = ROOM_TYPE.JUNGLE;
+      name = '무인도 정글';
+      description = '울창한 정글, 야생의 기운이 느껴집니다.';
+      // 정글 몬스터 배치
+      if (Math.random() &lt; 0.7) monsters.push(new Monster(ISLAND_MONSTERS[2], x, y));
+      if (Math.random() &lt; 0.3) monsters.push(new Monster(ISLAND_MONSTERS[3], x, y));
+    } else if (x &gt;= 6 &amp;&amp; y &gt;= 4 &amp;&amp; y &lt;= 6) {
+      type = ROOM_TYPE.VOLCANO;
+      name = '화산지대';
+      description = '뜨거운 용암이 흐르는 위험한 화산지대입니다.';
+      // 화산 몬스터 배치
+      if (Math.random() &lt; 0.7) monsters.push(new Monster(ISLAND_MONSTERS[4], x, y));
+      if (Math.random() &lt; 0.3) monsters.push(new Monster(ISLAND_MONSTERS[5], x, y));
+    } else {
+      type = ROOM_TYPE.ISLANDFIELD;
+      name = '무인도 평지';
+      description = '풀과 바람이 어우러진 무인도의 평지입니다.';
+      // 평지 몬스터 배치
+      if (Math.random() &lt; 0.7) monsters.push(new Monster(ISLAND_MONSTERS[6], x, y));
+      if (Math.random() &lt; 0.3) monsters.push(new Monster(ISLAND_MONSTERS[7], x, y));
+    }
+    const room = new Room(x, y, type, name, description, 2);
+    for (const m of monsters) room.monsters.push(m);
+    roomsIsland.push(room);
+  }
+}
+&nbsp;
+const MAP_SIZE_CAVE = 30;
+const CAVE_ZONES = [
+  { name: '동굴 입구', type: ROOM_TYPE.CAVE, yStart: 0, yEnd: 9, monsters: CAVE_MONSTERS },
+  { name: '동굴 중간', type: ROOM_TYPE.CAVE, yStart: 10, yEnd: 19, monsters: FOREST_MONSTERS },
+  { name: '동굴 심층', type: ROOM_TYPE.CAVE, yStart: 20, yEnd: 29, monsters: CAVE_MONSTERS },
+];
+&nbsp;
+// 동굴맵(월드3)
+const roomsCave = [];
+// 강한 몬스터 15종을 5마리씩 3구역에 배치
+const bossIdxs = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14];
+const bossEntrance = bossIdxs.slice(0,5);
+const bossMiddle = bossIdxs.slice(5,10);
+bossDeep = bossIdxs.slice(10,15);
+let bossEntrancePos = [], bossMiddlePos = [], bossDeepPos = [];
+// 입구 구역(0~9층)에서 5개 랜덤 위치 선정
+while (bossEntrancePos.length &lt; 5) {
+  let x = Math.floor(Math.random() * MAP_SIZE_CAVE);
+  let y = Math.floor(Math.random() * 10);
+  <span class="missing-if-branch" title="else path not taken" >E</span>if (!bossEntrancePos.some(p =&gt; p.x === x &amp;&amp; p.y === y)) bossEntrancePos.push({x,y});
+}
+// 중간 구역(10~19층)에서 5개 랜덤 위치 선정
+while (bossMiddlePos.length &lt; 5) {
+  let x = Math.floor(Math.random() * MAP_SIZE_CAVE);
+  let y = 10 + Math.floor(Math.random() * 10);
+  if (!bossMiddlePos.some(p =&gt; p.x === x &amp;&amp; p.y === y)) bossMiddlePos.push({x,y});
+}
+// 심층 구역(20~29층)에서 5개 랜덤 위치 선정
+while (bossDeepPos.length &lt; 5) {
+  let x = Math.floor(Math.random() * MAP_SIZE_CAVE);
+  let y = 20 + Math.floor(Math.random() * 10);
+  <span class="missing-if-branch" title="else path not taken" >E</span>if (!bossDeepPos.some(p =&gt; p.x === x &amp;&amp; p.y === y)) bossDeepPos.push({x,y});
+}
+let bossEntranceCount = 0, bossMiddleCount = 0, bossDeepCount = 0;
+// 각 구역별 추가 몬스터 위치 선정 (보스/벽 제외)
+function getRandomMonsterPositions(zoneStart, zoneEnd, count, excludePositions) {
+  const positions = [];
+  while (positions.length &lt; count) {
+    let x = Math.floor(Math.random() * MAP_SIZE_CAVE);
+    let y = zoneStart + Math.floor(Math.random() * (zoneEnd - zoneStart + 1));
+    if (
+      !positions.some(p =&gt; p.x === x &amp;&amp; p.y === y) &amp;&amp;
+      !excludePositions.some(p =&gt; p.x === x &amp;&amp; p.y === y)
+    ) {
+      positions.push({ x, y });
+    }
+  }
+  return positions;
+}
+const extraEntrance = getRandomMonsterPositions(0, 9, 120, bossEntrancePos.concat(bossMiddlePos, bossDeepPos));
+const extraMiddle = getRandomMonsterPositions(10, 19, 130, bossEntrancePos.concat(bossMiddlePos, bossDeepPos, extraEntrance));
+const extraDeep = getRandomMonsterPositions(20, 29, 140, bossEntrancePos.concat(bossMiddlePos, bossDeepPos, extraEntrance, extraMiddle));
+for (let y = 0; y &lt; MAP_SIZE_CAVE; y++) {
+  for (let x = 0; x &lt; MAP_SIZE_CAVE; x++) {
+    // 보스 위치 여부
+    const isBossEntrance = bossEntrancePos.some(p =&gt; p.x === x &amp;&amp; p.y === y);
+    const isBossMiddle = bossMiddlePos.some(p =&gt; p.x === x &amp;&amp; p.y === y);
+    const isBossDeep = bossDeepPos.some(p =&gt; p.x === x &amp;&amp; p.y === y);
+    // 사다리 방: 입구 왼쪽 위 모서리(x=0, y=9)에 고정 배치
+    if (x === 0 &amp;&amp; y === 9) {
+      const room = new Room(x, y, 'ladder', '사다리', '지상으로 올라가는 사다리가 있다. 여기서 "/나가기" 명령어를 입력하면 무인도 동굴 입구로 나갈 수 있습니다.', 3);
+      roomsCave.push(room);
+      continue;
+    }
+    // 미로 벽: 20% 확률로 벽 생성 (입구/출구/가장자리/보스 위치 제외)
+    let isWall = false;
+    if (!isBossEntrance &amp;&amp; !isBossMiddle &amp;&amp; !isBossDeep &amp;&amp; !(x === 0 &amp;&amp; y === 0) &amp;&amp; !(x === MAP_SIZE_CAVE-1 &amp;&amp; y === MAP_SIZE_CAVE-1) &amp;&amp; x !== 0 &amp;&amp; y !== 0 &amp;&amp; x !== MAP_SIZE_CAVE-1 &amp;&amp; y !== MAP_SIZE_CAVE-1) {
+      if (Math.random() &lt; 0.20) isWall = true;
+    }
+    if (isWall) {
+      const room = new Room(x, y, 'cave_wall', '동굴 벽', '두꺼운 암벽이 길을 막고 있습니다.', 3);
+      roomsCave.push(room);
+      continue;
+    }
+    // 강한 몬스터 배치
+    let monsters = [];
+    if (isBossEntrance) {
+      monsters.push(new Monster(CAVE_BOSS_MONSTERS[bossEntrance[bossEntranceCount]], x, y));
+      bossEntranceCount++;
+    } else if (isBossMiddle) {
+      monsters.push(new Monster(CAVE_BOSS_MONSTERS[bossMiddle[bossMiddleCount]], x, y));
+      bossMiddleCount++;
+    } else if (isBossDeep) {
+      monsters.push(new Monster(CAVE_BOSS_MONSTERS[bossDeep[bossDeepCount]], x, y));
+      bossDeepCount++;
+    } else if (extraEntrance.some(p =&gt; p.x === x &amp;&amp; p.y === y)) {
+      monsters.push(new Monster(CAVE_BOSS_MONSTERS[Math.floor(Math.random()*CAVE_BOSS_MONSTERS.length)], x, y));
+    } else if (extraMiddle.some(p =&gt; p.x === x &amp;&amp; p.y === y)) {
+      monsters.push(new Monster(CAVE_BOSS_MONSTERS[Math.floor(Math.random()*CAVE_BOSS_MONSTERS.length)], x, y));
+    } else if (extraDeep.some(p =&gt; p.x === x &amp;&amp; p.y === y)) {
+      monsters.push(new Monster(CAVE_MONSTERS[Math.floor(Math.random()*CAVE_MONSTERS.length)], x, y));
+    }
+    // 구역 결정
+    const zone = CAVE_ZONES.find(z =&gt; y &gt;= z.yStart &amp;&amp; y &lt;= z.yEnd);
+    let type = zone.type;
+    let name = zone.name;
+    let description = `${zone.name} (동굴 ${y+1}층)`;
+    const room = new Room(x, y, type, name, description, 3);
+    for (const m of monsters) room.monsters.push(m);
+    roomsCave.push(room);
+  }
+}
+&nbsp;
+// 무인도맵(roomsIsland)에서 x=2, y=6 위치를 동굴 입구로 지정
+const caveEntrance = roomsIsland.find(r =&gt; r.x === 2 &amp;&amp; r.y === 6);
+<span class="missing-if-branch" title="else path not taken" >E</span>if (caveEntrance) {
+  caveEntrance.type = 'cave_entrance';
+  caveEntrance.name = '동굴 입구';
+  caveEntrance.description = '깊고 어두운 동굴로 들어가는 입구입니다. 여기서 "/입장" 명령어를 입력하면 동굴로 들어갈 수 있습니다.';
+}
+&nbsp;
+// worlds 객체를 모든 맵 생성 이후에 선언
+const worlds = { 1: rooms, 2: roomsIsland, 3: roomsCave };
+function <span class="fstat-no" title="function not covered" >getRoom(</span>world, x, y) {
+  const arr = <span class="cstat-no" title="statement not covered" >worlds[world] || rooms;</span>
+<span class="cstat-no" title="statement not covered" >  return arr.find(<span class="fstat-no" title="function not covered" >r </span>=&gt; <span class="cstat-no" title="statement not covered" >r.x === x &amp;&amp; r.y === y)</span>;</span>
+}
+&nbsp;
+module.exports = { MAP_SIZE, VILLAGE_POS, rooms, getRoom, worlds, ISLAND_VILLAGE_POS, ROOM_TYPE }; </pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2025-05-05T16:48:42.143Z
+            </div>
+        <script src="../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../sorter.js"></script>
+        <script src="../../block-navigation.js"></script>
+    </body>
+</html>
+    

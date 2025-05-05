@@ -111,7 +111,7 @@ function useWebSocket(onDisconnect) {
       let username = '';
       try {
         username = jwtDecode(token).username;
-      } catch {}
+      } catch (e) { /* ignore decode error */ }
       console.log('[WebSocket] onopen, join 전송:', { name: username, token });
       if (ws.current.readyState === WebSocket.OPEN) {
         ws.current.send(JSON.stringify({ type: 'join', name: username, token }));
@@ -148,7 +148,7 @@ function useWebSocket(onDisconnect) {
       return;
     }
     if (input.trim() === COMMANDS.INN) {
-      ws.current.send(JSON.stringify({ type: 'inn' }));
+      ws.current.send(JSON.stringify({ type: 'chat', message: input.trim() }));
       setInput('');
       return;
     }
