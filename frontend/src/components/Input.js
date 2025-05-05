@@ -1,4 +1,20 @@
 import React from 'react';
+import styled from 'styled-components';
+
+const StyledInput = styled.input`
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: none;
+  background: #232837;
+  color: #fff;
+  font-size: 1rem;
+  outline: none;
+  transition: box-shadow 0.18s, border 0.18s;
+  &:focus {
+    box-shadow: 0 0 0 2px #7ecfff55;
+    border: 1.5px solid #7ecfff;
+  }
+`;
 
 /**
  * 공통 Input 컴포넌트
@@ -13,21 +29,13 @@ import React from 'react';
  */
 function Input({ value, onChange, placeholder = '', type = 'text', className = '', style = {}, ...rest }) {
   return (
-    <input
+    <StyledInput
       type={type}
       value={value}
       onChange={onChange}
       placeholder={placeholder}
-      className={`common-input ${className}`}
-      style={{
-        padding: '10px 14px',
-        borderRadius: 8,
-        border: 'none',
-        background: '#232837',
-        color: '#fff',
-        fontSize: '1rem',
-        ...style
-      }}
+      className={className}
+      style={style}
       {...rest}
     />
   );

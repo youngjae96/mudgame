@@ -1,4 +1,32 @@
 import React from 'react';
+import styled, { keyframes } from 'styled-components';
+
+const spin = keyframes`
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+`;
+
+const Spinner = styled.div`
+  width: ${({ size }) => size || 40}px;
+  height: ${({ size }) => size || 40}px;
+  border: ${({ size }) => (size ? size / 8 : 5)}px solid #eee;
+  border-top: ${({ size, color }) => `${size ? size / 8 : 5}px solid ${color || '#7ecfff'}`};
+  border-radius: 50%;
+  animation: ${spin} 1s linear infinite;
+  margin-bottom: ${({ message }) => (message ? 12 : 0)}px;
+`;
+
+const LoaderWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const LoaderMessage = styled.div`
+  color: #7ecfff;
+  font-weight: bold;
+  font-size: 1.08rem;
+`;
 
 /**
  * 공통 Loader(로딩 스피너) 컴포넌트
@@ -11,22 +39,10 @@ import React from 'react';
  */
 function Loader({ size = 40, color = '#7ecfff', message = '', style = {} }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', ...style }}>
-      <div
-        className="loader-spinner"
-        style={{
-          width: size, height: size, border: `${size/8}px solid #eee`, borderTop: `${size/8}px solid ${color}`,
-          borderRadius: '50%', animation: 'spin 1s linear infinite', marginBottom: message ? 12 : 0
-        }}
-      />
-      {message && <div style={{ color: '#7ecfff', fontWeight: 'bold', fontSize: '1.08rem' }}>{message}</div>}
-      <style>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}</style>
-    </div>
+    <LoaderWrapper style={style}>
+      <Spinner size={size} color={color} message={message} />
+      {message && <LoaderMessage>{message}</LoaderMessage>}
+    </LoaderWrapper>
   );
 }
 

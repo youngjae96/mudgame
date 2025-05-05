@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react';
+import styled from 'styled-components';
 import MiniMap from './MiniMap';
 import RoomInfo from './RoomInfo';
 import RoomItems from './RoomItems';
@@ -10,6 +11,70 @@ import Button from './components/Button';
 import Input from './components/Input';
 import Modal from './components/Modal';
 
+const Container = styled.div`
+  max-width: 1100px;
+  margin: 40px auto;
+  background: #232837;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px #0008;
+  padding: 32px 24px 24px 24px;
+`;
+const MudTitle = styled.div`
+  font-size: 2.2rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 32px;
+  letter-spacing: 2px;
+  color: #7ecfff;
+  position: relative;
+`;
+const MudMain = styled.div`
+  display: grid;
+  grid-template-columns: 1.1fr 2.8fr 1.1fr;
+  gap: 32px;
+  align-items: start;
+  @media (max-width: 1100px) {
+    grid-template-columns: 1fr 2fr 1fr;
+  }
+  @media (max-width: 800px) {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+`;
+const LeftPanel = styled.div`
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 24px;
+  min-width: 200px;
+  max-width: 220px;
+`;
+const ChatSection = styled.div`
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  min-height: 520px;
+  max-height: 600px;
+  height: 100%;
+  min-width: 320px;
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto;
+  justify-content: flex-start;
+`;
+const PlayerListPanel = styled.div`
+  flex: none;
+  background: #181c24;
+  border-radius: 8px;
+  padding: 16px;
+  max-height: 520px;
+  overflow-y: auto;
+  box-shadow: 0 2px 8px #0004;
+  min-width: 200px;
+  max-width: 220px;
+`;
 /**
  * 게임 메인 화면 컴포넌트
  * @param {object} props - 컴포넌트 props
@@ -81,23 +146,23 @@ function GameMain({
 
   return (
     <>
-      <div className="mud-title" style={{position:'relative'}}>
+      <MudTitle>
         그리머드RPG
         <Button className="logout-btn" onClick={handleLogout}>로그아웃</Button>
-      </div>
+      </MudTitle>
       {!connected ? (
         <div className="login-box">
           <div style={{ color: '#aaa', marginTop: 16 }}>서버에 연결 중...</div>
         </div>
       ) : (
-        <div className="mud-main">
-          <div className="left-panel">
+        <MudMain>
+          <LeftPanel>
             <MiniMap room={room} mapSize={mapSize} mapInfo={mapInfo} onMove={handleMove} nearbyRooms={nearbyRooms} world={mapInfo.world} />
             {room && (
               <RoomInfo room={room} renderRoomItems={renderRoomItems} renderRoomMonsters={renderRoomMonsters} />
             )}
-          </div>
-          <div className="chat-section">
+          </LeftPanel>
+          <ChatSection>
             <ChatBox messages={messages} chatEndRef={chatEndRef} />
             <form className="input-form" onSubmit={handleSend} style={{ display: 'flex', alignItems: 'center' }}>
               <Input
@@ -159,11 +224,11 @@ function GameMain({
                 </div>
               </div>
             </Modal>
-          </div>
-          <div className="player-list">
+          </ChatSection>
+          <PlayerListPanel>
             <PlayerList players={players} renderCharacterInfo={renderCharacterInfo} inventory={inventory} gold={character.gold} />
-          </div>
-        </div>
+          </PlayerListPanel>
+        </MudMain>
       )}
     </>
   );

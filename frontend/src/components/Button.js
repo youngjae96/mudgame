@@ -1,4 +1,21 @@
 import React from 'react';
+import styled from 'styled-components';
+
+const StyledButton = styled.button`
+  padding: 10px 22px;
+  border-radius: 8px;
+  border: none;
+  background: ${({ disabled }) => (disabled ? '#b3c6e0' : '#7ecfff')};
+  color: ${({ disabled }) => (disabled ? '#888' : '#181c24')};
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
+  box-shadow: 0 1px 4px #0002;
+  transition: background 0.18s, color 0.18s;
+  &:hover {
+    background: ${({ disabled }) => (disabled ? '#b3c6e0' : '#4ec3ff')};
+  }
+`;
 
 /**
  * 공통 Button 컴포넌트
@@ -11,29 +28,18 @@ import React from 'react';
  * @param {object} [props.style] - 인라인 스타일
  * @returns {JSX.Element}
  */
-function Button({ children, onClick, disabled, type = 'button', className = '', style = {} }) {
+function Button({ children, onClick, disabled, type = 'button', className = '', style = {}, ...rest }) {
   return (
-    <button
+    <StyledButton
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`common-btn ${className}`}
-      style={{
-        padding: '8px 18px',
-        borderRadius: 8,
-        border: 'none',
-        background: disabled ? '#b3c6e0' : '#7ecfff',
-        color: disabled ? '#888' : '#181c24',
-        fontWeight: 'bold',
-        fontSize: '1rem',
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        boxShadow: '0 1px 4px #0002',
-        transition: 'background 0.18s, color 0.18s',
-        ...style
-      }}
+      className={className}
+      style={style}
+      {...rest}
     >
       {children}
-    </button>
+    </StyledButton>
   );
 }
 

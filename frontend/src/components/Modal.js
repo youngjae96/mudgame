@@ -1,4 +1,43 @@
 import React, { useEffect } from 'react';
+import styled from 'styled-components';
+
+const ModalBg = styled.div`
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const ModalContent = styled.div`
+  background: #23293a;
+  border-radius: 16px;
+  box-shadow: 0 4px 32px #000a;
+  padding: 32px;
+  min-width: 420px;
+  min-height: 420px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const ModalClose = styled.button`
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: #333;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  z-index: 10;
+`;
 
 /**
  * 공통 Modal(모달) 컴포넌트
@@ -23,41 +62,13 @@ function Modal({ open = true, onClose, title, children, style = {}, contentStyle
 
   if (!open) return null;
   return (
-    <div
-      className="modal-bg"
-      style={{
-        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-        background: 'rgba(0,0,0,0.55)', zIndex: 1000,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        ...style
-      }}
-      onClick={onClose}
-    >
-      <div
-        className="modal-content"
-        style={{
-          background: '#23293a', borderRadius: 16, boxShadow: '0 4px 32px #000a',
-          padding: 32, minWidth: 420, minHeight: 420, position: 'relative',
-          display: 'flex', flexDirection: 'column', alignItems: 'center',
-          ...contentStyle
-        }}
-        onClick={e => e.stopPropagation()}
-      >
-        <button
-          className="modal-close"
-          style={{
-            position: 'absolute', top: 12, right: 16, background: '#333', color: '#fff',
-            border: 'none', borderRadius: '50%', width: 32, height: 32, fontSize: '1.2rem', cursor: 'pointer', zIndex: 10
-          }}
-          onClick={onClose}
-          aria-label="닫기"
-        >
-          ×
-        </button>
+    <ModalBg style={style} onClick={onClose}>
+      <ModalContent style={contentStyle} onClick={e => e.stopPropagation()}>
+        <ModalClose onClick={onClose} aria-label="닫기">×</ModalClose>
         {title && <div style={{ fontWeight: 'bold', fontSize: '1.2rem', marginBottom: 16 }}>{title}</div>}
         {children}
-      </div>
-    </div>
+      </ModalContent>
+    </ModalBg>
   );
 }
 

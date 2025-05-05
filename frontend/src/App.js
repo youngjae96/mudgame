@@ -18,6 +18,7 @@ import GameMobileMain from './GameMobileMain';
 import { login, register } from './api';
 import { UserProvider, useUserContext } from './UserContext';
 import { GameStateProvider, useGameStateContext } from './GameStateContext';
+import ResponsiveLayout from './layout/ResponsiveLayout';
 
 const WS_URL = 'ws://localhost:4000';
 
@@ -127,52 +128,60 @@ function AppInner() {
   const renderRoomMonsters = () => <RoomMonsters room={room} onAttack={handleAttack} />;
 
   return (
-    <div className={isMobile ? 'mobile-root' : 'container'}>
+    <>
       {showMap && !isMobile && <MapModal mapSize={mapSize} mapInfo={mapInfo} onClose={() => setShowMap(false)} />}
-      {isMobile ? (
-        <GameMobileMain
-          room={room}
-          mapSize={mapSize}
-          mapInfo={mapInfo}
-          handleMove={handleMove}
-          nearbyRooms={nearbyRooms}
-          messages={messages}
-          chatEndRef={chatEndRef}
-          handleSend={handleSend}
-          input={input}
-          setInput={setInput}
-          UI_LABELS={UI_LABELS}
-          name={name}
-          character={character}
-          inventory={inventory}
-          handlePickup={handlePickup}
-          handleAttack={handleAttack}
-          handleLogout={logout}
-        />
-      ) : (
-      <GameMain
-        connected={connected}
-        handleLogout={logout}
-        room={room}
-        mapSize={mapSize}
-        mapInfo={mapInfo}
-        handleMove={handleMove}
-        nearbyRooms={nearbyRooms}
-        messages={messages}
-        chatEndRef={chatEndRef}
-        handleSend={handleSend}
-        input={input}
-        setInput={setInput}
-        UI_LABELS={UI_LABELS}
-        players={players}
-        name={name}
-        character={character}
-        inventory={inventory}
-        handlePickup={handlePickup}
-        handleAttack={handleAttack}
+      <ResponsiveLayout
+        isMobile={isMobile}
+        desktop={
+          <div className="container">
+            <GameMain
+              connected={connected}
+              handleLogout={logout}
+              room={room}
+              mapSize={mapSize}
+              mapInfo={mapInfo}
+              handleMove={handleMove}
+              nearbyRooms={nearbyRooms}
+              messages={messages}
+              chatEndRef={chatEndRef}
+              handleSend={handleSend}
+              input={input}
+              setInput={setInput}
+              UI_LABELS={UI_LABELS}
+              players={players}
+              name={name}
+              character={character}
+              inventory={inventory}
+              handlePickup={handlePickup}
+              handleAttack={handleAttack}
+            />
+          </div>
+        }
+        mobile={
+          <div className="mobile-root">
+            <GameMobileMain
+              room={room}
+              mapSize={mapSize}
+              mapInfo={mapInfo}
+              handleMove={handleMove}
+              nearbyRooms={nearbyRooms}
+              messages={messages}
+              chatEndRef={chatEndRef}
+              handleSend={handleSend}
+              input={input}
+              setInput={setInput}
+              UI_LABELS={UI_LABELS}
+              name={name}
+              character={character}
+              inventory={inventory}
+              handlePickup={handlePickup}
+              handleAttack={handleAttack}
+              handleLogout={logout}
+            />
+          </div>
+        }
       />
-      )}
-    </div>
+    </>
   );
 }
 
