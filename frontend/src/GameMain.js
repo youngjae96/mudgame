@@ -142,7 +142,7 @@ function GameMain({
   const renderRoomItems = useCallback(() => <RoomItems room={room} onPickup={handlePickup} />, [room, handlePickup]);
   // 방 몬스터 UI 분리
   const renderRoomMonsters = useCallback(() => <RoomMonsters room={room} onAttack={handleAttack} />, [room, handleAttack]);
-  const renderCharacterInfo = useCallback(() => <CharacterInfo name={name} room={room} />, [name, room]);
+  const renderCharacterInfo = useCallback(() => <CharacterInfo name={name} room={room} character={character} />, [name, room, character]);
 
   return (
     <>
@@ -226,7 +226,7 @@ function GameMain({
             </Modal>
           </ChatSection>
           <PlayerListPanel>
-            <PlayerList players={players} renderCharacterInfo={renderCharacterInfo} inventory={inventory} gold={character.gold} />
+            <PlayerList players={players} renderCharacterInfo={renderCharacterInfo} inventory={inventory} gold={character?.gold} />
           </PlayerListPanel>
         </MudMain>
       )}

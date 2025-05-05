@@ -54,6 +54,22 @@ function useWebSocket(onDisconnect) {
             const next = [...msgs, { type: 'stat', text: data.text }];
             return next.length > 100 ? next.slice(next.length - 100) : next;
           });
+          if (typeof data.text === 'string') {
+            const stat = {};
+            const hpMatch = data.text.match(/HP\s*:\s*([\d.]+)\s*\/\s*([\d.]+)/);
+            const mpMatch = data.text.match(/MP\s*:\s*([\d.]+)\s*\/\s*([\d.]+)/);
+            const strMatch = data.text.match(/STR\s*:\s*([\d.]+)/) || data.text.match(/공격력\s*:\s*([\d.]+)/);
+            const defMatch = data.text.match(/DEF\s*:\s*([\d.]+)/) || data.text.match(/방어력\s*:\s*([\d.]+)/);
+            const dexMatch = data.text.match(/DEX\s*:\s*([\d.]+)/) || data.text.match(/민첩\s*:\s*([\d.]+)/);
+            const intMatch = data.text.match(/INT\s*:\s*([\d.]+)/) || data.text.match(/지능\s*:\s*([\d.]+)/);
+            if (hpMatch) { stat.hp = Number(hpMatch[1]); stat.maxHp = Number(hpMatch[2]); }
+            if (mpMatch) { stat.mp = Number(mpMatch[1]); stat.maxMp = Number(mpMatch[2]); }
+            if (strMatch) stat.atk = Number(strMatch[1]);
+            if (defMatch) stat.def = Number(defMatch[1]);
+            if (dexMatch) stat.dex = Number(dexMatch[1]);
+            if (intMatch) stat.int = Number(intMatch[1]);
+            if (Object.keys(stat).length > 0) setCharacter((prev) => ({ ...prev, ...stat }));
+          }
         } else if (data.type === 'battle') {
           setMessages((msgs) => {
             if (Array.isArray(data.log)) {

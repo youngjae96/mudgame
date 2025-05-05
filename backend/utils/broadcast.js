@@ -7,6 +7,7 @@
  * - sendCharacterInfo: 캐릭터 정보 전송
  */
 const { ROOM_TYPE } = require('../data/map');
+const Player = require('../models/Player');
 
 /**
  * 전체 클라이언트에 메시지 전송
@@ -111,8 +112,8 @@ function sendCharacterInfo(player) {
     str: player.str,
     dex: player.dex,
     int: player.int,
-    atk: player.atk,
-    def: player.def,
+    atk: typeof player.getAtk === 'function' ? player.getAtk() : player.atk,
+    def: typeof player.getDef === 'function' ? player.getDef() : player.def,
     strExp: player.strExp,
     strExpMax: player.strExpMax,
     dexExp: player.dexExp,

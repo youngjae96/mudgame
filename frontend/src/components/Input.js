@@ -1,15 +1,29 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
+
+const sizeStyles = {
+  md: css`
+    padding: 10px 14px;
+    font-size: 1rem;
+  `,
+  sm: css`
+    padding: 7px 10px;
+    font-size: 0.95rem;
+  `,
+  lg: css`
+    padding: 14px 20px;
+    font-size: 1.13rem;
+  `,
+};
 
 const StyledInput = styled.input`
-  padding: 10px 14px;
   border-radius: 8px;
   border: none;
   background: #232837;
   color: #fff;
-  font-size: 1rem;
   outline: none;
   transition: box-shadow 0.18s, border 0.18s;
+  ${({ size }) => sizeStyles[size || 'md']}
   &:focus {
     box-shadow: 0 0 0 2px #7ecfff55;
     border: 1.5px solid #7ecfff;
@@ -25,9 +39,10 @@ const StyledInput = styled.input`
  * @param {string} [props.type] - 입력 타입(text, password 등)
  * @param {string} [props.className] - 추가 클래스명
  * @param {object} [props.style] - 인라인 스타일
+ * @param {string} [props.size] - 입력 크기(md, sm, lg)
  * @returns {JSX.Element}
  */
-function Input({ value, onChange, placeholder = '', type = 'text', className = '', style = {}, ...rest }) {
+function Input({ value, onChange, placeholder = '', type = 'text', className = '', style = {}, size = 'md', ...rest }) {
   return (
     <StyledInput
       type={type}
@@ -36,6 +51,7 @@ function Input({ value, onChange, placeholder = '', type = 'text', className = '
       placeholder={placeholder}
       className={className}
       style={style}
+      size={size}
       {...rest}
     />
   );

@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
 import './App.css';
 import ChatBox from './ChatBox';
 import MiniMap from './MiniMap';
@@ -9,18 +10,31 @@ import RoomInfo from './RoomInfo';
 import RoomItems from './RoomItems';
 import RoomMonsters from './RoomMonsters';
 import useWebSocket from './useWebSocket';
-import { UI_LABELS, MAP_EMOJI } from './constants';
-import axios from 'axios';
+import { UI_LABELS } from './constants';
 import AuthForm from './AuthForm';
 import MapModal from './MapModal';
 import GameMain from './GameMain';
 import GameMobileMain from './GameMobileMain';
-import { login, register } from './api';
 import { UserProvider, useUserContext } from './UserContext';
 import { GameStateProvider, useGameStateContext } from './GameStateContext';
 import ResponsiveLayout from './layout/ResponsiveLayout';
 
-const WS_URL = 'ws://localhost:4000';
+const Container = styled.div`
+  max-width: 1100px;
+  margin: 40px auto;
+  background: #232837;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px #0008;
+  padding: 32px 24px 24px 24px;
+`;
+
+const MobileRoot = styled.div`
+  width: 100vw;
+  min-height: 100vh;
+  background: #181c24;
+  display: flex;
+  flex-direction: column;
+`;
 
 function isMobileDevice() {
   return window.innerWidth <= 700 || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
@@ -46,10 +60,7 @@ function AppInner() {
     messages, addMessage, clearMessages
   } = useGameStateContext();
 
-  // 서버 연결 끊김 시 로그인 화면으로 복귀
-  const handleDisconnect = () => {
-    logout();
-  };
+  const handleDisconnect = () => { logout(); };
 
   const {
     connected,
@@ -74,9 +85,12 @@ function AppInner() {
     ws
   } = useWebSocket(handleDisconnect);
 
-  // 소켓에서 받은 상태를 context로 동기화
   React.useEffect(() => { setInventory(wsInventory); }, [wsInventory]);
-  React.useEffect(() => { setCharacter(wsCharacter); }, [wsCharacter]);
+  React.useEffect(() => {
+    if (wsCharacter && Object.keys(wsCharacter).length > 0) {
+      setCharacter(prev => ({ ...prev, ...wsCharacter }));
+    }
+  }, [wsCharacter]);
   React.useEffect(() => { setMapInfo(wsMapInfo); }, [wsMapInfo]);
   React.useEffect(() => { setRoom(wsRoom); }, [wsRoom]);
   React.useEffect(() => { clearMessages(); wsMessages.forEach(addMessage); }, [wsMessages, addMessage, clearMessages]);
@@ -86,14 +100,12 @@ function AppInner() {
     return () => { window.setShowMap = null; };
   }, []);
 
-  // 로그인 후 자동 WebSocket 연결
   useEffect(() => {
     if (isLoggedIn && !connected) {
       handleConnect();
     }
   }, [isLoggedIn, connected, handleConnect]);
 
-  // 모바일/데스크톱 분기
   const [isMobile, setIsMobile] = useState(isMobileDevice());
   useEffect(() => {
     const handleResize = () => setIsMobile(isMobileDevice());
@@ -122,9 +134,7 @@ function AppInner() {
     );
   }
 
-  // 방 아이템 UI 분리
   const renderRoomItems = () => <RoomItems room={room} onPickup={handlePickup} />;
-  // 방 몬스터 UI 분리
   const renderRoomMonsters = () => <RoomMonsters room={room} onAttack={handleAttack} />;
 
   return (
@@ -133,7 +143,7 @@ function AppInner() {
       <ResponsiveLayout
         isMobile={isMobile}
         desktop={
-          <div className="container">
+          <Container>
             <GameMain
               connected={connected}
               handleLogout={logout}
@@ -155,10 +165,10 @@ function AppInner() {
               handlePickup={handlePickup}
               handleAttack={handleAttack}
             />
-          </div>
+          </Container>
         }
         mobile={
-          <div className="mobile-root">
+          <MobileRoot>
             <GameMobileMain
               room={room}
               mapSize={mapSize}
@@ -178,7 +188,7 @@ function AppInner() {
               handleAttack={handleAttack}
               handleLogout={logout}
             />
-          </div>
+          </MobileRoot>
         }
       />
     </>
