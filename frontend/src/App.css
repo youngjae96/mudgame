@@ -759,36 +759,57 @@ body {
 
 /* 모바일 전용 UI 스타일 */
 @media (max-width: 700px), (max-height: 700px) {
-  .mobile-root {
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    background: #181c24;
-    overflow: hidden;
-    min-height: 0;
-  }
-  .mobile-header {
-    flex: 0 0 48px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 12px;
-    background: #232837;
-    color: #7ecfff;
-    font-size: 1.2rem;
-    font-weight: bold;
-    box-shadow: 0 2px 8px #0002;
-  }
-  .mobile-title { font-size: 1.1rem; }
-  .mobile-logout { font-size: 1rem; padding: 6px 14px; }
-
   .mobile-main {
     flex: 1 1 0;
     min-height: 0;
     display: flex;
     flex-direction: column;
     overflow: hidden;
+  }
+  .mobile-top-row {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 220px;
+    min-height: 0;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .mobile-map-panel, .mobile-room-panel {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 0;
+    background: #232837;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px #0002;
+    padding: 8px 4px;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .mobile-chat {
+    flex: 1 1 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    background: #232837;
+    border-top: 1px solid #222;
+    box-shadow: 0 -2px 8px #0002;
+  }
+  .mobile-chat-messages {
+    flex: 1 1 0;
+    min-height: 0;
+    max-height: 100%;
+    overflow-y: auto;
+    padding: 6px 8px 0 8px;
+    font-size: 0.98rem;
+    background: #232837;
+  }
+  .mobile-chat-input {
+    display: flex;
+    gap: 4px;
+    padding: 6px 8px;
+    background: #232837;
   }
   .mobile-tabs {
     display: flex;
@@ -814,7 +835,7 @@ body {
     border-bottom: 2.5px solid #7ecfff;
   }
   .mobile-content {
-    flex: 1 1 0;
+    flex: 0 0 auto;
     min-height: 0;
     overflow: auto;
     padding: 8px 4px 0 4px;
@@ -822,58 +843,6 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-  }
-
-  .mobile-chat {
-    flex: 0 0 180px;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    background: #232837;
-    border-top: 1px solid #222;
-    box-shadow: 0 -2px 8px #0002;
-  }
-  .mobile-chat-messages {
-    flex: 1 1 0;
-    min-height: 0;
-    max-height: 100%;
-    overflow-y: auto;
-    padding: 6px 8px 0 8px;
-    font-size: 0.98rem;
-    background: #232837;
-  }
-  .mobile-chat-input {
-    display: flex;
-    gap: 4px;
-    padding: 6px 8px;
-    background: #232837;
-  }
-  .chat-input {
-    flex: 1;
-    padding: 8px 10px;
-    border-radius: 8px;
-    border: none;
-    background: #232837;
-    color: #fff;
-    font-size: 1rem;
-  }
-  .send-btn {
-    padding: 8px 14px;
-    border-radius: 8px;
-    border: none;
-    background: #7ecfff;
-    color: #181c24;
-    font-weight: bold;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background 0.18s;
-  }
-  .send-btn:active {
-    background: #4ec3ff;
-  }
-  /* 데스크톱 UI 숨김 */
-  .container, .mud-main, .left-panel, .player-list, .chat-section {
-    display: none !important;
   }
   .character-info, .inventory {
     width: 100%;

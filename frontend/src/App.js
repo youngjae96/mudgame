@@ -150,27 +150,27 @@ function AppInner() {
           handleLogout={logout}
         />
       ) : (
-        <GameMain
-          connected={connected}
-          handleLogout={logout}
-          room={room}
-          mapSize={mapSize}
-          mapInfo={mapInfo}
-          handleMove={handleMove}
-          nearbyRooms={nearbyRooms}
-          messages={messages}
-          chatEndRef={chatEndRef}
-          handleSend={handleSend}
-          input={input}
-          setInput={setInput}
-          UI_LABELS={UI_LABELS}
-          players={players}
-          name={name}
-          character={character}
-          inventory={inventory}
-          handlePickup={handlePickup}
-          handleAttack={handleAttack}
-        />
+      <GameMain
+        connected={connected}
+        handleLogout={logout}
+        room={room}
+        mapSize={mapSize}
+        mapInfo={mapInfo}
+        handleMove={handleMove}
+        nearbyRooms={nearbyRooms}
+        messages={messages}
+        chatEndRef={chatEndRef}
+        handleSend={handleSend}
+        input={input}
+        setInput={setInput}
+        UI_LABELS={UI_LABELS}
+        players={players}
+        name={name}
+        character={character}
+        inventory={inventory}
+        handlePickup={handlePickup}
+        handleAttack={handleAttack}
+      />
       )}
     </div>
   );
