@@ -10,7 +10,6 @@ const TABS = [
   { key: 'map', label: '맵' },
   { key: 'room', label: '방 정보' },
   { key: 'me', label: '내 정보' },
-  { key: 'chat', label: '채팅' },
 ];
 
 export default function GameMobileMain(props) {
@@ -34,18 +33,22 @@ export default function GameMobileMain(props) {
         {tab === 'map' && <MiniMap room={props.room} mapSize={props.mapSize} mapInfo={props.mapInfo} onMove={props.handleMove} nearbyRooms={props.nearbyRooms} world={props.mapInfo?.world} />}
         {tab === 'room' && <RoomInfo room={props.room} renderRoomItems={props.renderRoomItems} renderRoomMonsters={props.renderRoomMonsters} />}
         {tab === 'me' && <CharacterInfo name={props.name} room={props.room} character={props.character} inventory={props.inventory} gold={props.character?.gold} />}
-        {tab === 'chat' && <ChatBox messages={props.messages} chatEndRef={props.chatEndRef} />}
       </div>
-      <form className="mobile-chat-input" onSubmit={props.handleSend}>
-        <Input
-          className="chat-input"
-          placeholder={props.UI_LABELS?.CHAT_PLACEHOLDER || '명령어 또는 채팅 입력...'}
-          aria-label="채팅 입력"
-          value={props.input}
-          onChange={e => props.setInput(e.target.value)}
-        />
-        <Button className="send-btn" type="submit" aria-label="전송">{props.UI_LABELS?.SEND || '전송'}</Button>
-      </form>
+      <div className="mobile-chat-area">
+        <div className="mobile-chat-messages">
+          <ChatBox messages={props.messages} chatEndRef={props.chatEndRef} />
+        </div>
+        <form className="mobile-chat-input" onSubmit={props.handleSend}>
+          <Input
+            className="chat-input"
+            placeholder={props.UI_LABELS?.CHAT_PLACEHOLDER || '명령어 또는 채팅 입력...'}
+            aria-label="채팅 입력"
+            value={props.input}
+            onChange={e => props.setInput(e.target.value)}
+          />
+          <Button className="send-btn" type="submit" aria-label="전송">{props.UI_LABELS?.SEND || '전송'}</Button>
+        </form>
+      </div>
     </div>
   );
 } 
