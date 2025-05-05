@@ -14,6 +14,7 @@ import axios from 'axios';
 import AuthForm from './AuthForm';
 import MapModal from './MapModal';
 import GameMain from './GameMain';
+import GameMobileMain from './GameMobileMain';
 import { login, register } from './api';
 import { UserProvider, useUserContext } from './UserContext';
 import { GameStateProvider, useGameStateContext } from './GameStateContext';
@@ -87,6 +88,8 @@ function AppInner() {
     }
   }, [isLoggedIn, connected, handleConnect]);
 
+  const isMobile = window.innerWidth < 700;
+
   // 방 아이템 UI 분리
   const renderRoomItems = () => <RoomItems room={room} onPickup={handlePickup} />;
   // 방 몬스터 UI 분리
@@ -116,27 +119,53 @@ function AppInner() {
   return (
     <div className="container">
       {showMap && <MapModal mapSize={mapSize} mapInfo={mapInfo} onClose={() => setShowMap(false)} />}
-      <GameMain
-        connected={connected}
-        handleLogout={logout}
-        room={room}
-        mapSize={mapSize}
-        mapInfo={mapInfo}
-        handleMove={handleMove}
-        nearbyRooms={nearbyRooms}
-        messages={messages}
-        chatEndRef={chatEndRef}
-        handleSend={handleSend}
-        input={input}
-        setInput={setInput}
-        UI_LABELS={UI_LABELS}
-        players={players}
-        name={name}
-        character={character}
-        inventory={inventory}
-        handlePickup={handlePickup}
-        handleAttack={handleAttack}
-      />
+      {isMobile ? (
+        <GameMobileMain
+          connected={connected}
+          handleLogout={logout}
+          room={room}
+          mapSize={mapSize}
+          mapInfo={mapInfo}
+          handleMove={handleMove}
+          nearbyRooms={nearbyRooms}
+          messages={messages}
+          chatEndRef={chatEndRef}
+          handleSend={handleSend}
+          input={input}
+          setInput={setInput}
+          UI_LABELS={UI_LABELS}
+          players={players}
+          name={name}
+          character={character}
+          inventory={inventory}
+          handlePickup={handlePickup}
+          handleAttack={handleAttack}
+          renderRoomItems={renderRoomItems}
+          renderRoomMonsters={renderRoomMonsters}
+        />
+      ) : (
+        <GameMain
+          connected={connected}
+          handleLogout={logout}
+          room={room}
+          mapSize={mapSize}
+          mapInfo={mapInfo}
+          handleMove={handleMove}
+          nearbyRooms={nearbyRooms}
+          messages={messages}
+          chatEndRef={chatEndRef}
+          handleSend={handleSend}
+          input={input}
+          setInput={setInput}
+          UI_LABELS={UI_LABELS}
+          players={players}
+          name={name}
+          character={character}
+          inventory={inventory}
+          handlePickup={handlePickup}
+          handleAttack={handleAttack}
+        />
+      )}
     </div>
   );
 }
