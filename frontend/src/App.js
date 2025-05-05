@@ -14,11 +14,16 @@ import axios from 'axios';
 import AuthForm from './AuthForm';
 import MapModal from './MapModal';
 import GameMain from './GameMain';
+import GameMobileMain from './GameMobileMain';
 import { login, register } from './api';
 import { UserProvider, useUserContext } from './UserContext';
 import { GameStateProvider, useGameStateContext } from './GameStateContext';
 
 const WS_URL = 'ws://localhost:4000';
+
+function isMobileDevice() {
+  return window.innerWidth <= 700 || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+}
 
 function AppInner() {
   const {
@@ -87,6 +92,14 @@ function AppInner() {
     }
   }, [isLoggedIn, connected, handleConnect]);
 
+  // 모바일/데스크톱 분기
+  const [isMobile, setIsMobile] = useState(isMobileDevice());
+  useEffect(() => {
+    const handleResize = () => setIsMobile(isMobileDevice());
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   if (!isLoggedIn) {
     return (
       <AuthForm
@@ -114,29 +127,51 @@ function AppInner() {
   const renderRoomMonsters = () => <RoomMonsters room={room} onAttack={handleAttack} />;
 
   return (
-    <div className="container">
-      {showMap && <MapModal mapSize={mapSize} mapInfo={mapInfo} onClose={() => setShowMap(false)} />}
-      <GameMain
-        connected={connected}
-        handleLogout={logout}
-        room={room}
-        mapSize={mapSize}
-        mapInfo={mapInfo}
-        handleMove={handleMove}
-        nearbyRooms={nearbyRooms}
-        messages={messages}
-        chatEndRef={chatEndRef}
-        handleSend={handleSend}
-        input={input}
-        setInput={setInput}
-        UI_LABELS={UI_LABELS}
-        players={players}
-        name={name}
-        character={character}
-        inventory={inventory}
-        handlePickup={handlePickup}
-        handleAttack={handleAttack}
-      />
+    <div className={isMobile ? 'mobile-root' : 'container'}>
+      {showMap && !isMobile && <MapModal mapSize={mapSize} mapInfo={mapInfo} onClose={() => setShowMap(false)} />}
+      {isMobile ? (
+        <GameMobileMain
+          room={room}
+          mapSize={mapSize}
+          mapInfo={mapInfo}
+          handleMove={handleMove}
+          nearbyRooms={nearbyRooms}
+          messages={messages}
+          chatEndRef={chatEndRef}
+          handleSend={handleSend}
+          input={input}
+          setInput={setInput}
+          UI_LABELS={UI_LABELS}
+          name={name}
+          character={character}
+          inventory={inventory}
+          handlePickup={handlePickup}
+          handleAttack={handleAttack}
+          handleLogout={logout}
+        />
+      ) : (
+        <GameMain
+          connected={connected}
+          handleLogout={logout}
+          room={room}
+          mapSize={mapSize}
+          mapInfo={mapInfo}
+          handleMove={handleMove}
+          nearbyRooms={nearbyRooms}
+          messages={messages}
+          chatEndRef={chatEndRef}
+          handleSend={handleSend}
+          input={input}
+          setInput={setInput}
+          UI_LABELS={UI_LABELS}
+          players={players}
+          name={name}
+          character={character}
+          inventory={inventory}
+          handlePickup={handlePickup}
+          handleAttack={handleAttack}
+        />
+      )}
     </div>
   );
 }
