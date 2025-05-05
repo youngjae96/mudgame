@@ -9,7 +9,7 @@ const PlayerService = {
   /**
    * 아이템 장착
    */
-  equipItem({ ws, playerName, message, players, savePlayerData, sendCharacterInfo, sendInventory }) {
+  async equipItem({ ws, playerName, message, players, savePlayerData, sendCharacterInfo, sendInventory }) {
     const player = players[playerName];
     if (!player) return;
     const itemName = message.trim().replace('/장착 ', '').trim();
@@ -24,7 +24,7 @@ const PlayerService = {
       if (item.type === ITEM_TYPE.ARMOR && player.equipArmor) player.inventory.push(player.equipArmor);
       player.inventory.splice(idx, 1);
       player.equipItem(item);
-      savePlayerData(playerName);
+      await savePlayerData(playerName).catch(() => {});
       sendCharacterInfo(player);
       sendInventory(player);
       ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `${item.name}을(를) 장착했습니다.` }));
@@ -36,7 +36,7 @@ const PlayerService = {
   /**
    * 장비 해제
    */
-  unequipItem({ ws, playerName, message, players, savePlayerData, sendCharacterInfo, sendInventory }) {
+  async unequipItem({ ws, playerName, message, players, savePlayerData, sendCharacterInfo, sendInventory }) {
     const player = players[playerName];
     if (!player) return;
     const typeStr = message.trim().replace('/해제 ', '').trim();
@@ -46,14 +46,14 @@ const PlayerService = {
     if (type === ITEM_TYPE.WEAPON && player.equipWeapon) {
       player.inventory.push(player.equipWeapon);
       player.unequipItem(type);
-      savePlayerData(playerName);
+      await savePlayerData(playerName).catch(() => {});
       sendCharacterInfo(player);
       sendInventory(player);
       ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `${typeStr}를 해제했습니다.` }));
     } else if (type === ITEM_TYPE.ARMOR && player.equipArmor) {
       player.inventory.push(player.equipArmor);
       player.unequipItem(type);
-      savePlayerData(playerName);
+      await savePlayerData(playerName).catch(() => {});
       sendCharacterInfo(player);
       sendInventory(player);
       ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `${typeStr}를 해제했습니다.` }));

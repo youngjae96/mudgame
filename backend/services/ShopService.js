@@ -7,7 +7,7 @@ const ShopService = {
   /**
    * 아이템 구매
    */
-  buyItem({ ws, playerName, message, players, getRoom, SHOP_ITEMS, savePlayerData, sendInventory, sendCharacterInfo }) {
+  async buyItem({ ws, playerName, message, players, getRoom, SHOP_ITEMS, savePlayerData, sendInventory, sendCharacterInfo }) {
     const player = players[playerName];
     if (!player) { console.log('[구매명령] 플레이어 없음'); return; }
     const { x, y } = player.position;
@@ -32,7 +32,7 @@ const ShopService = {
     }
     player.gold -= foundItem.price;
     player.inventory.push({ ...foundItem });
-    savePlayerData(playerName);
+    await savePlayerData(playerName).catch(() => {});
     sendInventory(player);
     sendCharacterInfo(player);
     ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `${foundItem.name}을(를) 구매했습니다!` }));
@@ -41,7 +41,7 @@ const ShopService = {
   /**
    * 아이템 판매
    */
-  sellItem({ ws, playerName, message, players, getRoom, SHOP_ITEMS, savePlayerData, sendInventory, sendCharacterInfo }) {
+  async sellItem({ ws, playerName, message, players, getRoom, SHOP_ITEMS, savePlayerData, sendInventory, sendCharacterInfo }) {
     const player = players[playerName];
     if (!player) return;
     const { x, y } = player.position;
@@ -68,7 +68,7 @@ const ShopService = {
     const sellPrice = Math.floor(foundItem.price * 0.5);
     player.gold += sellPrice;
     player.inventory.splice(idx, 1);
-    savePlayerData(playerName);
+    await savePlayerData(playerName).catch(() => {});
     sendInventory(player);
     sendCharacterInfo(player);
     ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `${itemName}을(를) 판매했습니다! (+${sellPrice}G)` }));

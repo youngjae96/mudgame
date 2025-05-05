@@ -141,31 +141,40 @@ function respawnMonsterWithDeps(world, x, y) {
 async function savePlayerData(playerName) {
   const player = players[playerName];
   if (!player) return;
-  const pdata = await PlayerData.findOne({ name: playerName });
-  if (!pdata) return;
-  pdata.world = player.world;
-  pdata.position = player.position;
-  pdata.hp = player.hp;
-  pdata.maxHp = player.maxHp;
-  pdata.mp = player.mp;
-  pdata.maxMp = player.maxMp;
-  pdata.str = player.str;
-  pdata.dex = player.dex;
-  pdata.int = player.int;
-  pdata.atk = player.atk;
-  pdata.def = player.def;
-  pdata.gold = player.gold;
-  pdata.inventory = player.inventory;
-  pdata.strExp = player.strExp;
-  pdata.strExpMax = player.strExpMax;
-  pdata.dexExp = player.dexExp;
-  pdata.dexExpMax = player.dexExpMax;
-  pdata.intExp = player.intExp;
-  pdata.intExpMax = player.intExpMax;
-  pdata.equipWeapon = player.equipWeapon;
-  pdata.equipArmor = player.equipArmor;
-  pdata.updatedAt = new Date();
-  await pdata.save();
+  try {
+    const pdata = await PlayerData.findOne({ name: playerName });
+    if (!pdata) return;
+    pdata.world = player.world;
+    pdata.position = player.position;
+    pdata.hp = player.hp;
+    pdata.maxHp = player.maxHp;
+    pdata.mp = player.mp;
+    pdata.maxMp = player.maxMp;
+    pdata.str = player.str;
+    pdata.dex = player.dex;
+    pdata.int = player.int;
+    pdata.atk = player.atk;
+    pdata.def = player.def;
+    pdata.gold = player.gold;
+    pdata.inventory = player.inventory;
+    pdata.strExp = player.strExp;
+    pdata.strExpMax = player.strExpMax;
+    pdata.dexExp = player.dexExp;
+    pdata.dexExpMax = player.dexExpMax;
+    pdata.intExp = player.intExp;
+    pdata.intExpMax = player.intExpMax;
+    pdata.equipWeapon = player.equipWeapon;
+    pdata.equipArmor = player.equipArmor;
+    pdata.updatedAt = new Date();
+    await pdata.save();
+  } catch (err) {
+    if (err.name === 'VersionError') {
+      console.warn('[경고] VersionError 발생, 저장 무시:', err.message);
+      // 필요시 재시도 로직 추가 가능
+    } else {
+      console.error('[에러] PlayerData 저장 실패:', err);
+    }
+  }
 }
 
 // 명령어-핸들러 매핑 객체
@@ -741,7 +750,7 @@ wss.on('connection', (ws) => {
 // 40초마다 전체 플레이어 자동저장
 setInterval(() => {
   Object.keys(players).forEach(playerName => {
-    savePlayerData(playerName);
+    savePlayerData(playerName).catch(() => {}); // 예외 무시
   });
 }, 40000); // 40초마다
 
