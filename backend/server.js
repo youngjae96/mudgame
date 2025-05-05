@@ -386,6 +386,11 @@ wss.on('connection', (ws) => {
           broadcast(wss, { type: 'system', subtype: 'event', message: `[운영자] ${targetName}님이 강퇴되었습니다.` });
           ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `[운영자] ${targetName}님을 강퇴했습니다.` }));
           return;
+        } else if (cmd === '저장') {
+          // /운영자 저장: 전체 플레이어 즉시 저장
+          await Promise.all(Object.keys(players).map(name => savePlayerData(name)));
+          ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '[운영자] 모든 플레이어 상태가 즉시 저장되었습니다.' }));
+          return;
         } else {
           ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[운영자] 알 수 없는 명령어입니다.' }));
           return;
@@ -485,6 +490,12 @@ wss.on('connection', (ws) => {
         } else {
           ws.send(JSON.stringify({ type: 'error', message: '잘못된 좌표입니다.' }));
         }
+        return;
+      }
+      // /저장 명령어: 본인 상태 즉시 저장
+      if (trimmed === '/저장') {
+        await savePlayerData(playerName);
+        ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '현재 상태가 즉시 저장되었습니다!' }));
         return;
       }
     } else if (data.type === 'move') {
@@ -726,6 +737,13 @@ wss.on('connection', (ws) => {
     // ... 이하 기존 코드 계속 ...
   });
 });
+
+// 40초마다 전체 플레이어 자동저장
+setInterval(() => {
+  Object.keys(players).forEach(playerName => {
+    savePlayerData(playerName);
+  });
+}, 40000); // 40초마다
 
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
