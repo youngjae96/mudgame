@@ -85,4 +85,45 @@ describe('PlayerService', () => {
     });
     expect(ctx.ws.send).toHaveBeenCalledWith(expect.stringContaining('해제할 수 있는 장비 종류는 무기, 방어구입니다'));
   });
+
+  it('장착 실패: 플레이어 없음', async () => {
+    await playerService.equipItem({
+      ws: ctx.ws,
+      playerName: '없는유저',
+      message: '/장착 나무검',
+      players: { testuser: ctx.player }
+    });
+    expect(ctx.ws.send).not.toHaveBeenCalled();
+  });
+
+  it('장착 실패: 장착할 수 없는 아이템(잡화)', async () => {
+    ctx.player.inventory.push({ name: '중형 물약', type: '잡화' });
+    await playerService.equipItem({
+      ws: ctx.ws,
+      playerName: 'testuser',
+      message: '/장착 중형 물약',
+      players: { testuser: ctx.player }
+    });
+    expect(ctx.ws.send).toHaveBeenCalledWith(expect.stringContaining('장착할 수 없는 아이템'));
+  });
+
+  it('해제 실패: 플레이어 없음', async () => {
+    await playerService.unequipItem({
+      ws: ctx.ws,
+      playerName: '없는유저',
+      message: '/해제 무기',
+      players: { testuser: ctx.player }
+    });
+    expect(ctx.ws.send).not.toHaveBeenCalled();
+  });
+
+  it('해제 실패: 잘못된 타입(무기/방어구 아님)', async () => {
+    await playerService.unequipItem({
+      ws: ctx.ws,
+      playerName: 'testuser',
+      message: '/해제 신발',
+      players: { testuser: ctx.player }
+    });
+    expect(ctx.ws.send).toHaveBeenCalledWith(expect.stringContaining('해제할 수 있는 장비 종류는 무기, 방어구입니다'));
+  });
 }); 

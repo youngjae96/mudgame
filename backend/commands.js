@@ -6,12 +6,19 @@ const { ISLAND_VILLAGE_POS } = require('./data/map');
 const PlayerController = require('./controllers/PlayerController');
 const ShopService = require('./services/ShopService');
 
+let shopServiceInstance = null;
+
+function setupCommands({ shopService, playerService }) {
+  shopServiceInstance = shopService;
+  PlayerController.setPlayerServiceInstance(playerService);
+}
+
 function handleBuyCommand(args) {
-  return ShopService.buyItem(args);
+  return shopServiceInstance.buyItem(args);
 }
 
 function handleSellCommand(args) {
-  return ShopService.sellItem(args);
+  return shopServiceInstance.sellItem(args);
 }
 
 function handleTeleportCommand({ ws, playerName, message, players, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS, sendRoomInfo, sendInventory, sendCharacterInfo }) {
@@ -35,6 +42,7 @@ function handleTeleportCommand({ ws, playerName, message, players, getRoom, getP
       ws.send(JSON.stringify({ type: 'system', subtype: 'guide', message: '[텔레포트] 마을 광장에서만 무인도로 이동할 수 있습니다.' }));
     }
   } else if (dest === '마을') {
+    const { ISLAND_VILLAGE_POS } = require('./data/map');
     if (player.world === 2 && player.position.x === ISLAND_VILLAGE_POS.x && player.position.y === ISLAND_VILLAGE_POS.y) {
       player.world = 1;
       player.position = { x: 4, y: 4 };
@@ -63,6 +71,7 @@ function handleTeleportCommand({ ws, playerName, message, players, getRoom, getP
 }
 
 module.exports = {
+  setupCommands,
   handleBuyCommand,
   handleSellCommand,
   handleEquipCommand: PlayerController.handleEquipCommand,

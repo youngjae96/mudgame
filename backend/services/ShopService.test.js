@@ -67,6 +67,31 @@ describe('ShopService', () => {
     expect(ctx.ws.send).toHaveBeenCalledWith(expect.stringContaining('골드가 부족합니다'));
   });
 
+  it('구매 실패: 상점에 없는 아이템', async () => {
+    await shopService.buyItem({
+      ws: ctx.ws,
+      playerName: 'testuser',
+      message: '/구매 없는아이템',
+      players: { testuser: ctx.player },
+      getRoom: ctx.getRoom,
+      SHOP_ITEMS: ctx.SHOP_ITEMS
+    });
+    expect(ctx.ws.send).toHaveBeenCalledWith(expect.stringContaining('상점에 없는 아이템'));
+  });
+
+  it('구매 실패: 마을이 아닌 곳에서 구매 시도', async () => {
+    ctx.getRoom = jest.fn(() => ({ type: 'field' }));
+    await shopService.buyItem({
+      ws: ctx.ws,
+      playerName: 'testuser',
+      message: '/구매 나무검',
+      players: { testuser: ctx.player },
+      getRoom: ctx.getRoom,
+      SHOP_ITEMS: ctx.SHOP_ITEMS
+    });
+    expect(ctx.ws.send).toHaveBeenCalledWith(expect.stringContaining('상점은 마을에서만 이용'));
+  });
+
   it('판매 성공', async () => {
     ctx.player.inventory.push({ name: '나무검', type: ITEM_TYPE.WEAPON });
     await shopService.sellItem({
@@ -92,5 +117,32 @@ describe('ShopService', () => {
       SHOP_ITEMS: ctx.SHOP_ITEMS
     });
     expect(ctx.ws.send).toHaveBeenCalledWith(expect.stringContaining('인벤토리에 해당 아이템이 없습니다'));
+  });
+
+  it('판매 실패: 상점에서 판매할 수 없는 아이템', async () => {
+    ctx.player.inventory.push({ name: '없는아이템', type: ITEM_TYPE.WEAPON });
+    await shopService.sellItem({
+      ws: ctx.ws,
+      playerName: 'testuser',
+      message: '/판매 없는아이템',
+      players: { testuser: ctx.player },
+      getRoom: ctx.getRoom,
+      SHOP_ITEMS: ctx.SHOP_ITEMS
+    });
+    expect(ctx.ws.send).toHaveBeenCalledWith(expect.stringContaining('상점에서 판매할 수 없는 아이템'));
+  });
+
+  it('판매 실패: 마을이 아닌 곳에서 판매 시도', async () => {
+    ctx.getRoom = jest.fn(() => ({ type: 'field' }));
+    ctx.player.inventory.push({ name: '나무검', type: ITEM_TYPE.WEAPON });
+    await shopService.sellItem({
+      ws: ctx.ws,
+      playerName: 'testuser',
+      message: '/판매 나무검',
+      players: { testuser: ctx.player },
+      getRoom: ctx.getRoom,
+      SHOP_ITEMS: ctx.SHOP_ITEMS
+    });
+    expect(ctx.ws.send).toHaveBeenCalledWith(expect.stringContaining('상점은 마을에서만 이용'));
   });
 }); 

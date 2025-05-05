@@ -1,10 +1,14 @@
-const PlayerService = require('../services/PlayerService');
+let playerServiceInstance = null;
+
 const PlayerController = {
+  setPlayerServiceInstance(instance) {
+    playerServiceInstance = instance;
+  },
   handleEquipCommand(args) {
-    return PlayerService.equipItem(args);
+    return playerServiceInstance.equipItem(args);
   },
   handleUnequipCommand(args) {
-    return PlayerService.unequipItem(args);
+    return playerServiceInstance.unequipItem(args);
   }
 };
 

@@ -1,6 +1,6 @@
 const request = require('supertest');
 const mongoose = require('mongoose');
-const app = require('./server');
+const { app } = require('./server');
 const PlayerData = require('./models/PlayerData');
 const User = require('./models/User');
 
