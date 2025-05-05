@@ -10,6 +10,7 @@ const {
   broadcast,
   sendPlayerList,
   sendRoomInfo,
+  sendRoomInfoToAllInRoom,
   sendInventory,
   sendCharacterInfo
 } = require('./utils/broadcast');
@@ -34,6 +35,8 @@ const playerRouter = require('./routes/player');
 const shopRouter = require('./routes/shop');
 const battleRouter = require('./routes/battle');
 const docsRouter = require('./routes/docs');
+const PlayerManager = require('./playerManager');
+const RoomManager = require('./roomManager');
 
 const app = express();
 app.use(cors());
@@ -49,11 +52,10 @@ const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 const PORT = process.env.PORT || 4000;
 
-let players = {};
 let battleIntervals = {};
 
 function getPlayersInRoom(x, y) {
-  return Object.values(players)
+  return Object.values(PlayerManager.getAllPlayers())
     .filter((p) => p.position && p.position.x === x && p.position.y === y)
     .map((p) => p.name);
 }
@@ -133,13 +135,13 @@ function respawnMonsterWithDeps(world, x, y) {
     world, x, y,
     getRoom,
     FIELD_MONSTERS, FOREST_MONSTERS, CAVE_MONSTERS, Monster,
-    getPlayersInRoom, sendRoomInfo, MAP_SIZE, VILLAGE_POS, players
+    getPlayersInRoom, sendRoomInfo, MAP_SIZE, VILLAGE_POS, PlayerManager.getAllPlayers()
   );
 }
 
 // PlayerData 저장 함수
 async function savePlayerData(playerName) {
-  const player = players[playerName];
+  const player = PlayerManager.getPlayer(playerName);
   if (!player) return;
   try {
     const pdata = await PlayerData.findOne({ name: playerName });
@@ -261,24 +263,26 @@ wss.on('connection', (ws) => {
         player.intExpMax = pdata.intExpMax || 10;
         player.equipWeapon = pdata.equipWeapon || null;
         player.equipArmor = pdata.equipArmor || null;
-        players[playerName] = player;
+        PlayerManager.addPlayer(playerName, player);
         broadcast(wss, { type: 'system', subtype: 'event', message: `${playerName}님이 입장했습니다.` });
-        sendPlayerList(wss, players);
-        sendRoomInfo(players[playerName], getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
-        sendInventory(players[playerName]);
-        sendCharacterInfo(players[playerName]);
+        sendPlayerList(wss, PlayerManager.getAllPlayers());
+        RoomManager.addPlayerToRoom(playerName, player.world, player.position.x, player.position.y);
+        sendInventory(PlayerManager.getPlayer(playerName));
+        sendCharacterInfo(PlayerManager.getPlayer(playerName));
+        // 입장 시 방 정보도 전송 (room 정보가 클라이언트에 안 떠서 추가)
+        sendRoomInfo(PlayerManager.getPlayer(playerName), getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
       })();
     } else if (data.type === 'chat') {
       const trimmed = data.message.trim();
       // /나가기 명령어는 async로 여기서 처리
       if (trimmed === '/나가기') {
-        const player = players[playerName];
+        const player = PlayerManager.getPlayer(playerName);
         if (player && player.world === 3 && player.position.x === 0 && player.position.y === 9) {
           player.world = 2;
           player.position = { x: 2, y: 6 };
           ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '[동굴] 사다리를 타고 무인도 동굴 입구로 나갑니다!' }));
           await savePlayerData(playerName);
-          await sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+          await sendRoomInfoToAllInRoom(PlayerManager.getAllPlayers(), player.world, player.position.x, player.position.y, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
           sendInventory(player);
           sendCharacterInfo(player);
         } else {
@@ -288,13 +292,13 @@ wss.on('connection', (ws) => {
       }
       // /입장 명령어: 무인도 동굴 입구(x=2, y=6)에서만 동작
       if (trimmed === '/입장') {
-        const player = players[playerName];
+        const player = PlayerManager.getPlayer(playerName);
         if (player && player.world === 2 && player.position.x === 2 && player.position.y === 6) {
           player.world = 3;
           player.position = { x: 0, y: 9 };
           ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '[동굴] 동굴로 입장합니다!' }));
           await savePlayerData(playerName);
-          await sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+          await sendRoomInfoToAllInRoom(PlayerManager.getAllPlayers(), player.world, player.position.x, player.position.y, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
           sendInventory(player);
           sendCharacterInfo(player);
         } else {
@@ -304,8 +308,8 @@ wss.on('connection', (ws) => {
       }
       // 운영자 한글 명령어 처리
       if (trimmed.startsWith('/운영자')) {
-        const player = players[playerName];
-        if (!player || player.name !== 'admin') {
+        const currentPlayer = PlayerManager.getPlayer(playerName);
+        if (!currentPlayer || currentPlayer.name !== 'admin') {
           ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '운영자만 사용할 수 있는 명령어입니다.' }));
           return;
         }
@@ -323,8 +327,8 @@ wss.on('connection', (ws) => {
             // 아이템명은 targetName 다음부터 끝까지 join
             itemName = args.slice(1).join(' ');
           }
-          const target = players[targetName];
-          if (!target) {
+          const targetPlayer = PlayerManager.getPlayer(targetName);
+          if (!targetPlayer) {
             ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: `[운영자] 대상 유저를 찾을 수 없습니다.` }));
             return;
           }
@@ -338,43 +342,43 @@ wss.on('connection', (ws) => {
             return;
           }
           for (let i = 0; i < count; i++) {
-            target.inventory.push({ ...found });
+            targetPlayer.inventory.push({ ...found });
           }
           ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `[운영자] ${targetName}에게 ${itemName} ${count}개를 지급했습니다.` }));
-          if (target.ws) {
-            target.ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `[운영자] ${itemName} ${count}개를 지급받았습니다.` }));
+          if (targetPlayer.ws) {
+            targetPlayer.ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `[운영자] ${itemName} ${count}개를 지급받았습니다.` }));
           }
           await savePlayerData(targetName);
           return;
         } else if (cmd === '골드지급') {
           const [targetName, goldStr] = args;
           const gold = parseInt(goldStr) || 0;
-          const target = players[targetName];
-          if (!target) {
+          const targetPlayer = PlayerManager.getPlayer(targetName);
+          if (!targetPlayer) {
             ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: `[운영자] 대상 유저를 찾을 수 없습니다.` }));
             return;
           }
-          target.gold += gold;
+          targetPlayer.gold += gold;
           ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `[운영자] ${targetName}에게 골드 ${gold}G를 지급했습니다.` }));
-          if (target.ws) {
-            target.ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `[운영자] 골드 ${gold}G를 지급받았습니다.` }));
+          if (targetPlayer.ws) {
+            targetPlayer.ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `[운영자] 골드 ${gold}G를 지급받았습니다.` }));
           }
           await savePlayerData(targetName);
           return;
         } else if (cmd === '텔포') {
           // /운영자 텔포 닉네임
           const [targetName] = args;
-          const target = players[targetName];
-          if (!target || !target.ws) {
+          const targetPlayer = PlayerManager.getPlayer(targetName);
+          if (!targetPlayer || !targetPlayer.ws) {
             ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: `[운영자] 대상 유저를 찾을 수 없습니다. (닉네임 확인)` }));
             return;
           }
           // 운영자(admin) 본인을 해당 유저의 위치로 이동
-          const player = players[playerName];
-          player.position = { ...target.position };
-          player.world = target.world;
+          const currentPlayer = PlayerManager.getPlayer(playerName);
+          currentPlayer.position = { ...targetPlayer.position };
+          currentPlayer.world = targetPlayer.world;
           ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `[운영자] ${targetName}님의 위치로 순간이동했습니다.` }));
-          sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+          sendRoomInfoToAllInRoom(PlayerManager.getAllPlayers(), currentPlayer.world, currentPlayer.position.x, currentPlayer.position.y, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
           await savePlayerData(playerName);
           return;
         } else if (cmd === '공지') {
@@ -384,20 +388,24 @@ wss.on('connection', (ws) => {
           return;
         } else if (cmd === '강퇴') {
           const [targetName] = args;
-          const target = players[targetName];
-          if (!target || !target.ws) {
+          const targetPlayer = PlayerManager.getPlayer(targetName);
+          if (!targetPlayer || !targetPlayer.ws) {
             ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: `[운영자] 대상 유저를 찾을 수 없습니다.` }));
             return;
           }
-          target.ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '[운영자] 강퇴되었습니다.' }));
-          target.ws.close();
-          delete players[targetName];
+          targetPlayer.ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '[운영자] 강퇴되었습니다.' }));
+          targetPlayer.ws.close();
+          const prevWorld = targetPlayer.world;
+          const prevX = targetPlayer.position.x;
+          const prevY = targetPlayer.position.y;
+          PlayerManager.removePlayer(targetName);
           broadcast(wss, { type: 'system', subtype: 'event', message: `[운영자] ${targetName}님이 강퇴되었습니다.` });
           ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `[운영자] ${targetName}님을 강퇴했습니다.` }));
+          sendRoomInfoToAllInRoom(PlayerManager.getAllPlayers(), prevWorld, prevX, prevY, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
           return;
         } else if (cmd === '저장') {
           // /운영자 저장: 전체 플레이어 즉시 저장
-          await Promise.all(Object.keys(players).map(name => savePlayerData(name)));
+          await Promise.all(Object.keys(PlayerManager.getAllPlayers()).map(name => savePlayerData(name)));
           ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '[운영자] 모든 플레이어 상태가 즉시 저장되었습니다.' }));
           return;
         } else {
@@ -406,7 +414,7 @@ wss.on('connection', (ws) => {
         }
       }
       // 전투 외에도 채팅 입력 시 HP가 부족하면 자동 물약 사용
-      const player = players[playerName];
+      const player = PlayerManager.getPlayer(playerName);
       if (player) {
         const potionResult = player.autoUsePotion();
         if (potionResult) {
@@ -426,7 +434,7 @@ wss.on('connection', (ws) => {
           ws,
           playerName,
           message: data.message,
-          players,
+          players: PlayerManager.getAllPlayers(),
           getRoom,
           getPlayersInRoom,
           SHOP_ITEMS,
@@ -447,17 +455,17 @@ wss.on('connection', (ws) => {
         broadcast(wss, { type: 'chat', chatType: 'global', name: playerName, message: chatMsg });
       } else {
         // 지역채팅: 같은 방(좌표) 유저만
-        const player = players[playerName];
+        const player = PlayerManager.getPlayer(playerName);
         if (!player) return;
         const { x, y } = player.position;
-        Object.values(players).forEach((p) => {
+        Object.values(PlayerManager.getAllPlayers()).forEach((p) => {
           if (p.position && p.position.x === x && p.position.y === y) {
             p.ws.send(JSON.stringify({ type: 'chat', chatType: 'local', name: playerName, message: chatMsg }));
           }
         });
       }
       if (chatType === 'move') {
-        const player = players[playerName];
+        const player = PlayerManager.getPlayer(playerName);
         if (!player) return;
         const { x, y } = player.position;
         const nx = x + dx;
@@ -474,7 +482,7 @@ wss.on('connection', (ws) => {
           if (nx < MAP_SIZE && ny < MAP_SIZE || (player.world === 3 && nx < 30 && ny < 30)) {
             player.position = { x: nx, y: ny };
             await savePlayerData(playerName);
-            await sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+            await sendRoomInfoToAllInRoom(PlayerManager.getAllPlayers(), player.world, player.position.x, player.position.y, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
             // 자동전투 중단
             if (battleIntervals[playerName]) {
               clearInterval(battleIntervals[playerName]);
@@ -509,7 +517,7 @@ wss.on('connection', (ws) => {
       }
     } else if (data.type === 'move') {
       const { x, y } = data;
-      const player = players[playerName];
+      const player = PlayerManager.getPlayer(playerName);
       let maxSize = MAP_SIZE;
       if (player && player.world === 3) maxSize = 30;
       if (
@@ -521,9 +529,9 @@ wss.on('connection', (ws) => {
           ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '두꺼운 암벽이 길을 막고 있습니다.' }));
           return;
         }
-        players[playerName].position = { x, y };
+        player.position = { x, y };
         await savePlayerData(playerName);
-        await sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+        await sendRoomInfoToAllInRoom(PlayerManager.getAllPlayers(), player.world, player.position.x, player.position.y, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
         // 자동전투 중단
         if (battleIntervals[playerName]) {
           clearInterval(battleIntervals[playerName]);
@@ -549,7 +557,7 @@ wss.on('connection', (ws) => {
       }
     } else if (data.type === 'pickup') {
       const { itemId } = data;
-      const player = players[playerName];
+      const player = PlayerManager.getPlayer(playerName);
       if (!player) return;
       const { x, y } = player.position;
       const room = getRoom(player.world, x, y);
@@ -558,7 +566,7 @@ wss.on('connection', (ws) => {
         const [item] = room.items.splice(idx, 1);
         player.inventory.push(item);
         await savePlayerData(playerName);
-        await sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+        await sendRoomInfoToAllInRoom(PlayerManager.getAllPlayers(), player.world, player.position.x, player.position.y, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
         sendInventory(player);
         ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `${item.name}을(를) 획득했습니다!` }));
         // 아이템 획득 시 HP가 부족하면 자동 물약 사용
@@ -578,7 +586,7 @@ wss.on('connection', (ws) => {
       }
     } else if (data.type === 'attack') {
       const { monsterId } = data;
-      const player = players[playerName];
+      const player = PlayerManager.getPlayer(playerName);
       if (!player) return;
       const { x, y } = player.position;
       const room = getRoom(player.world, x, y);
@@ -597,7 +605,7 @@ wss.on('connection', (ws) => {
         // 몬스터 처치 시
         if (result.monsterDead) {
           // 같은 방(좌표)에 있는 유저에게만 메시지 전송
-          Object.values(players).forEach((p) => {
+          Object.values(PlayerManager.getAllPlayers()).forEach((p) => {
             if (p.position && p.position.x === x && p.position.y === y) {
               p.ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `${playerName}님이 ${monster.name}을(를) 처치했습니다!` }));
             }
@@ -606,16 +614,16 @@ wss.on('connection', (ws) => {
         } else {
           // 플레이어 사망 시
           if (result.playerDead) {
-            await sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+            await sendRoomInfoToAllInRoom(PlayerManager.getAllPlayers(), player.world, player.position.x, player.position.y, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
           }
         }
-        await sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+        await sendRoomInfoToAllInRoom(PlayerManager.getAllPlayers(), player.world, player.position.x, player.position.y, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
         sendCharacterInfo(player);
       } else {
         ws.send(JSON.stringify({ type: 'error', message: '해당 몬스터가 없습니다.' }));
       }
     } else if (data.type === 'stat') {
-      const player = players[playerName];
+      const player = PlayerManager.getPlayer(playerName);
       if (!player) return;
       const statMsg =
         `[능력치]\n` +
@@ -624,7 +632,7 @@ wss.on('connection', (ws) => {
         `공격력: ${player.getAtk()}   방어력: ${player.getDef()}`;
       ws.send(JSON.stringify({ type: 'system', subtype: 'info', message: statMsg }));
     } else if (data.type === 'equipinfo') {
-      const player = players[playerName];
+      const player = PlayerManager.getPlayer(playerName);
       if (!player) return;
       let msg = '[장비 정보]\n';
       // 무기 옵션 문자열 생성
@@ -651,7 +659,7 @@ wss.on('connection', (ws) => {
       }
       ws.send(JSON.stringify({ type: 'system', subtype: 'info', message: msg }));
     } else if (data.type === 'shop') {
-      const player = players[playerName];
+      const player = PlayerManager.getPlayer(playerName);
       if (!player) return;
       const { x, y } = player.position;
       const room = getRoom(player.world, x, y);
@@ -682,10 +690,21 @@ wss.on('connection', (ws) => {
     } else if (data.type === 'inn') {
       // ... 이하 기존 코드 계속 ...
     } else if (data.type === 'close') {
-      // ... 이하 기존 코드 계속 ...
+      // 클라이언트가 창을 닫거나 나갈 때
+      if (playerName && PlayerManager.getPlayer(playerName)) {
+        const prevWorld = PlayerManager.getPlayer(playerName).world;
+        const prevX = PlayerManager.getPlayer(playerName).position.x;
+        const prevY = PlayerManager.getPlayer(playerName).position.y;
+        PlayerManager.removePlayer(playerName);
+        sendPlayerList(wss, PlayerManager.getAllPlayers());
+        broadcast(wss, { type: 'system', subtype: 'event', message: `${playerName}님이 퇴장했습니다.` });
+        sendRoomInfoToAllInRoom(PlayerManager.getAllPlayers(), prevWorld, prevX, prevY, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+      }
+      ws.close();
+      return;
     } else if (data.type === 'autobattle') {
       const { monsterId } = data;
-      const player = players[playerName];
+      const player = PlayerManager.getPlayer(playerName);
       if (!player) return;
       const { x, y } = player.position;
       const room = getRoom(player.world, x, y);
@@ -711,7 +730,7 @@ wss.on('connection', (ws) => {
         const monster = curRoom.monsters[curIdx];
         const result = processBattle(player, monster, curRoom, VILLAGE_POS);
         await savePlayerData(playerName);
-        await sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS); // 실시간 room 정보 전송
+        await sendRoomInfoToAllInRoom(PlayerManager.getAllPlayers(), player.world, player.position.x, player.position.y, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS); // 실시간 room 정보 전송
         sendCharacterInfo(player); // 매 턴마다 캐릭터 상태 전송
         if (Array.isArray(result.log)) {
           ws.send(JSON.stringify({ type: 'battle', log: result.log }));
@@ -724,7 +743,7 @@ wss.on('connection', (ws) => {
           if (result.monsterDead) {
             // 같은 방(좌표)에 있는 유저에게만 메시지 전송
             const { x, y } = player.position;
-            Object.values(players).forEach((p) => {
+            Object.values(PlayerManager.getAllPlayers()).forEach((p) => {
               if (p.position && p.position.x === x && p.position.y === y) {
                 p.ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `${playerName}님이 ${monster.name}을(를) 처치했습니다!` }));
               }
@@ -732,9 +751,9 @@ wss.on('connection', (ws) => {
             respawnMonsterWithDeps(player.world, player.position.x, player.position.y);
           }
           if (result.playerDead) {
-            await sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+            await sendRoomInfoToAllInRoom(PlayerManager.getAllPlayers(), player.world, player.position.x, player.position.y, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
           }
-          await sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+          await sendRoomInfoToAllInRoom(PlayerManager.getAllPlayers(), player.world, player.position.x, player.position.y, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
           sendCharacterInfo(player);
         }
       }, 1200);
@@ -743,17 +762,30 @@ wss.on('connection', (ws) => {
   });
 
   ws.on('close', () => {
-    // ... 이하 기존 코드 계속 ...
+    // WebSocket 연결이 끊겼을 때도 동일하게 처리
+    if (playerName && PlayerManager.getPlayer(playerName)) {
+      const prevWorld = PlayerManager.getPlayer(playerName).world;
+      const prevX = PlayerManager.getPlayer(playerName).position.x;
+      const prevY = PlayerManager.getPlayer(playerName).position.y;
+      PlayerManager.removePlayer(playerName);
+      sendPlayerList(wss, PlayerManager.getAllPlayers());
+      broadcast(wss, { type: 'system', subtype: 'event', message: `${playerName}님이 퇴장했습니다.` });
+      sendRoomInfoToAllInRoom(PlayerManager.getAllPlayers(), prevWorld, prevX, prevY, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+    }
   });
 });
 
 // 40초마다 전체 플레이어 자동저장
 setInterval(() => {
-  Object.keys(players).forEach(playerName => {
+  Object.keys(PlayerManager.getAllPlayers()).forEach(playerName => {
     savePlayerData(playerName).catch(() => {}); // 예외 무시
   });
 }, 40000); // 40초마다
 
-server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+if (require.main === module) {
+  server.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+}
+
+module.exports = app;

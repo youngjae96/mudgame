@@ -86,6 +86,19 @@ function useWebSocket(onDisconnect) {
     }
   }, [connected]);
 
+  useEffect(() => {
+    // 페이지 이탈/새로고침/닫기 시 서버에 알림
+    const handleBeforeUnload = () => {
+      if (ws.current && ws.current.readyState === 1) {
+        ws.current.send(JSON.stringify({ type: 'close' }));
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
+
   const handleConnect = () => {
     if (ws.current && (ws.current.readyState === 0 || ws.current.readyState === 1)) {
       // 이미 연결 중이거나 연결됨

@@ -3,12 +3,14 @@
  * - broadcast: 전체 클라이언트에 메시지 전송
  * - sendPlayerList: 플레이어 목록 전송
  * - sendRoomInfo: 방 정보 전송
+ * - sendRoomInfoToAllInRoom: 방에 있는 모든 유저에게 방 정보 전송
  * - sendInventory: 인벤토리 전송
  * - sendCharacterInfo: 캐릭터 정보 전송
  */
 const { ROOM_TYPE, MAP_SIZE, ISLAND_VILLAGE_POS } = require('../data/map');
 const Player = require('../models/Player');
 const MAP_SIZE_CAVE = 30;
+const Room = require('./Room');
 
 /**
  * 전체 클라이언트에 메시지 전송
@@ -36,6 +38,10 @@ function sendRoomInfo(player, getRoom, getPlayersInRoom, _MAP_SIZE, VILLAGE_POS)
   const { x, y } = player.position;
   const world = player.world || 1;
   const room = getRoom(world, x, y);
+  if (!room) {
+    console.error(`[sendRoomInfo] room not found: world=${world}, x=${x}, y=${y}`);
+    return;
+  }
   const playerList = getPlayersInRoom(x, y);
   // 월드별 맵 크기 결정
   let mapSize = _MAP_SIZE;
@@ -93,6 +99,17 @@ function sendRoomInfo(player, getRoom, getPlayersInRoom, _MAP_SIZE, VILLAGE_POS)
 }
 
 /**
+ * 방에 있는 모든 유저에게 방 정보 전송
+ */
+function sendRoomInfoToAllInRoom(players, world, x, y, getRoom, getPlayersInRoom, _MAP_SIZE, VILLAGE_POS) {
+  Object.values(players).forEach((p) => {
+    if (p.world === world && p.position.x === x && p.position.y === y) {
+      sendRoomInfo(p, getRoom, getPlayersInRoom, _MAP_SIZE, VILLAGE_POS);
+    }
+  });
+}
+
+/**
  * 인벤토리 정보 전송
  */
 function sendInventory(player) {
@@ -129,4 +146,4 @@ function sendCharacterInfo(player) {
   player.ws.send(JSON.stringify({ type: 'character', info }));
 }
 
-module.exports = { broadcast, sendPlayerList, sendRoomInfo, sendInventory, sendCharacterInfo }; 
+module.exports = { broadcast, sendPlayerList, sendRoomInfo, sendRoomInfoToAllInRoom, sendInventory, sendCharacterInfo, Room }; 

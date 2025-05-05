@@ -1,4 +1,4 @@
-const Room = require('../models/Room');
+const Room = require('../utils/Room');
 const Monster = require('../models/Monster');
 const { FIELD_MONSTERS, FOREST_MONSTERS, CAVE_MONSTERS, ISLAND_MONSTERS, CAVE_BOSS_MONSTERS } = require('./items');
 
@@ -57,7 +57,7 @@ for (let y = 0; y < MAP_SIZE; y++) {
       description = '푸른 풀밭이 펼쳐진 사냥터입니다. 몬스터가 자주 출몰합니다.';
       monsterChance = 1;
     }
-    const room = new Room(x, y, type, name, description);
+    const room = new Room(x, y, type, name, description, 1);
     for (const m of monsters) room.monsters.push(m);
     if (monsters.length === 0 && monsterChance) {
       let pool = FIELD_MONSTERS;
@@ -117,7 +117,7 @@ for (let y = 0; y < MAP_SIZE; y++) {
       if (Math.random() < 0.7) monsters.push(new Monster(ISLAND_MONSTERS[6], x, y));
       if (Math.random() < 0.3) monsters.push(new Monster(ISLAND_MONSTERS[7], x, y));
     }
-    const room = new Room(x, y, type, name, description);
+    const room = new Room(x, y, type, name, description, 2);
     for (const m of monsters) room.monsters.push(m);
     roomsIsland.push(room);
   }
@@ -183,7 +183,7 @@ for (let y = 0; y < MAP_SIZE_CAVE; y++) {
     const isBossDeep = bossDeepPos.some(p => p.x === x && p.y === y);
     // 사다리 방: 입구 왼쪽 위 모서리(x=0, y=9)에 고정 배치
     if (x === 0 && y === 9) {
-      const room = new Room(x, y, 'ladder', '사다리', '지상으로 올라가는 사다리가 있다. 여기서 "/나가기" 명령어를 입력하면 무인도 동굴 입구로 나갈 수 있습니다.');
+      const room = new Room(x, y, 'ladder', '사다리', '지상으로 올라가는 사다리가 있다. 여기서 "/나가기" 명령어를 입력하면 무인도 동굴 입구로 나갈 수 있습니다.', 3);
       roomsCave.push(room);
       continue;
     }
@@ -193,7 +193,7 @@ for (let y = 0; y < MAP_SIZE_CAVE; y++) {
       if (Math.random() < 0.20) isWall = true;
     }
     if (isWall) {
-      const room = new Room(x, y, 'cave_wall', '동굴 벽', '두꺼운 암벽이 길을 막고 있습니다.');
+      const room = new Room(x, y, 'cave_wall', '동굴 벽', '두꺼운 암벽이 길을 막고 있습니다.', 3);
       roomsCave.push(room);
       continue;
     }
@@ -220,7 +220,7 @@ for (let y = 0; y < MAP_SIZE_CAVE; y++) {
     let type = zone.type;
     let name = zone.name;
     let description = `${zone.name} (동굴 ${y+1}층)`;
-    const room = new Room(x, y, type, name, description);
+    const room = new Room(x, y, type, name, description, 3);
     for (const m of monsters) room.monsters.push(m);
     roomsCave.push(room);
   }

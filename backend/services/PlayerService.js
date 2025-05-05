@@ -5,11 +5,17 @@
  */
 const { ITEM_TYPE } = require('../data/items');
 
-const PlayerService = {
+class PlayerService {
+  constructor({ savePlayerData, sendCharacterInfo, sendInventory }) {
+    this.savePlayerData = savePlayerData;
+    this.sendCharacterInfo = sendCharacterInfo;
+    this.sendInventory = sendInventory;
+  }
+
   /**
    * 아이템 장착
    */
-  async equipItem({ ws, playerName, message, players, savePlayerData, sendCharacterInfo, sendInventory }) {
+  async equipItem({ ws, playerName, message, players }) {
     const player = players[playerName];
     if (!player) return;
     const itemName = message.trim().replace('/장착 ', '').trim();
@@ -24,19 +30,19 @@ const PlayerService = {
       if (item.type === ITEM_TYPE.ARMOR && player.equipArmor) player.inventory.push(player.equipArmor);
       player.inventory.splice(idx, 1);
       player.equipItem(item);
-      await savePlayerData(playerName).catch(() => {});
-      sendCharacterInfo(player);
-      sendInventory(player);
+      await this.savePlayerData(playerName).catch(() => {});
+      this.sendCharacterInfo(player);
+      this.sendInventory(player);
       ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `${item.name}을(를) 장착했습니다.` }));
     } else {
       ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '장착할 수 없는 아이템입니다.' }));
     }
-  },
+  }
 
   /**
    * 장비 해제
    */
-  async unequipItem({ ws, playerName, message, players, savePlayerData, sendCharacterInfo, sendInventory }) {
+  async unequipItem({ ws, playerName, message, players }) {
     const player = players[playerName];
     if (!player) return;
     const typeStr = message.trim().replace('/해제 ', '').trim();
@@ -46,21 +52,21 @@ const PlayerService = {
     if (type === ITEM_TYPE.WEAPON && player.equipWeapon) {
       player.inventory.push(player.equipWeapon);
       player.unequipItem(type);
-      await savePlayerData(playerName).catch(() => {});
-      sendCharacterInfo(player);
-      sendInventory(player);
+      await this.savePlayerData(playerName).catch(() => {});
+      this.sendCharacterInfo(player);
+      this.sendInventory(player);
       ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `${typeStr}를 해제했습니다.` }));
     } else if (type === ITEM_TYPE.ARMOR && player.equipArmor) {
       player.inventory.push(player.equipArmor);
       player.unequipItem(type);
-      await savePlayerData(playerName).catch(() => {});
-      sendCharacterInfo(player);
-      sendInventory(player);
+      await this.savePlayerData(playerName).catch(() => {});
+      this.sendCharacterInfo(player);
+      this.sendInventory(player);
       ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `${typeStr}를 해제했습니다.` }));
     } else {
       ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '해제할 수 있는 장비 종류는 무기, 방어구입니다.' }));
     }
   }
-};
+}
 
 module.exports = PlayerService; 

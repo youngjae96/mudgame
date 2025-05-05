@@ -3,11 +3,17 @@
  * - buyItem: 아이템 구매
  * - sellItem: 아이템 판매
  */
-const ShopService = {
+class ShopService {
+  constructor({ savePlayerData, sendInventory, sendCharacterInfo }) {
+    this.savePlayerData = savePlayerData;
+    this.sendInventory = sendInventory;
+    this.sendCharacterInfo = sendCharacterInfo;
+  }
+
   /**
    * 아이템 구매
    */
-  async buyItem({ ws, playerName, message, players, getRoom, SHOP_ITEMS, savePlayerData, sendInventory, sendCharacterInfo }) {
+  async buyItem({ ws, playerName, message, players, getRoom, SHOP_ITEMS }) {
     const player = players[playerName];
     if (!player) { console.log('[구매명령] 플레이어 없음'); return; }
     const { x, y } = player.position;
@@ -32,16 +38,16 @@ const ShopService = {
     }
     player.gold -= foundItem.price;
     player.inventory.push({ ...foundItem });
-    await savePlayerData(playerName).catch(() => {});
-    sendInventory(player);
-    sendCharacterInfo(player);
+    await this.savePlayerData(playerName).catch(() => {});
+    this.sendInventory(player);
+    this.sendCharacterInfo(player);
     ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `${foundItem.name}을(를) 구매했습니다!` }));
-  },
+  }
 
   /**
    * 아이템 판매
    */
-  async sellItem({ ws, playerName, message, players, getRoom, SHOP_ITEMS, savePlayerData, sendInventory, sendCharacterInfo }) {
+  async sellItem({ ws, playerName, message, players, getRoom, SHOP_ITEMS }) {
     const player = players[playerName];
     if (!player) return;
     const { x, y } = player.position;
@@ -68,11 +74,11 @@ const ShopService = {
     const sellPrice = Math.floor(foundItem.price * 0.5);
     player.gold += sellPrice;
     player.inventory.splice(idx, 1);
-    await savePlayerData(playerName).catch(() => {});
-    sendInventory(player);
-    sendCharacterInfo(player);
+    await this.savePlayerData(playerName).catch(() => {});
+    this.sendInventory(player);
+    this.sendCharacterInfo(player);
     ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `${itemName}을(를) 판매했습니다! (+${sellPrice}G)` }));
   }
-};
+}
 
 module.exports = ShopService; 

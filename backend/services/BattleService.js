@@ -5,11 +5,11 @@
 const { ITEM_NAME_MONGHWA } = require('../data/items');
 const { calcExpBonus, calcGoldDrop } = require('../utils/expUtils');
 
-const BattleService = {
+class BattleService {
   /**
    * 플레이어와 몬스터의 전투 처리 및 결과 반환
    */
-  processBattle(player, monster, room, VILLAGE_POS) {
+  static processBattle(player, monster, room, VILLAGE_POS) {
     let log = [];
     let playerDmg;
     if (player.equipWeapon && player.equipWeapon.name === ITEM_NAME_MONGHWA) {
@@ -124,6 +124,6 @@ const BattleService = {
     }
     return { log, monsterDead, playerDead, goldDrop, playerDmg };
   }
-};
+}
 
 module.exports = BattleService; 
