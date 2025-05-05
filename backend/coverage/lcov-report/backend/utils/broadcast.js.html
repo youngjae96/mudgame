@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">93.75% </span>
+                <span class="strong">97.91% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>45/48</span>
+                <span class='fraction'>47/48</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">70.96% </span>
+                <span class="strong">75.75% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>22/31</span>
+                <span class='fraction'>25/33</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">95.23% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>40/42</span>
+                <span class='fraction'>42/42</span>
             </div>
         
             
@@ -220,19 +220,19 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -248,12 +248,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -315,9 +315,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -359,7 +359,7 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span></td><td class="text"><pre class="prettyprint lang-js">/**
+<span class="cline-any cline-yes">6x</span></td><td class="text"><pre class="prettyprint lang-js">/**
  * broadcast.js: 서버-클라이언트 메시지/정보 전송 유틸
  * - broadcast: 전체 클라이언트에 메시지 전송
  * - sendPlayerList: 플레이어 목록 전송
@@ -399,11 +399,11 @@ function sendRoomInfo(player, getRoom, getPlayersInRoom, _MAP_SIZE, VILLAGE_POS)
   const { x, y } = player.position;
   const world = player.world || <span class="branch-1 cbranch-no" title="branch not covered" >1;</span>
   const room = getRoom(world, x, y);
-  <span class="missing-if-branch" title="if path not taken" >I</span>if (!room) {
-<span class="cstat-no" title="statement not covered" >    console.error(`[sendRoomInfo] room not found: world=${world}, x=${x}, y=${y}`);</span>
-<span class="cstat-no" title="statement not covered" >    return;</span>
+  if (!room) {
+    console.error(`[sendRoomInfo] room not found: world=${world}, x=${x}, y=${y}`);
+    return;
   }
-  const playerList = getPlayersInRoom(x, y);
+  const playerList = getPlayersInRoom(world, x, y);
   // 월드별 맵 크기 결정
   let mapSize = _MAP_SIZE;
   <span class="missing-if-branch" title="if path not taken" >I</span>if (world === 3) <span class="cstat-no" title="statement not covered" >mapSize = MAP_SIZE_CAVE;</span>
@@ -464,7 +464,7 @@ function sendRoomInfo(player, getRoom, getPlayersInRoom, _MAP_SIZE, VILLAGE_POS)
  */
 function sendRoomInfoToAllInRoom(players, world, x, y, getRoom, getPlayersInRoom, _MAP_SIZE, VILLAGE_POS) {
   Object.values(players).forEach((p) =&gt; {
-    <span class="missing-if-branch" title="else path not taken" >E</span>if (p.world === world &amp;&amp; p.position.x === x &amp;&amp; p.position.y === y) {
+    <span class="missing-if-branch" title="else path not taken" >E</span>if (p &amp;&amp; p.world === world &amp;&amp; p.position &amp;&amp; p.position.x === x &amp;&amp; p.position.y === y) {
       sendRoomInfo(p, getRoom, getPlayersInRoom, _MAP_SIZE, VILLAGE_POS);
     }
   });
@@ -514,7 +514,7 @@ module.exports = { broadcast, sendPlayerList, sendRoomInfo, sendRoomInfoToAllInR
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-05T16:48:42.143Z
+                at 2025-05-05T17:31:29.949Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

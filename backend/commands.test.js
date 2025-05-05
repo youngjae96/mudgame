@@ -16,7 +16,7 @@ jest.mock('./controllers/PlayerController', () => ({
 
 // Helper to create a mock ws
 function createMockWs() {
-  return { send: jest.fn() };
+  return { send: jest.fn(), readyState: 1 };
 }
 
 describe('commands.js', () => {
@@ -47,10 +47,10 @@ describe('commands.js', () => {
     let ws, player, players, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS, sendRoomInfo, sendInventory, sendCharacterInfo;
     beforeEach(() => {
       ws = createMockWs();
-      player = { name: '유저', world: 1, position: { x: 4, y: 4 } };
+      player = { name: '유저', world: 1, position: { x: 4, y: 4 }, ws };
       players = { 유저: player };
-      getRoom = jest.fn();
-      getPlayersInRoom = jest.fn();
+      getRoom = jest.fn((world, x, y) => ({ type: (world === 1 && x === 4 && y === 4) ? 'village' : (world === 2 && x === 4 && y === 7) ? 'village' : 'field', name: (world === 1 && x === 4 && y === 4) ? '마을 광장' : (world === 2 && x === 4 && y === 7) ? '무인도 오두막' : '필드', description: '', items: [], monsters: [] }));
+      getPlayersInRoom = jest.fn(() => []);
       MAP_SIZE = 10;
       VILLAGE_POS = { x: 0, y: 0 };
       sendRoomInfo = jest.fn();
@@ -71,8 +71,8 @@ describe('commands.js', () => {
     it('무인도 이동 성공', () => {
       commands.handleTeleportCommand({ ws, playerName: '유저', message: '/텔포 무인도', players, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS, sendRoomInfo, sendInventory, sendCharacterInfo });
       expect(player.world).toBe(2);
-      expect(player.position).toEqual({ x: 0, y: 4 });
-      expect(ws.send).toHaveBeenCalledWith(expect.stringContaining('무인도 해변'));
+      expect(player.position).toEqual({ x: 4, y: 7 });
+      expect(ws.send).toHaveBeenCalledWith(expect.stringContaining('무인도 오두막'));
       expect(sendRoomInfo).toHaveBeenCalled();
       expect(sendInventory).toHaveBeenCalled();
       expect(sendCharacterInfo).toHaveBeenCalled();
@@ -88,7 +88,7 @@ describe('commands.js', () => {
       player.world = 2;
       const map = require('./data/map');
       const old = map.ISLAND_VILLAGE_POS;
-      map.ISLAND_VILLAGE_POS = { x: 2, y: 4 };
+      map.ISLAND_VILLAGE_POS = { x: 4, y: 7 };
       player.position = map.ISLAND_VILLAGE_POS;
       const commandsReloaded = require('./commands');
       commandsReloaded.setupCommands({ shopService: mockShopService, playerService: mockPlayerService });
@@ -162,6 +162,90 @@ describe('commands.js', () => {
       player.hp = 20; player.mp = 10;
       commands.handleInnCommand({ ws, playerName: '유저', players, getRoom, savePlayerData, sendInventory, sendCharacterInfo });
       expect(ws.send).toHaveBeenCalledWith(expect.stringContaining('가득'));
+    });
+  });
+
+  describe('handleAdminCommand', () => {
+    let ws, admin, target, players, sendInventory, sendCharacterInfo, getRoom;
+    beforeEach(() => {
+      ws = createMockWs();
+      admin = { name: '운영자', ws, world: 1, position: { x: 1, y: 1 }, inventory: [], gold: 0 };
+      target = { name: '유저', ws: createMockWs(), world: 2, position: { x: 2, y: 2 }, inventory: [], gold: 100 };
+      players = { 운영자: admin, 유저: target };
+      sendInventory = jest.fn();
+      sendCharacterInfo = jest.fn();
+      getRoom = jest.fn();
+      global.wss = { clients: [{ readyState: 1, send: jest.fn() }] };
+    });
+    afterEach(() => { delete global.wss; });
+
+    it('공지: 전체 공지 브로드캐스트', () => {
+      commands.handleAdminCommand({ ws, playerName: '운영자', message: '/운영자 공지 테스트공지', players, getRoom, sendInventory, sendCharacterInfo });
+      expect(global.wss.clients[0].send).toHaveBeenCalledWith(expect.stringContaining('테스트공지'));
+    });
+
+    it('골드지급: 대상에게 골드 지급', () => {
+      commands.handleAdminCommand({ ws, playerName: '운영자', message: '/운영자 골드지급 유저 500', players, getRoom, sendInventory, sendCharacterInfo });
+      expect(target.gold).toBe(600);
+      expect(sendInventory).toHaveBeenCalledWith(target);
+      expect(ws.send).toHaveBeenCalledWith(expect.stringContaining('지급 완료'));
+      // JSON 메시지 허용
+      const calls = target.ws.send.mock.calls;
+      const found = calls.some(call => {
+        try {
+          const msg = JSON.parse(call[0]);
+          return msg.message && msg.message.includes('지급되었습니다');
+        } catch (e) {
+          return typeof call[0] === 'string' && call[0].includes('지급되었습니다');
+        }
+      });
+      expect(found).toBe(true);
+    });
+
+    it('아이템지급: 대상에게 아이템 지급', () => {
+      commands.handleAdminCommand({ ws, playerName: '운영자', message: '/운영자 아이템지급 유저 황금 열쇠', players, getRoom, sendInventory, sendCharacterInfo });
+      expect(target.inventory.some(i => i.name === '황금 열쇠')).toBe(true);
+      expect(sendInventory).toHaveBeenCalledWith(target);
+      expect(ws.send).toHaveBeenCalledWith(expect.stringContaining('지급 완료'));
+      // JSON 메시지 허용
+      const calls = target.ws.send.mock.calls;
+      const found = calls.some(call => {
+        try {
+          const msg = JSON.parse(call[0]);
+          return msg.message && msg.message.includes('지급되었습니다');
+        } catch (e) {
+          return typeof call[0] === 'string' && call[0].includes('지급되었습니다');
+        }
+      });
+      expect(found).toBe(true);
+    });
+
+    it('텔포: 운영자가 대상 위치로 이동', () => {
+      admin.world = 1; admin.position = { x: 1, y: 1 };
+      target.world = 2; target.position = { x: 5, y: 5 };
+      global.getRoom = jest.fn();
+      global.getPlayersInRoom = jest.fn();
+      const { MAP_SIZE, VILLAGE_POS } = require('./data/map');
+      const { sendRoomInfo } = require('./utils/broadcast');
+      jest.spyOn(require('./utils/broadcast'), 'sendRoomInfo').mockImplementation(() => {});
+      commands.handleAdminCommand({ ws, playerName: '운영자', message: '/운영자 텔포 유저', players, getRoom, sendInventory, sendCharacterInfo });
+      expect(admin.world).toBe(2);
+      expect(admin.position).toEqual({ x: 5, y: 5 });
+      expect(ws.send).toHaveBeenCalledWith(expect.stringContaining('텔레포트 완료'));
+      // JSON 메시지 허용
+      const calls = admin.ws.send.mock.calls;
+      const found = calls.some(call => {
+        try {
+          const msg = JSON.parse(call[0]);
+          return msg.message && msg.message.includes('텔레포트 되었습니다');
+        } catch (e) {
+          return typeof call[0] === 'string' && call[0].includes('텔레포트 되었습니다');
+        }
+      });
+      expect(found).toBe(true);
+      require('./utils/broadcast').sendRoomInfo.mockRestore();
+      delete global.getRoom;
+      delete global.getPlayersInRoom;
     });
   });
 }); 
