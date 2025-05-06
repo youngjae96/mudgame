@@ -5,6 +5,7 @@ function createMockContext(overrides = {}) {
   return {
     ws: { send: jest.fn() },
     playerName: 'testuser',
+    player: { inventory: [], position: { x: 1, y: 2 }, world: 1 },
     PlayerManager: {
       getPlayer: jest.fn(() => ({
         name: 'testuser',
@@ -209,7 +210,7 @@ describe('PlayerGameService', () => {
       ctx.processBattle = jest.fn(() => ({ log: [], monsterDead: true, playerDead: false }));
       const p1ws = { send: jest.fn() };
       ctx.PlayerManager.getAllPlayers = jest.fn(() => ({
-        testuser: { position: { x: 0, y: 0 }, ws: p1ws }
+        testuser: { position: { x: 0, y: 0 }, ws: p1ws, world: 1 }
       }));
       await PlayerGameService.handleAttack({ ...ctx, monsterId: 1, getPlayersInRoom: ctx.getPlayersInRoom });
       expect(ctx.respawnMonsterWithDeps).toHaveBeenCalled();
@@ -304,7 +305,7 @@ describe('PlayerGameService', () => {
       ctx.battleIntervals = {};
       ctx.processBattle = jest.fn(() => ({ log: [], monsterDead: true, playerDead: false }));
       const p1ws = { send: jest.fn() };
-      ctx.PlayerManager.getAllPlayers = jest.fn(() => ({ testuser: { position: { x: 0, y: 0 }, ws: p1ws } }));
+      ctx.PlayerManager.getAllPlayers = jest.fn(() => ({ testuser: { position: { x: 0, y: 0 }, ws: p1ws, world: 1 } }));
       await PlayerGameService.handleAutoBattle({ ...ctx, monsterId: 1, getPlayersInRoom: ctx.getPlayersInRoom });
       jest.runOnlyPendingTimers();
       await Promise.resolve(); await Promise.resolve(); await Promise.resolve();
@@ -331,4 +332,114 @@ describe('PlayerGameService', () => {
       jest.useRealTimers();
     });
   });
+
+  describe('handleShop', () => {
+    it('카테고리 안내 메시지 출력', async () => {
+      const ctx = createMockContext({
+        getRoom: jest.fn(() => ({ type: 'village' })),
+        SHOP_ITEMS: { 무기: [{ name: '나무검', price: 10, desc: '테스트' }] }
+      });
+      await PlayerGameService.handleShop({ ...ctx, ws: ctx.ws, playerName: 'testuser', message: '/상점', PlayerManager: ctx.PlayerManager, getRoom: ctx.getRoom, SHOP_ITEMS: ctx.SHOP_ITEMS });
+      const msg = ctx.ws.send.mock.calls[0][0];
+      expect(msg).toContain('상점 카테고리');
+      expect(msg).toContain('/상점 무기 1');
+    });
+    it('카테고리/페이지별 아이템 목록 출력', async () => {
+      const ctx = createMockContext({
+        getRoom: jest.fn(() => ({ type: 'village' })),
+        SHOP_ITEMS: { 무기: [
+          { name: '나무검', price: 10, desc: '테스트' },
+          { name: '철검', price: 20, desc: '테스트2' }
+        ] }
+      });
+      await PlayerGameService.handleShop({ ...ctx, ws: ctx.ws, playerName: 'testuser', message: '/상점 무기 1', PlayerManager: ctx.PlayerManager, getRoom: ctx.getRoom, SHOP_ITEMS: ctx.SHOP_ITEMS });
+      const msg = ctx.ws.send.mock.calls[0][0];
+      expect(msg).toContain('무기 상점 1페이지');
+      expect(msg).toContain('나무검');
+      expect(msg).toContain('철검');
+    });
+    it('마을이 아니면 안내', async () => {
+      const ctx = createMockContext({ getRoom: jest.fn(() => ({ type: 'field' })), SHOP_ITEMS: { 무기: [] } });
+      await PlayerGameService.handleShop({ ...ctx, ws: ctx.ws, playerName: 'testuser', message: '/상점', PlayerManager: ctx.PlayerManager, getRoom: ctx.getRoom, SHOP_ITEMS: ctx.SHOP_ITEMS });
+      const msg = ctx.ws.send.mock.calls[0][0];
+      expect(msg).toContain('상점은 마을에서만');
+    });
+    it('없는 카테고리 입력 시 안내', async () => {
+      const ctx = createMockContext({ getRoom: jest.fn(() => ({ type: 'village' })), SHOP_ITEMS: { 무기: [] } });
+      await PlayerGameService.handleShop({ ...ctx, ws: ctx.ws, playerName: 'testuser', message: '/상점 없는카테고리', PlayerManager: ctx.PlayerManager, getRoom: ctx.getRoom, SHOP_ITEMS: ctx.SHOP_ITEMS });
+      const msg = ctx.ws.send.mock.calls[0][0];
+      expect(msg).toContain('상점 카테고리');
+    });
+    it('페이지 초과 시 빈 목록', async () => {
+      const ctx = createMockContext({ getRoom: jest.fn(() => ({ type: 'village' })), SHOP_ITEMS: { 무기: [{ name: '나무검', price: 10, desc: '테스트' }] } });
+      await PlayerGameService.handleShop({ ...ctx, ws: ctx.ws, playerName: 'testuser', message: '/상점 무기 99', PlayerManager: ctx.PlayerManager, getRoom: ctx.getRoom, SHOP_ITEMS: ctx.SHOP_ITEMS });
+      const msg = ctx.ws.send.mock.calls[0][0];
+      expect(msg).toContain('무기 상점');
+    });
+  });
+
+  describe('handleShopSell', () => {
+    it('판매 가능한 아이템 목록 출력', async () => {
+      const ctx = createMockContext({
+        getRoom: jest.fn(() => ({ type: 'village' })),
+        SHOP_ITEMS: { 무기: [{ name: '나무검', price: 10, desc: '테스트' }] },
+        player: { inventory: [{ name: '나무검' }, { name: '없는아이템' }] }
+      });
+      await PlayerGameService.handleShopSell({ ...ctx, ws: ctx.ws, playerName: 'testuser', message: '/상점판매', PlayerManager: ctx.PlayerManager, getRoom: ctx.getRoom, SHOP_ITEMS: ctx.SHOP_ITEMS });
+      const msg = ctx.ws.send.mock.calls[0][0];
+      expect(msg).toContain('판매 가능한 아이템');
+      expect(msg).toContain('나무검');
+      expect(msg).not.toContain('없는아이템');
+    });
+    it('마을이 아니면 안내', async () => {
+      const ctx = createMockContext({ getRoom: jest.fn(() => ({ type: 'field' })), SHOP_ITEMS: { 무기: [] } });
+      await PlayerGameService.handleShopSell({ ...ctx, ws: ctx.ws, playerName: 'testuser', message: '/상점판매', PlayerManager: ctx.PlayerManager, getRoom: ctx.getRoom, SHOP_ITEMS: ctx.SHOP_ITEMS });
+      const msg = ctx.ws.send.mock.calls[0][0];
+      expect(msg).toContain('상점은 마을에서만');
+    });
+    it('판매 가능한 아이템이 없으면 안내', async () => {
+      const ctx = createMockContext({ getRoom: jest.fn(() => ({ type: 'village' })), SHOP_ITEMS: { 무기: [] }, player: { inventory: [] } });
+      await PlayerGameService.handleShopSell({ ...ctx, ws: ctx.ws, playerName: 'testuser', message: '/상점판매', PlayerManager: ctx.PlayerManager, getRoom: ctx.getRoom, SHOP_ITEMS: ctx.SHOP_ITEMS });
+      const msg = ctx.ws.send.mock.calls[0][0];
+      expect(msg).toContain('판매 가능한 아이템이 없습니다');
+    });
+  });
+
+  describe('handleMove (coverage)', () => {
+    it('잘못된 좌표면 에러 메시지', async () => {
+      const ctx = createMockContext();
+      await PlayerGameService.handleMove({ ...ctx, dx: -999, dy: -999, getPlayersInRoom: ctx.getPlayersInRoom });
+      const callArg = ctx.ws.send.mock.calls[0][0];
+      expect(JSON.parse(callArg).message).toContain('잘못된 좌표');
+    });
+  });
+
+  describe('handleCommand (coverage)', () => {
+    it('명령어 핸들러가 정의되어 있지 않으면 에러', async () => {
+      const ctx = createMockContext();
+      await PlayerGameService.handleCommand({ ...ctx, command: '/없는명령', args: [], commandHandlers: null, sendRoomInfo: ctx.sendRoomInfo });
+      const callArg = ctx.ws.send.mock.calls[0][0];
+      expect(JSON.parse(callArg).message).toContain('명령어 핸들러가 정의되어 있지 않습니다');
+    });
+  });
+});
+
+describe('PlayerGameService coverage', () => {
+  it('잘못된 명령어 입력 시 에러 없이 처리', async () => {
+    const ctx = createMockContext();
+    await expect(PlayerGameService.handleCommand({ ...ctx, command: '/없는명령', args: [], commandHandlers: null, sendRoomInfo: ctx.sendRoomInfo })).resolves.not.toThrow();
+  });
+  it('잘못된 이동(맵 밖) 시 안내', async () => {
+    const ctx = createMockContext();
+    await PlayerGameService.handleMove({ ...ctx, dx: 999, dy: 999, getPlayersInRoom: ctx.getPlayersInRoom });
+    const callArg = ctx.ws.send.mock.calls[0][0];
+    expect(JSON.parse(callArg).message).toContain('잘못된 좌표');
+  });
+  // it('인벤토리 없는 아이템 사용 시 안내', async () => {
+  //   const ctx = createMockContext();
+  //   ctx.player = { inventory: [], position: { x: 1, y: 2 }, world: 1 };
+  //   await PlayerGameService.handleUseItem({ ...ctx, ws: ctx.ws, playerName: 'testuser', message: '/사용 없는아이템', PlayerManager: ctx.PlayerManager });
+  //   const callArg = ctx.ws.send.mock.calls[0][0];
+  //   expect(callArg).toContain('아이템이 없습니다');
+  // });
 }); 

@@ -9,6 +9,9 @@ const PlayerManager = require('./playerManager');
 const RoomManager = require('./roomManager');
 const { sendRoomInfoToAllInRoom, broadcast } = require('./utils/broadcast');
 const Guild = require('./models/Guild');
+const PlayerGameService = require('./services/PlayerGameService');
+const { getRoom } = require('./data/map');
+const { SHOP_ITEMS } = require('./data/items');
 
 let shopServiceInstance = null;
 
@@ -370,6 +373,8 @@ async function handleGuildCommand({ ws, playerName, message, players }) {
       ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[길드] 길드장만 추방이 가능합니다.' }));
       return;
     }
+    if (!guild.members || !Array.isArray(guild.members)) guild.members = [];
+    if (!guild.joinRequests || !Array.isArray(guild.joinRequests)) guild.joinRequests = [];
     if (targetName === playerName) {
       ws.send(JSON.stringify({ type: 'system', message: '[길드] 자신은 추방할 수 없습니다.' }));
       return;
@@ -472,11 +477,37 @@ async function handleHelpCommand({ ws }) {
     '/장비 : 내 장비 정보',
     '/지도 : 전체 맵 보기',
     '/텔포 <지역> : 월드 이동(예: 무인도, 마을)',
-    '/길드 <생성|가입|수락|탈퇴|추방|공지|정보|목록|해체|채팅|채팅로그> ...',
+    '/길드 <생성|가입|수락|탈퇴|추방|공지|정보|목록|해체|채팅|채팅로그> ... : 길드 관련 명령어',
     '/저장 : 내 상태 즉시 저장',
     '/도움말 : 명령어 전체 안내',
   ].join('\n');
   ws.send(JSON.stringify({ type: 'system', message: msg }));
+}
+
+function handleShopCommand(args) {
+  const SHOP_ITEMS = args.SHOP_ITEMS || {};
+  const categories = Object.keys(SHOP_ITEMS);
+  if (!categories.length) {
+    if (args.ws && typeof args.ws.send === 'function') {
+      args.ws.send(JSON.stringify({ type: 'system', subtype: 'info', message: '[상점 카테고리]\n(카테고리가 없습니다)' }));
+    }
+    return;
+  }
+  return PlayerGameService.handleShop({
+    ...args,
+    PlayerManager,
+    getRoom,
+    SHOP_ITEMS,
+  });
+}
+
+function handleShopSellCommand(args) {
+  return PlayerGameService.handleShopSell({
+    ...args,
+    PlayerManager,
+    getRoom,
+    SHOP_ITEMS,
+  });
 }
 
 module.exports = {
@@ -491,4 +522,6 @@ module.exports = {
   handleGuildCommand,
   handleWhoCommand,
   handleHelpCommand,
+  handleShopCommand,
+  handleShopSellCommand,
 }; 

@@ -1,7 +1,9 @@
 const ITEM_POOL = [
   { name: '황금 열쇠', description: '반짝이는 황금 열쇠입니다.' },
   { name: '고대 두루마리', description: '신비한 힘이 깃든 두루마리.' },
-  { name: '회복 물약', description: '마시면 체력이 회복됩니다.' }
+  { name: '회복 물약', description: '마시면 체력이 회복됩니다.' },
+  { name: '무적검', description: '어드민 전용. 공격력 500.', atk: 500, type: '무기' },
+  { name: '무적갑옷', description: '어드민 전용. 방어력 500.', def: 500, type: '방어구' },
 ];
 
 const FIELD_MONSTERS = [

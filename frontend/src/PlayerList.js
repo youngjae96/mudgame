@@ -12,6 +12,8 @@ const PlayerUl = styled.ul`
   list-style: none;
   padding: 0;
   margin: 0 0 8px 0;
+  max-height: 180px;
+  overflow-y: auto;
 `;
 const PlayerLi = styled.li`
   padding: 6px 0 4px 0;

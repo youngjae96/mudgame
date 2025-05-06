@@ -64,7 +64,7 @@ const PlayerGameService = {
       return;
     }
     if (chatType === 'command') {
-      console.log('DEBUG handleChat command:', command, args);
+      if (process.env.DEBUG === 'true') console.log('DEBUG handleChat command:', command, args);
       await this.handleCommand({ ws, playerName, command, args, PlayerManager, RoomManager: null, getRoom, getPlayersInRoom, sendRoomInfoToAllInRoom, savePlayerData, sendInventory, sendCharacterInfo, broadcast, SHOP_ITEMS, MAP_SIZE, VILLAGE_POS, commandHandlers, sendRoomInfo: sendRoomInfoToAllInRoom });
       return;
     }
@@ -74,9 +74,9 @@ const PlayerGameService = {
     }
   },
   async handleCommand({ ws, playerName, command, args, PlayerManager, RoomManager, getRoom, getPlayersInRoom, sendRoomInfoToAllInRoom, savePlayerData, sendInventory, sendCharacterInfo, broadcast, SHOP_ITEMS, MAP_SIZE, VILLAGE_POS, commandHandlers, sendRoomInfo }) {
-    console.log('DEBUG commandHandlers:', commandHandlers);
-    console.log('DEBUG command:', command);
-    console.log('DEBUG commandHandlers[command]:', commandHandlers && commandHandlers[command]);
+    if (process.env.DEBUG === 'true') console.log('DEBUG commandHandlers:', commandHandlers);
+    if (process.env.DEBUG === 'true') console.log('DEBUG command:', command);
+    if (process.env.DEBUG === 'true') console.log('DEBUG commandHandlers[command]:', commandHandlers && commandHandlers[command]);
     if (!commandHandlers) {
       ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '명령어 핸들러가 정의되어 있지 않습니다.' }));
       return;
@@ -157,12 +157,17 @@ const PlayerGameService = {
       }
       if (result.monsterDead) {
         Object.values(PlayerManager.getAllPlayers()).forEach((p) => {
-          if (p.position && p.position.x === x && p.position.y === y) {
+          if (p.position && p.position.x === x && p.position.y === y && p.world === player.world) {
             p.ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `${playerName}님이 ${monster.name}을(를) 처치했습니다!` }));
           }
         });
         respawnMonsterWithDeps(player.world, player.position.x, player.position.y);
       } else if (result.playerDead) {
+        // 리스폰: 1번 마을로 이동, HP 20%로 설정
+        player.world = 1;
+        player.position = { x: 4, y: 4 };
+        player.hp = Math.max(1, Math.floor(player.maxHp * 0.2));
+        await savePlayerData(playerName);
         await sendRoomInfoToAllInRoom(PlayerManager.getAllPlayers(), player.world, player.position.x, player.position.y, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
       }
       await sendRoomInfoToAllInRoom(PlayerManager.getAllPlayers(), player.world, player.position.x, player.position.y, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
@@ -214,13 +219,18 @@ const PlayerGameService = {
         if (result.monsterDead) {
           const { x, y } = player.position;
           Object.values(PlayerManager.getAllPlayers()).forEach((p) => {
-            if (p.position && p.position.x === x && p.position.y === y) {
+            if (p.position && p.position.x === x && p.position.y === y && p.world === player.world) {
               p.ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `${playerName}님이 ${monster.name}을(를) 처치했습니다!` }));
             }
           });
           respawnMonsterWithDeps(player.world, player.position.x, player.position.y);
         }
         if (result.playerDead) {
+          // 리스폰: 1번 마을로 이동, HP 20%로 설정
+          player.world = 1;
+          player.position = { x: 4, y: 4 };
+          player.hp = Math.max(1, Math.floor(player.maxHp * 0.2));
+          await savePlayerData(playerName);
           await sendRoomInfoToAllInRoom(
             PlayerManager.getAllPlayers(),
             player.world, player.position.x, player.position.y,
@@ -274,7 +284,7 @@ const PlayerGameService = {
     }
     ws.send(JSON.stringify({ type: 'system', subtype: 'info', message: msg }));
   },
-  async handleShop({ ws, playerName, PlayerManager, getRoom, SHOP_ITEMS, MAP_SIZE, VILLAGE_POS }) {
+  async handleShop({ ws, playerName, PlayerManager, getRoom, SHOP_ITEMS, MAP_SIZE, VILLAGE_POS, message }) {
     const player = PlayerManager.getPlayer(playerName);
     if (!player) return;
     const { x, y } = player.position;
@@ -283,24 +293,69 @@ const PlayerGameService = {
       ws.send(JSON.stringify({ type: 'system', subtype: 'guide', message: '상점은 마을에서만 이용할 수 있습니다.' }));
       return;
     }
-    let msg = '[상점 목록]\n────────────────────\n';
-    for (const cat of Object.keys(SHOP_ITEMS)) {
-      msg += `[${cat}]\n`;
-      SHOP_ITEMS[cat].forEach((item) => {
-        let statStr = '';
-        if (item.atk) statStr += ` 공격력+${item.atk}`;
-        if (item.def) statStr += ` 방어력+${item.def}`;
-        if (item.str) statStr += ` 힘+${item.str}`;
-        if (item.dex) statStr += ` 민첩+${item.dex}`;
-        if (item.perUse && item.total) statStr += ` 1회 ${item.perUse} 회복 / 총 ${item.total}`;
-        statStr = statStr.trim();
-        msg += `  • ${item.name.padEnd(8, ' ')} ${String(item.price).padEnd(5, ' ')}G  - ${item.desc}`;
-        if (statStr) msg += ` [${statStr}]`;
-        msg += '\n';
+    // 명령어 파싱: /상점 [카테고리] [페이지]
+    const args = message ? message.trim().split(' ').slice(1) : [];
+    const categories = Object.keys(SHOP_ITEMS);
+    if (args.length === 0 || !categories.includes(args[0])) {
+      // 카테고리 안내
+      let msg = '[상점 카테고리]\n';
+      categories.forEach(cat => {
+        msg += `- ${cat}: /상점 ${cat} 1\n`;
       });
-      msg += '────────────────────\n';
+      msg += '\n구매: /구매 아이템명 (예: /구매 나무검)';
+      msg += '\n판매: /상점판매';
+      ws.send(JSON.stringify({ type: 'system', subtype: 'info', message: msg }));
+      return;
     }
-    msg += '구매: /구매 아이템명 (예: /구매 나무검)';
+    const cat = args[0];
+    const page = Math.max(1, parseInt(args[1] || '1', 10));
+    const itemsPerPage = 7;
+    const items = SHOP_ITEMS[cat] || [];
+    const totalPages = Math.max(1, Math.ceil(items.length / itemsPerPage));
+    const pageItems = items.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+    let msg = `[${cat} 상점 ${page}페이지/${totalPages}]\n`;
+    pageItems.forEach((item, idx) => {
+      let statStr = '';
+      if (item.atk) statStr += ` 공격력+${item.atk}`;
+      if (item.def) statStr += ` 방어력+${item.def}`;
+      if (item.str) statStr += ` 힘+${item.str}`;
+      if (item.dex) statStr += ` 민첩+${item.dex}`;
+      if (item.perUse && item.total) statStr += ` 1회 ${item.perUse} 회복 / 총 ${item.total}`;
+      statStr = statStr.trim();
+      msg += `  ${idx + 1}. ${item.name.padEnd(8, ' ')} ${String(item.price).padEnd(5, ' ')}G  - ${item.desc}`;
+      if (statStr) msg += ` [${statStr}]`;
+      msg += '\n';
+    });
+    msg += `\n페이지: /상점 ${cat} [페이지번호]`;
+    msg += '\n구매: /구매 아이템명 (예: /구매 나무검)';
+    msg += '\n판매: /상점판매';
+    ws.send(JSON.stringify({ type: 'system', subtype: 'info', message: msg }));
+  },
+  // /상점판매 [페이지]
+  async handleShopSell({ ws, playerName, PlayerManager, getRoom, SHOP_ITEMS, message }) {
+    const player = PlayerManager.getPlayer(playerName);
+    if (!player) return;
+    const { x, y } = player.position;
+    const room = getRoom(player.world, x, y);
+    if (room.type !== 'village') {
+      ws.send(JSON.stringify({ type: 'system', subtype: 'guide', message: '상점은 마을에서만 이용할 수 있습니다.' }));
+      return;
+    }
+    const args = message ? message.trim().split(' ').slice(1) : [];
+    const page = Math.max(1, parseInt(args[0] || '1', 10));
+    // 인벤토리 내 판매 가능한 아이템만 필터링
+    const sellable = player.inventory.filter(invItem => {
+      return Object.values(SHOP_ITEMS).flat().some(shopItem => shopItem.name === invItem.name);
+    });
+    const itemsPerPage = 7;
+    const totalPages = Math.max(1, Math.ceil(sellable.length / itemsPerPage));
+    const pageItems = sellable.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+    let msg = `[판매 가능한 아이템 ${page}페이지/${totalPages}]\n`;
+    pageItems.forEach((item, idx) => {
+      msg += `  ${idx + 1}. ${item.name} (${item.count || 1}개)\n`;
+    });
+    if (sellable.length === 0) msg += '판매 가능한 아이템이 없습니다.\n';
+    msg += `\n페이지: /상점판매 [페이지번호]`;
     msg += '\n판매: /판매 아이템명 (예: /판매 나무검)';
     ws.send(JSON.stringify({ type: 'system', subtype: 'info', message: msg }));
   },

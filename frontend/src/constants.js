@@ -1,6 +1,7 @@
 export const COMMANDS = {
   INFO: '/정보',
   SHOP: '/상점',
+  SHOP_SELL: '/상점판매',
   INN: '/여관',
   BUY: '/구매',
   SELL: '/판매',
@@ -14,7 +15,7 @@ export const COMMANDS = {
 
 export const SYSTEM_MESSAGES = {
   DISCONNECTED: '서버와 연결이 끊어졌습니다.',
-  SHOP_GUIDE: '[상점 명령어 안내] /구매 아이템명, /판매 아이템명',
+  SHOP_GUIDE: '[상점 명령어 안내] /상점 [카테고리] [페이지], /상점판매 [페이지], /구매 아이템명, /판매 아이템명',
   INN_GUIDE: '[여관] 체력과 마나를 모두 회복할 수 있습니다. (추후 구현 예정)',
   CHAT_GUIDE: '[채팅 명령어 안내] /전체 전체채팅, /전 전체채팅, /동/서/남/북 : 방향 이동, /지역 지역채팅, /지 지역채팅(기본)',
   INVALID_COMMAND: '[알림] 지원하지 않는 명령어입니다.',

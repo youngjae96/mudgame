@@ -107,7 +107,7 @@ function useWebSocket(onDisconnect) {
       return;
     }
     ws.current = new window.WebSocket(WS_URL);
-    console.log('[WebSocket] WebSocket 객체 생성:', WS_URL);
+    if (process.env.REACT_APP_DEBUG === 'true') console.log('[WebSocket] WebSocket 객체 생성:', WS_URL);
     ws.current.onopen = () => {
       reconnectAttempts.current = 0; // 성공 시 초기화
       const token = localStorage.getItem('jwtToken');
@@ -115,7 +115,7 @@ function useWebSocket(onDisconnect) {
       try {
         username = jwtDecode(token).username;
       } catch (e) { /* ignore decode error */ }
-      console.log('[WebSocket] onopen, join 전송:', { name: username, token });
+      if (process.env.REACT_APP_DEBUG === 'true') console.log('[WebSocket] onopen, join 전송:', { name: username, token });
       if (ws.current.readyState === WebSocket.OPEN) {
         ws.current.send(JSON.stringify({ type: 'join', name: username, token }));
         setConnected(true);
@@ -127,20 +127,15 @@ function useWebSocket(onDisconnect) {
       }
     };
     ws.current.onerror = (err) => {
-      console.log('[WebSocket] onerror:', err);
+      if (process.env.REACT_APP_DEBUG === 'true') console.log('[WebSocket] onerror:', err);
     };
     ws.current.onclose = () => {
-      console.log('[WebSocket] onclose');
+      if (process.env.REACT_APP_DEBUG === 'true') console.log('[WebSocket] onclose');
       setConnected(false);
       setMessages((msgs) => [...msgs, { type: 'system', message: SYSTEM_MESSAGES.DISCONNECTED }]);
       if (onDisconnect) onDisconnect();
-      // 자동 재연결 로직
-      reconnectAttempts.current += 1;
-      if (reconnectAttempts.current < 5) {
-        reconnectTimeout.current = setTimeout(handleConnect, 2000);
-      } else {
-        window.location.reload();
-      }
+      // 무한 자동 재연결
+      reconnectTimeout.current = setTimeout(handleConnect, 2000);
     };
   };
 

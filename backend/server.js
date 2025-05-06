@@ -33,6 +33,8 @@ const {
   handleGuildCommand,
   handleWhoCommand,
   handleHelpCommand,
+  handleShopCommand,
+  handleShopSellCommand,
 } = require('./commands');
 const logger = require('./middlewares/logger');
 const errorHandler = require('./middlewares/errorHandler');
@@ -197,6 +199,8 @@ async function savePlayerData(playerName) {
 const commandHandlers = {
   '/구매': handleBuyCommand,
   '/판매': handleSellCommand,
+  '/상점': handleShopCommand,
+  '/상점판매': handleShopSellCommand,
   '/장착': handleEquipCommand,
   '/해제': handleUnequipCommand,
   '/텔포': handleTeleportCommand,
@@ -234,9 +238,9 @@ wss.on('connection', (ws) => {
 
     if (data.type === 'join') {
       const { name, token } = data;
-      console.log('[서버] join 요청:', { name, token });
+      if (process.env.DEBUG === 'true') console.log('[서버] join 요청:', { name, token });
       if (!token) {
-        console.log('[서버] 인증 토큰 없음');
+        if (process.env.DEBUG === 'true') console.log('[서버] 인증 토큰 없음');
         ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '인증 토큰이 필요합니다.' }));
         ws.close();
         return;
@@ -245,13 +249,13 @@ wss.on('connection', (ws) => {
       try {
         decoded = jwt.verify(token, SECRET);
         if (decoded.username !== name) {
-          console.log('[서버] 토큰 username 불일치', decoded.username, name);
+          if (process.env.DEBUG === 'true') console.log('[서버] 토큰 username 불일치', decoded.username, name);
           ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '토큰 정보가 일치하지 않습니다.' }));
           ws.close();
           return;
         }
       } catch (e) {
-        console.log('[서버] 유효하지 않은 토큰', e);
+        if (process.env.DEBUG === 'true') console.log('[서버] 유효하지 않은 토큰', e);
         ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '유효하지 않은 토큰입니다.' }));
         ws.close();
         return;
@@ -260,7 +264,7 @@ wss.on('connection', (ws) => {
       (async () => {
         let pdata = await PlayerData.findOne({ userId: decoded.userId });
         if (!pdata) {
-          console.log('[서버] PlayerData 없음, 새로 생성', decoded.userId, playerName);
+          if (process.env.DEBUG === 'true') console.log('[서버] PlayerData 없음, 새로 생성', decoded.userId, playerName);
           pdata = await PlayerData.create({
             userId: decoded.userId,
             name: playerName,
@@ -271,7 +275,7 @@ wss.on('connection', (ws) => {
             inventory: [],
           });
         } else {
-          console.log('[서버] PlayerData 불러옴', pdata);
+          if (process.env.DEBUG === 'true') console.log('[서버] PlayerData 불러옴', pdata);
         }
         const player = new Player(playerName, ws);
         player.world = pdata.world;

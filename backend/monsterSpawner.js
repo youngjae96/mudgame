@@ -15,7 +15,7 @@ function respawnMonster(world, x, y, getRoom, FIELD_MONSTERS, FOREST_MONSTERS, C
           const m = new Monster(pool[Math.floor(Math.random() * pool.length)], x, y);
           room.monsters.push(m);
         }
-        const playerNames = getPlayersInRoom(x, y);
+        const playerNames = getPlayersInRoom(world, x, y);
         playerNames.forEach((name) => sendRoomInfo(players[name], getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS));
       }
     }

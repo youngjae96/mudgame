@@ -248,4 +248,151 @@ describe('commands.js', () => {
       delete global.getPlayersInRoom;
     });
   });
+
+  describe('handleShopCommand', () => {
+    it('/상점 명령어는 PlayerGameService.handleShop을 호출한다', () => {
+      const spy = jest.spyOn(require('./services/PlayerGameService'), 'handleShop').mockImplementation(() => {});
+      const ws = { send: jest.fn() };
+      const SHOP_ITEMS = { 무기: [{ name: '나무검', price: 10, desc: '테스트' }] };
+      commands.handleShopCommand({ ws, playerName: 'test', message: '/상점', SHOP_ITEMS });
+      expect(spy).toHaveBeenCalled();
+      spy.mockRestore();
+    });
+  });
+
+  describe('handleShopSellCommand', () => {
+    it('/상점판매 명령어는 PlayerGameService.handleShopSell을 호출한다', () => {
+      const spy = jest.spyOn(require('./services/PlayerGameService'), 'handleShopSell').mockImplementation(() => {});
+      commands.handleShopSellCommand({ ws: {}, playerName: 'test', message: '/상점판매' });
+      expect(spy).toHaveBeenCalled();
+      spy.mockRestore();
+    });
+  });
+
+  describe('handleGuildCommand', () => {
+    it('/길드 생성 명령어 정상 동작', async () => {
+      const ws = createMockWs();
+      const players = {};
+      const Guild = require('./models/Guild');
+      Guild.findOne = jest.fn().mockResolvedValue(null);
+      Guild.prototype.save = jest.fn().mockResolvedValue();
+      await commands.handleGuildCommand({ ws, playerName: '길드장', message: '/길드 생성 테스트길드', players });
+      const callArg = ws.send.mock.calls[0][0];
+      expect(JSON.parse(callArg)).toEqual(expect.objectContaining({ type: 'system', message: expect.stringContaining('생성되었습니다') }));
+    });
+  });
+
+  describe('handleGuildCommand (coverage)', () => {
+    let ws, players, Guild;
+    beforeEach(() => {
+      ws = createMockWs();
+      players = {};
+      Guild = require('./models/Guild');
+    });
+    it('길드 생성: 이미 길드 소속', async () => {
+      Guild.findOne = jest.fn().mockResolvedValueOnce({ name: '기존길드' });
+      await commands.handleGuildCommand({ ws, playerName: '길드장', message: '/길드 생성 중복', players });
+      const callArg = ws.send.mock.calls[0][0];
+      expect(JSON.parse(callArg).message).toContain('이미 다른 길드에 소속');
+    });
+    it('길드 생성: 이미 존재하는 길드명', async () => {
+      Guild.findOne = jest.fn()
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce({ name: '중복길드' });
+      await commands.handleGuildCommand({ ws, playerName: '길드장', message: '/길드 생성 중복길드', players });
+      const callArg = ws.send.mock.calls[0][0];
+      expect(JSON.parse(callArg).message).toContain('이미 존재하는 길드명');
+    });
+    it('길드 가입: 없는 길드', async () => {
+      Guild.findOne = jest.fn().mockResolvedValue(null);
+      await commands.handleGuildCommand({ ws, playerName: '유저', message: '/길드 가입 없음', players });
+      const callArg = ws.send.mock.calls[0][0];
+      expect(JSON.parse(callArg).message).toContain('해당 이름의 길드가 없습니다');
+    });
+    it('길드 수락: 길드장 아님', async () => {
+      Guild.findOne = jest.fn().mockResolvedValue(null);
+      await commands.handleGuildCommand({ ws, playerName: '유저', message: '/길드 수락 누군가', players });
+      const callArg = ws.send.mock.calls[0][0];
+      expect(JSON.parse(callArg).message).toContain('길드장만 가입 수락');
+    });
+    it('길드 탈퇴: 소속 없음', async () => {
+      Guild.findOne = jest.fn().mockResolvedValue(null);
+      await commands.handleGuildCommand({ ws, playerName: '유저', message: '/길드 탈퇴', players });
+      const callArg = ws.send.mock.calls[0][0];
+      expect(JSON.parse(callArg).message).toContain('소속된 길드가 없습니다');
+    });
+    it('길드 추방: 길드장 아님', async () => {
+      Guild.findOne = jest.fn().mockResolvedValue(null);
+      await commands.handleGuildCommand({ ws, playerName: '유저', message: '/길드 추방 누군가', players });
+      const callArg = ws.send.mock.calls[0][0];
+      expect(JSON.parse(callArg).message).toContain('길드장만 추방이 가능합니다');
+    });
+    it('길드 공지: 길드장 아님', async () => {
+      Guild.findOne = jest.fn().mockResolvedValue(null);
+      await commands.handleGuildCommand({ ws, playerName: '유저', message: '/길드 공지 공지내용', players });
+      const callArg = ws.send.mock.calls[0][0];
+      expect(JSON.parse(callArg).message).toContain('길드장만 공지 등록');
+    });
+    it('길드 해체: 길드장 아님', async () => {
+      Guild.findOne = jest.fn().mockResolvedValue(null);
+      await commands.handleGuildCommand({ ws, playerName: '유저', message: '/길드 해체', players });
+      const callArg = ws.send.mock.calls[0][0];
+      expect(JSON.parse(callArg).message).toContain('길드장만 해체가 가능합니다');
+    });
+    it('길드 정보: 소속 없음', async () => {
+      Guild.findOne = jest.fn().mockResolvedValue(null);
+      await commands.handleGuildCommand({ ws, playerName: '유저', message: '/길드 정보', players });
+      const callArg = ws.send.mock.calls[0][0];
+      expect(JSON.parse(callArg).message).toContain('소속된 길드가 없습니다');
+    });
+    it('길드 목록: 길드 없음', async () => {
+      Guild.find = jest.fn().mockResolvedValue([]);
+      await commands.handleGuildCommand({ ws, playerName: '유저', message: '/길드 목록', players });
+      const callArg = ws.send.mock.calls[0][0];
+      expect(JSON.parse(callArg).message).toContain('생성된 길드가 없습니다');
+    });
+    it('길드 채팅: 소속 없음', async () => {
+      Guild.findOne = jest.fn().mockResolvedValue(null);
+      await commands.handleGuildCommand({ ws, playerName: '유저', message: '/길드 채팅 안녕', players });
+      const callArg = ws.send.mock.calls[0][0];
+      expect(JSON.parse(callArg).message).toContain('소속된 길드가 없습니다');
+    });
+    it('길드 채팅로그: 채팅 내역 없음', async () => {
+      Guild.findOne = jest.fn().mockResolvedValue({ chatLog: [] });
+      await commands.handleGuildCommand({ ws, playerName: '유저', message: '/길드 로그', players });
+      const callArg = ws.send.mock.calls[0][0];
+      expect(JSON.parse(callArg).message).toContain('채팅 내역이 없습니다');
+    });
+    it('지원하지 않는 서브명령어', async () => {
+      await commands.handleGuildCommand({ ws, playerName: '유저', message: '/길드 뭔가', players });
+      const callArg = ws.send.mock.calls[0][0];
+      expect(JSON.parse(callArg).message).toContain('지원하지 않는 서브명령어');
+    });
+  });
+});
+
+describe('commands.js coverage', () => {
+  it('없는 명령어 입력 시 에러 없이 처리', () => {
+    expect(() => {
+      commands.handleCommand && commands.handleCommand({ ws: {}, playerName: 'test', message: '/없는명령' });
+    }).not.toThrow();
+  });
+  it('길드 명령어: 권한 없는 유저가 강퇴 시도', async () => {
+    const ws2 = { send: jest.fn() };
+    const players = { '길드원': { guild: '테스트길드', name: '길드원' } };
+    const Guild = require('./models/Guild');
+    Guild.findOne = jest.fn().mockResolvedValue(null);
+    await commands.handleGuildCommand({ ws: ws2, playerName: '길드원', message: '/길드 추방 다른유저', players, guild: { members: ['다른유저'] } });
+    expect(ws2.send).toHaveBeenCalled();
+    const callArg = ws2.send.mock.calls[0][0];
+    expect(JSON.parse(callArg).message).toContain('길드장만');
+  });
+  it('상점 명령어: 잘못된 카테고리', async () => {
+    const ws3 = { send: jest.fn() };
+    const SHOP_ITEMS = { 무기: [{ name: '나무검', price: 10, desc: '테스트' }] };
+    const spy = jest.spyOn(require('./services/PlayerGameService'), 'handleShop').mockImplementation(() => {});
+    await commands.handleShopCommand({ ws: ws3, playerName: 'test', message: '/상점 없는카테고리', SHOP_ITEMS });
+    expect(spy).toHaveBeenCalled();
+    spy.mockRestore();
+  });
 }); 
