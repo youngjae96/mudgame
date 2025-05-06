@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">53.37% </span>
+                <span class="strong">53.21% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>229/429</span>
+                <span class='fraction'>232/436</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">52.83% </span>
+                <span class="strong">52.78% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>121/229</span>
+                <span class='fraction'>123/233</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">37.03% </span>
+                <span class="strong">38.46% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>10/27</span>
+                <span class='fraction'>10/26</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">54.96% </span>
+                <span class="strong">55.02% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>227/413</span>
+                <span class='fraction'>230/418</span>
             </div>
         
             
@@ -726,7 +726,11 @@
 <a name='L661'></a><a href='#L661'>661</a>
 <a name='L662'></a><a href='#L662'>662</a>
 <a name='L663'></a><a href='#L663'>663</a>
-<a name='L664'></a><a href='#L664'>664</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L664'></a><a href='#L664'>664</a>
+<a name='L665'></a><a href='#L665'>665</a>
+<a name='L666'></a><a href='#L666'>666</a>
+<a name='L667'></a><a href='#L667'>667</a>
+<a name='L668'></a><a href='#L668'>668</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
@@ -866,16 +870,20 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1526,19 +1534,23 @@ async function handleAdminCommand({ ws, playerName, message, players, getRoom, s
   // /운영자 공지 메시지
   if (subcmd === '공지') {
     const notice = args.slice(2).join(' ');
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (notice === '취소') {
+<span class="cstat-no" title="statement not covered" >      if (typeof global.currentNotice !== 'undefined') <span class="cstat-no" title="statement not covered" >global.currentNotice = null;</span></span>
+<span class="cstat-no" title="statement not covered" >      if (typeof global.wss !== 'undefined') {</span>
+<span class="cstat-no" title="statement not covered" >        broadcast(global.wss, { type: 'notice', notice: null });</span>
+      }
+<span class="cstat-no" title="statement not covered" >      ws.send(JSON.stringify({ type: 'system', message: '[운영자] 공지가 해제되었습니다.' }));</span>
+<span class="cstat-no" title="statement not covered" >      return;</span>
+    }
     <span class="missing-if-branch" title="if path not taken" >I</span>if (!notice) {
 <span class="cstat-no" title="statement not covered" >      ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[운영자] 공지할 메시지를 입력하세요. (/운영자 공지 &lt;메시지&gt;)' }));</span>
 <span class="cstat-no" title="statement not covered" >      return;</span>
     }
-    if (typeof global.wss !== 'undefined') {
-      broadcast(global.wss, { type: 'system', message: `[공지] ${notice}` });
-    } else <span class="missing-if-branch" title="else path not taken" >E</span>{
-<span class="cstat-no" title="statement not covered" >      Object.values(players).forEach(<span class="fstat-no" title="function not covered" >(p</span>) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >        if (p.ws &amp;&amp; p.ws.readyState === 1) {</span>
-<span class="cstat-no" title="statement not covered" >          p.ws.send(JSON.stringify({ type: 'system', message: `[공지] ${notice}` }));</span>
-        }
-      });
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (typeof global.currentNotice !== 'undefined') <span class="cstat-no" title="statement not covered" >global.currentNotice = notice;</span>
+    <span class="missing-if-branch" title="else path not taken" >E</span>if (typeof global.wss !== 'undefined') {
+      broadcast(global.wss, { type: 'notice', notice });
     }
+    ws.send(JSON.stringify({ type: 'system', message: '[운영자] 공지가 등록되었습니다.' }));
     return;
   }
   // /운영자 골드지급 닉네임 숫자
@@ -2059,7 +2071,7 @@ module.exports = {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-06T12:33:54.701Z
+                at 2025-05-06T12:49:11.672Z
             </div>
         <script src="../prettify.js"></script>
         <script>

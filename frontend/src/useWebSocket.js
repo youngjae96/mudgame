@@ -31,6 +31,7 @@ function useWebSocket(onDisconnect) {
   const chatEndRef = useRef(null);
   const reconnectAttempts = useRef(0);
   const reconnectTimeout = useRef(null);
+  const [wsError, setWsError] = useState(null);
 
   useEffect(() => {
     if (connected && ws.current) {
@@ -105,19 +106,23 @@ function useWebSocket(onDisconnect) {
   }, []);
 
   const handleConnect = () => {
-    if (ws.current && (ws.current.readyState === 0 || ws.current.readyState === 1)) {
-      // 이미 연결 중이거나 연결됨
-      return;
+    // 기존 연결이 있으면 정리
+    if (ws.current) {
+      if (ws.current.readyState === 0 || ws.current.readyState === 1) {
+        ws.current.onclose = null;
+        ws.current.onerror = null;
+        ws.current.onmessage = null;
+        ws.current.close();
+      }
     }
     ws.current = new window.WebSocket(WS_URL);
     if (process.env.REACT_APP_DEBUG === 'true') console.log('[WebSocket] WebSocket 객체 생성:', WS_URL);
     ws.current.onopen = () => {
-      reconnectAttempts.current = 0; // 성공 시 초기화
+      reconnectAttempts.current = 0;
+      setWsError(null);
       const token = localStorage.getItem('jwtToken');
       let username = '';
-      try {
-        username = jwtDecode(token).username;
-      } catch (e) { /* ignore decode error */ }
+      try { username = jwtDecode(token).username; } catch (e) {/* ignore error */}
       if (process.env.REACT_APP_DEBUG === 'true') console.log('[WebSocket] onopen, join 전송:', { name: username, token });
       if (ws.current.readyState === WebSocket.OPEN) {
         ws.current.send(JSON.stringify({ type: 'join', name: username, token }));
@@ -130,15 +135,70 @@ function useWebSocket(onDisconnect) {
       }
     };
     ws.current.onerror = (err) => {
+      setWsError('WebSocket 연결 오류');
       if (process.env.REACT_APP_DEBUG === 'true') console.log('[WebSocket] onerror:', err);
     };
     ws.current.onclose = () => {
-      if (process.env.REACT_APP_DEBUG === 'true') console.log('[WebSocket] onclose');
       setConnected(false);
       setMessages((msgs) => [...msgs, { type: 'system', message: SYSTEM_MESSAGES.DISCONNECTED }]);
+      setWsError('WebSocket 연결 종료');
       if (onDisconnect) onDisconnect();
-      // 무한 자동 재연결
+      if (reconnectTimeout.current) clearTimeout(reconnectTimeout.current);
       reconnectTimeout.current = setTimeout(handleConnect, 2000);
+    };
+    ws.current.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'chat' || data.type === 'system') {
+        setMessages((msgs) => {
+          const next = [...msgs, data];
+          return next.length > 100 ? next.slice(next.length - 100) : next;
+        });
+      } else if (data.type === 'players') {
+        setPlayers(data.list);
+      } else if (data.type === 'room') {
+        setRoom(data.room);
+        setMapSize(data.mapSize || 5);
+        if (data.mapInfo) setMapInfo(data.mapInfo);
+        if (data.nearbyRooms) setNearbyRooms(data.nearbyRooms);
+      } else if (data.type === 'inventory') {
+        setInventory(data.inventory);
+      } else if (data.type === 'character') {
+        setCharacter(data.info);
+      } else if (data.type === 'stat') {
+        setMessages((msgs) => {
+          const next = [...msgs, { type: 'stat', text: data.text }];
+          return next.length > 100 ? next.slice(next.length - 100) : next;
+        });
+        if (typeof data.text === 'string') {
+          const stat = {};
+          const hpMatch = data.text.match(/HP\s*:\s*([\d.]+)\s*\/\s*([\d.]+)/);
+          const mpMatch = data.text.match(/MP\s*:\s*([\d.]+)\s*\/\s*([\d.]+)/);
+          const strMatch = data.text.match(/STR\s*:\s*([\d.]+)/) || data.text.match(/공격력\s*:\s*([\d.]+)/);
+          const defMatch = data.text.match(/DEF\s*:\s*([\d.]+)/) || data.text.match(/방어력\s*:\s*([\d.]+)/);
+          const dexMatch = data.text.match(/DEX\s*:\s*([\d.]+)/) || data.text.match(/민첩\s*:\s*([\d.]+)/);
+          const intMatch = data.text.match(/INT\s*:\s*([\d.]+)/) || data.text.match(/지능\s*:\s*([\d.]+)/);
+          if (hpMatch) { stat.hp = Number(hpMatch[1]); stat.maxHp = Number(hpMatch[2]); }
+          if (mpMatch) { stat.mp = Number(mpMatch[1]); stat.maxMp = Number(mpMatch[2]); }
+          if (strMatch) stat.atk = Number(strMatch[1]);
+          if (defMatch) stat.def = Number(defMatch[1]);
+          if (dexMatch) stat.dex = Number(dexMatch[1]);
+          if (intMatch) stat.int = Number(intMatch[1]);
+          if (Object.keys(stat).length > 0) setCharacter((prev) => ({ ...prev, ...stat }));
+        }
+      } else if (data.type === 'battle') {
+        setMessages((msgs) => {
+          if (Array.isArray(data.log)) {
+            const logs = data.log.map((log) => ({ ...log, type: 'battle' }));
+            const next = [...msgs.flat(), ...logs];
+            return next.length > 100 ? next.slice(next.length - 100) : next;
+          } else {
+            const next = [...msgs.flat(), { ...data, type: 'battle' }];
+            return next.length > 100 ? next.slice(next.length - 100) : next;
+          }
+        });
+      } else if (data.type === 'notice') {
+        setNotice(data.notice);
+      }
     };
   };
 
@@ -241,7 +301,8 @@ function useWebSocket(onDisconnect) {
     handlePickup,
     handleAttack,
     nearbyRooms,
-    notice
+    notice,
+    wsError
   };
 }
 

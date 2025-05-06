@@ -94,17 +94,17 @@ const SHOP_ITEMS = {
 
 const ISLAND_MONSTERS = [
   // 해변(중간~강, 기존의 2~2.5배)
-  { name: '해변의 크랩킹', maxHp: 220, atk: 45, def: 28, gold: 50, dropItems: [ITEM_NAME_FLAME_SWORD], dropRates: [0.05] },
-  { name: '거대 조개괴수', maxHp: 260, atk: 40, def: 34, gold: 55, dropItems: [ITEM_NAME_FLAME_ARMOR], dropRates: [0.06] },
+  { name: '해변의 크랩킹', maxHp: 220, atk: 45, def: 28, gold: 50, dropItems: [ITEM_NAME_FLAME_SWORD], dropRates: [0.08] },
+  { name: '거대 조개괴수', maxHp: 260, atk: 40, def: 34, gold: 55, dropItems: [ITEM_NAME_FLAME_ARMOR], dropRates: [0.08] },
   // 정글(강~매우강, 기존의 2.5~3배)
-  { name: '정글 히드라', maxHp: 420, atk: 70, def: 40, gold: 80, dropItems: [ITEM_NAME_FROST_SWORD], dropRates: [0.07] },
-  { name: '맹독 고릴라', maxHp: 320, atk: 60, def: 36, gold: 65, dropItems: [ITEM_NAME_FROST_ARMOR], dropRates: [0.05] },
+  { name: '정글 히드라', maxHp: 420, atk: 70, def: 40, gold: 80, dropItems: [ITEM_NAME_FROST_SWORD], dropRates: [0.08] },
+  { name: '맹독 고릴라', maxHp: 320, atk: 60, def: 36, gold: 65, dropItems: [ITEM_NAME_FROST_ARMOR], dropRates: [0.08] },
   // 화산(최상급, 기존의 2.5~3배)
-  { name: '화산 드래곤', maxHp: 600, atk: 100, def: 55, gold: 150, dropItems: [ITEM_NAME_DRAGON_SWORD], dropRates: [0.06] },
-  { name: '용암 거인', maxHp: 520, atk: 90, def: 70, gold: 130, dropItems: [ITEM_NAME_DRAGON_ARMOR], dropRates: [0.07] },
+  { name: '화산 드래곤', maxHp: 600, atk: 100, def: 55, gold: 150, dropItems: [ITEM_NAME_DRAGON_SWORD], dropRates: [0.08] },
+  { name: '용암 거인', maxHp: 520, atk: 90, def: 70, gold: 130, dropItems: [ITEM_NAME_DRAGON_ARMOR], dropRates: [0.08] },
   // 평지(중~강, 기존의 2~2.5배)
-  { name: '무인도 멧돼지', maxHp: 180, atk: 38, def: 22, gold: 40, dropItems: [ITEM_NAME_DARK_SWORD], dropRates: [0.05] },
-  { name: '야생 코뿔소', maxHp: 260, atk: 48, def: 30, gold: 48, dropItems: [ITEM_NAME_DARK_ARMOR], dropRates: [0.07] },
+  { name: '무인도 멧돼지', maxHp: 180, atk: 38, def: 22, gold: 40, dropItems: [ITEM_NAME_DARK_SWORD], dropRates: [0.08] },
+  { name: '야생 코뿔소', maxHp: 260, atk: 48, def: 30, gold: 48, dropItems: [ITEM_NAME_DARK_ARMOR], dropRates: [0.08] },
 ];
 
 const CAVE_BOSS_MONSTERS = [
