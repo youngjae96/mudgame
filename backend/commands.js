@@ -113,14 +113,23 @@ function handleInnCommand({ ws, playerName, players, getRoom, savePlayerData, se
   ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `[여관] HP/MP가 모두 회복되었습니다! (-${INN_PRICE}G)` }));
 }
 
-function handleAdminCommand({ ws, playerName, message, players, getRoom, sendInventory, sendCharacterInfo }) {
+function handleAdminCommand({ ws, playerName, message, players, getRoom, sendInventory, sendCharacterInfo, savePlayerData }) {
   // /운영자 <subcmd> ...
   const args = message.trim().split(' ');
   if (args.length < 2) {
-    ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[운영자] 사용법: /운영자 <공지|골드지급|아이템지급|텔포> ...' }));
+    ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[운영자] 사용법: /운영자 <공지|골드지급|아이템지급|텔포|서버저장> ...' }));
     return;
   }
   const subcmd = args[1];
+  // /운영자 서버저장: 모든 플레이어 DB 저장
+  if (subcmd === '서버저장') {
+    const allPlayers = Object.keys(players);
+    Promise.all(allPlayers.map(name => savePlayerData(name).catch(() => {})))
+      .then(() => {
+        ws.send(JSON.stringify({ type: 'system', message: '[운영자] 모든 플레이어 데이터가 DB에 저장되었습니다.' }));
+      });
+    return;
+  }
   // /운영자 공지 메시지
   if (subcmd === '공지') {
     const notice = args.slice(2).join(' ');

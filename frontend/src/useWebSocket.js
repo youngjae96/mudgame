@@ -28,6 +28,8 @@ function useWebSocket(onDisconnect) {
   const [nearbyRooms, setNearbyRooms] = useState([]);
   const ws = useRef(null);
   const chatEndRef = useRef(null);
+  const reconnectAttempts = useRef(0);
+  const reconnectTimeout = useRef(null);
 
   useEffect(() => {
     if (connected && ws.current) {
@@ -107,6 +109,7 @@ function useWebSocket(onDisconnect) {
     ws.current = new window.WebSocket(WS_URL);
     console.log('[WebSocket] WebSocket 객체 생성:', WS_URL);
     ws.current.onopen = () => {
+      reconnectAttempts.current = 0; // 성공 시 초기화
       const token = localStorage.getItem('jwtToken');
       let username = '';
       try {
@@ -131,8 +134,22 @@ function useWebSocket(onDisconnect) {
       setConnected(false);
       setMessages((msgs) => [...msgs, { type: 'system', message: SYSTEM_MESSAGES.DISCONNECTED }]);
       if (onDisconnect) onDisconnect();
+      // 자동 재연결 로직
+      reconnectAttempts.current += 1;
+      if (reconnectAttempts.current < 5) {
+        reconnectTimeout.current = setTimeout(handleConnect, 2000);
+      } else {
+        window.location.reload();
+      }
     };
   };
+
+  useEffect(() => {
+    // 언마운트 시 타임아웃 정리
+    return () => {
+      if (reconnectTimeout.current) clearTimeout(reconnectTimeout.current);
+    };
+  }, []);
 
   const handleSend = (e) => {
     e.preventDefault();

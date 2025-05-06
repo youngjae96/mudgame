@@ -198,7 +198,7 @@ const commandHandlers = {
   '/해제': handleUnequipCommand,
   '/텔포': handleTeleportCommand,
   '/여관': handleInnCommand,
-  '/운영자': handleAdminCommand,
+  '/운영자': (args) => handleAdminCommand({ ...args, savePlayerData }),
 };
 
 // 서비스 인스턴스 생성 및 의존성 주입
