@@ -26,6 +26,7 @@ function useWebSocket(onDisconnect) {
   const [mapInfo, setMapInfo] = useState({ village: { x: 2, y: 2 } });
   const [character, setCharacter] = useState({});
   const [nearbyRooms, setNearbyRooms] = useState([]);
+  const [notice, setNotice] = useState(null);
   const ws = useRef(null);
   const chatEndRef = useRef(null);
   const reconnectAttempts = useRef(0);
@@ -83,6 +84,8 @@ function useWebSocket(onDisconnect) {
               return next.length > 100 ? next.slice(next.length - 100) : next;
             }
           });
+        } else if (data.type === 'notice') {
+          setNotice(data.notice);
         }
       };
     }
@@ -237,7 +240,8 @@ function useWebSocket(onDisconnect) {
     handleMove,
     handlePickup,
     handleAttack,
-    nearbyRooms
+    nearbyRooms,
+    notice
   };
 }
 

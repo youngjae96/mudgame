@@ -182,7 +182,7 @@ const PlayerGameService = {
       ws.send(JSON.stringify({ type: 'error', message: '해당 아이템이 없습니다.' }));
     }
   },
-  async handleAttack({ ws, playerName, monsterId, PlayerManager, getRoom, getPlayersInRoom, sendRoomInfoToAllInRoom, savePlayerData, sendCharacterInfo, broadcast, processBattle, respawnMonsterWithDeps, MAP_SIZE, VILLAGE_POS }) {
+  async handleAttack({ ws, playerName, monsterId, PlayerManager, getRoom, getPlayersInRoom, sendRoomInfoToAllInRoom, savePlayerData, sendCharacterInfo, broadcast, processBattle, respawnMonsterWithDeps, MAP_SIZE, VILLAGE_POS, sendInventory }) {
     const player = PlayerManager.getPlayer(playerName);
     if (!player) return;
     const { x, y } = player.position;

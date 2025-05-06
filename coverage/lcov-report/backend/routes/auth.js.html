@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">74.62% </span>
+                <span class="strong">67.16% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>50/67</span>
+                <span class='fraction'>45/67</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">62.5% </span>
+                <span class="strong">59.37% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>20/32</span>
+                <span class='fraction'>19/32</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">87.5% </span>
+                <span class="strong">80.35% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>49/56</span>
+                <span class='fraction'>45/56</span>
             </div>
         
             
@@ -193,17 +193,17 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -228,7 +228,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -239,23 +239,23 @@
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -292,18 +292,18 @@ router.post('/register', async (req, res) =&gt; {
   <span class="missing-if-branch" title="if path not taken" >I</span>if (bannedUser) <span class="cstat-no" title="statement not covered" >return res.status(403).json({ error: '이 계정은 차단되어 회원가입이 불가합니다.' });</span>
   // 같은 IP로 이미 가입된 계정이 있으면 거부
   const existingUserByIp = await User.findOne({ createdIp: ip });
-  <span class="missing-if-branch" title="if path not taken" >I</span>if (existingUserByIp) {
-<span class="cstat-no" title="statement not covered" >    return res.status(400).json({ error: '이 IP에서는 이미 계정이 생성되었습니다.' });</span>
+  <span class="missing-if-branch" title="else path not taken" >E</span>if (existingUserByIp) {
+    return res.status(400).json({ error: '이 IP에서는 이미 계정이 생성되었습니다.' });
   }
-  const hash = await bcrypt.hash(password, 10);
+  const hash = <span class="cstat-no" title="statement not covered" >await bcrypt.hash(password, 10);</span>
   let user;
-  try {
-    user = await User.create({ username, password: hash, createdIp: ip });
+<span class="cstat-no" title="statement not covered" >  try {</span>
+<span class="cstat-no" title="statement not covered" >    user = await User.create({ username, password: hash, createdIp: ip });</span>
   } catch (e) {
 <span class="cstat-no" title="statement not covered" >    return res.status(400).json({ error: '이미 존재하는 닉네임입니다.' });</span>
   }
-  try {
-    await PlayerData.create({
+<span class="cstat-no" title="statement not covered" >  try {</span>
+<span class="cstat-no" title="statement not covered" >    await PlayerData.create({</span>
       userId: user._id,
       name: user.username,
       world: 1,
@@ -328,7 +328,7 @@ router.post('/register', async (req, res) =&gt; {
       equipWeapon: null,
       equipArmor: null,
     });
-    res.json({ success: true, userId: user._id });
+<span class="cstat-no" title="statement not covered" >    res.json({ success: true, userId: user._id });</span>
   } catch (e) {
 <span class="cstat-no" title="statement not covered" >    await User.deleteOne({ _id: user._id });</span>
 <span class="cstat-no" title="statement not covered" >    res.status(500).json({ error: '회원가입 중 오류가 발생했습니다. 다시 시도해 주세요.' });</span>
@@ -338,7 +338,7 @@ router.post('/register', async (req, res) =&gt; {
 router.post('/login', async (req, res) =&gt; {
   const { username, password } = req.body;
   const user = await User.findOne({ username });
-  if (!user) return res.status(400).json({ error: '존재하지 않는 계정입니다.' });
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) <span class="cstat-no" title="statement not covered" >return res.status(400).json({ error: '존재하지 않는 계정입니다.' });</span>
   const pdata = await PlayerData.findOne({ userId: user._id });
   <span class="missing-if-branch" title="if path not taken" >I</span>if (!pdata) <span class="cstat-no" title="statement not covered" >return res.status(400).json({ error: '플레이어 데이터가 존재하지 않습니다. 관리자에게 문의하세요.' });</span>
   const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip;
@@ -355,7 +355,7 @@ router.post('/login', async (req, res) =&gt; {
   user.lastLoginIp = ip;
   user.lastLoginAt = new Date();
   await user.save();
-<span class="cstat-no" title="statement not covered" >  res.json({ success: true, token });</span>
+  res.json({ success: true, token });
 });
 &nbsp;
 // JWT 인증 테스트용 엔드포인트
@@ -370,7 +370,7 @@ module.exports = router; </pre></td></tr></table></pre>
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-06T11:58:29.133Z
+                at 2025-05-06T12:33:54.701Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

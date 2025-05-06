@@ -135,19 +135,23 @@ async function handleAdminCommand({ ws, playerName, message, players, getRoom, s
   // /운영자 공지 메시지
   if (subcmd === '공지') {
     const notice = args.slice(2).join(' ');
+    if (notice === '취소') {
+      if (typeof global.currentNotice !== 'undefined') global.currentNotice = null;
+      if (typeof global.wss !== 'undefined') {
+        broadcast(global.wss, { type: 'notice', notice: null });
+      }
+      ws.send(JSON.stringify({ type: 'system', message: '[운영자] 공지가 해제되었습니다.' }));
+      return;
+    }
     if (!notice) {
       ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[운영자] 공지할 메시지를 입력하세요. (/운영자 공지 <메시지>)' }));
       return;
     }
+    if (typeof global.currentNotice !== 'undefined') global.currentNotice = notice;
     if (typeof global.wss !== 'undefined') {
-      broadcast(global.wss, { type: 'system', message: `[공지] ${notice}` });
-    } else {
-      Object.values(players).forEach((p) => {
-        if (p.ws && p.ws.readyState === 1) {
-          p.ws.send(JSON.stringify({ type: 'system', message: `[공지] ${notice}` }));
-        }
-      });
+      broadcast(global.wss, { type: 'notice', notice });
     }
+    ws.send(JSON.stringify({ type: 'system', message: '[운영자] 공지가 등록되었습니다.' }));
     return;
   }
   // /운영자 골드지급 닉네임 숫자

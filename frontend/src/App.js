@@ -82,7 +82,8 @@ function AppInner() {
     handlePickup,
     handleAttack,
     nearbyRooms,
-    ws
+    ws,
+    notice
   } = useWebSocket(handleDisconnect);
 
   React.useEffect(() => { setInventory(wsInventory); }, [wsInventory]);
@@ -139,6 +140,9 @@ function AppInner() {
 
   return (
     <>
+      {notice && (
+        <div style={{ background: '#222', color: '#ffe066', fontWeight: 'bold', padding: '10px', textAlign: 'center', borderRadius: '8px', marginBottom: '10px', fontSize: '1.1em', letterSpacing: '1px' }}>{notice}</div>
+      )}
       {showMap && !isMobile && <MapModal mapSize={mapSize} mapInfo={mapInfo} onClose={() => setShowMap(false)} />}
       <ResponsiveLayout
         isMobile={isMobile}

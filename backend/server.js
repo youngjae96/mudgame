@@ -66,6 +66,8 @@ const wss = new WebSocketServer({ server });
 const PORT = process.env.PORT || 4000;
 
 let battleIntervals = {};
+global.currentNotice = null;
+global.wss = wss;
 
 function getPlayersInRoom(world, x, y) {
   return Object.values(PlayerManager.getAllPlayers())
@@ -323,8 +325,11 @@ wss.on('connection', (ws) => {
         RoomManager.addPlayerToRoom(playerName, player.world, player.position.x, player.position.y);
         sendInventory(PlayerManager.getPlayer(playerName));
         sendCharacterInfo(PlayerManager.getPlayer(playerName));
-        // 입장 시 방 정보도 전송 (room 정보가 클라이언트에 안 떠서 추가)
         sendRoomInfo(PlayerManager.getPlayer(playerName), getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+        // 공지 전송
+        if (global.currentNotice) {
+          ws.send(JSON.stringify({ type: 'notice', notice: global.currentNotice }));
+        }
       })();
     } else if (data.type === 'chat') {
       // 운영자 명령어, /입장, /나가기 등은 기존 분기 유지

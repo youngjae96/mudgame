@@ -184,17 +184,17 @@ describe('PlayerGameService', () => {
         inventory: [],
       }));
       ctx.processBattle = jest.fn(() => ({ log: [], monsterDead: false, playerDead: false }));
-      await PlayerGameService.handleAttack({ ...ctx, monsterId: 1, getPlayersInRoom: ctx.getPlayersInRoom });
+      await PlayerGameService.handleAttack({ ...ctx, monsterId: 1, getPlayersInRoom: ctx.getPlayersInRoom, sendInventory: ctx.sendInventory });
       expect(ctx.savePlayerData).toHaveBeenCalled();
     });
     it('플레이어가 없으면 아무 동작도 하지 않음', async () => {
       ctx.PlayerManager.getPlayer = jest.fn(() => null);
-      await PlayerGameService.handleAttack({ ...ctx, monsterId: 1, getPlayersInRoom: ctx.getPlayersInRoom });
+      await PlayerGameService.handleAttack({ ...ctx, monsterId: 1, getPlayersInRoom: ctx.getPlayersInRoom, sendInventory: ctx.sendInventory });
       expect(ctx.savePlayerData).not.toHaveBeenCalled();
     });
     it('없는 몬스터면 에러 메시지 전송', async () => {
       ctx.getRoom = jest.fn(() => ({ monsters: [], items: [], type: 'normal' }));
-      await PlayerGameService.handleAttack({ ...ctx, monsterId: 999, getPlayersInRoom: ctx.getPlayersInRoom });
+      await PlayerGameService.handleAttack({ ...ctx, monsterId: 999, getPlayersInRoom: ctx.getPlayersInRoom, sendInventory: ctx.sendInventory });
       const callArg = ctx.ws.send.mock.calls[0][0];
       expect(JSON.parse(callArg)).toEqual(expect.objectContaining({ message: expect.stringContaining('해당 몬스터가 없습니다') }));
     });
@@ -212,7 +212,7 @@ describe('PlayerGameService', () => {
       ctx.PlayerManager.getAllPlayers = jest.fn(() => ({
         testuser: { position: { x: 0, y: 0 }, ws: p1ws, world: 1 }
       }));
-      await PlayerGameService.handleAttack({ ...ctx, monsterId: 1, getPlayersInRoom: ctx.getPlayersInRoom });
+      await PlayerGameService.handleAttack({ ...ctx, monsterId: 1, getPlayersInRoom: ctx.getPlayersInRoom, sendInventory: ctx.sendInventory });
       expect(ctx.respawnMonsterWithDeps).toHaveBeenCalled();
       expect(p1ws.send).toHaveBeenCalled();
     });
@@ -226,7 +226,7 @@ describe('PlayerGameService', () => {
         inventory: [],
       }));
       ctx.processBattle = jest.fn(() => ({ log: [], monsterDead: false, playerDead: true }));
-      await PlayerGameService.handleAttack({ ...ctx, monsterId: 1, getPlayersInRoom: ctx.getPlayersInRoom });
+      await PlayerGameService.handleAttack({ ...ctx, monsterId: 1, getPlayersInRoom: ctx.getPlayersInRoom, sendInventory: ctx.sendInventory });
       expect(ctx.sendRoomInfoToAllInRoom).toHaveBeenCalled();
     });
   });
@@ -242,18 +242,18 @@ describe('PlayerGameService', () => {
         inventory: [],
       }));
       ctx.battleIntervals = {};
-      await PlayerGameService.handleAutoBattle({ ...ctx, monsterId: 1, getPlayersInRoom: ctx.getPlayersInRoom });
+      await PlayerGameService.handleAutoBattle({ ...ctx, monsterId: 1, getPlayersInRoom: ctx.getPlayersInRoom, sendInventory: ctx.sendInventory });
       expect(ctx.battleIntervals['testuser']).toBeDefined();
       clearInterval(ctx.battleIntervals['testuser']);
     });
     it('플레이어가 없으면 아무 동작도 하지 않음', async () => {
       ctx.PlayerManager.getPlayer = jest.fn(() => null);
-      await PlayerGameService.handleAutoBattle({ ...ctx, monsterId: 1, getPlayersInRoom: ctx.getPlayersInRoom });
+      await PlayerGameService.handleAutoBattle({ ...ctx, monsterId: 1, getPlayersInRoom: ctx.getPlayersInRoom, sendInventory: ctx.sendInventory });
       expect(ctx.battleIntervals['testuser']).toBeUndefined();
     });
     it('없는 몬스터면 에러 메시지 전송', async () => {
       ctx.getRoom = jest.fn(() => ({ monsters: [], items: [], type: 'normal' }));
-      await PlayerGameService.handleAutoBattle({ ...ctx, monsterId: 999, getPlayersInRoom: ctx.getPlayersInRoom });
+      await PlayerGameService.handleAutoBattle({ ...ctx, monsterId: 999, getPlayersInRoom: ctx.getPlayersInRoom, sendInventory: ctx.sendInventory });
       const callArg = ctx.ws.send.mock.calls[0][0];
       expect(JSON.parse(callArg)).toEqual(expect.objectContaining({ message: expect.stringContaining('해당 몬스터가 없습니다') }));
     });
@@ -267,7 +267,7 @@ describe('PlayerGameService', () => {
         inventory: [],
       }));
       ctx.battleIntervals = { testuser: setTimeout(() => {}, 1000) };
-      await PlayerGameService.handleAutoBattle({ ...ctx, monsterId: 1, getPlayersInRoom: ctx.getPlayersInRoom });
+      await PlayerGameService.handleAutoBattle({ ...ctx, monsterId: 1, getPlayersInRoom: ctx.getPlayersInRoom, sendInventory: ctx.sendInventory });
       const callArg = ctx.ws.send.mock.calls[0][0];
       expect(JSON.parse(callArg)).toEqual(expect.objectContaining({ message: expect.stringContaining('이미 자동전투 중입니다') }));
       clearTimeout(ctx.battleIntervals['testuser']);
@@ -285,7 +285,7 @@ describe('PlayerGameService', () => {
         inventory: [],
       }));
       ctx.battleIntervals = {};
-      await PlayerGameService.handleAutoBattle({ ...ctx, monsterId: 1, getPlayersInRoom: ctx.getPlayersInRoom });
+      await PlayerGameService.handleAutoBattle({ ...ctx, monsterId: 1, getPlayersInRoom: ctx.getPlayersInRoom, sendInventory: ctx.sendInventory });
       jest.runOnlyPendingTimers();
       const found = ctx.ws.send.mock.calls.some(call => JSON.parse(call[0]).message && call[0].includes('자동전투가 중단'));
       expect(found).toBe(true);
@@ -306,7 +306,7 @@ describe('PlayerGameService', () => {
       ctx.processBattle = jest.fn(() => ({ log: [], monsterDead: true, playerDead: false }));
       const p1ws = { send: jest.fn() };
       ctx.PlayerManager.getAllPlayers = jest.fn(() => ({ testuser: { position: { x: 0, y: 0 }, ws: p1ws, world: 1 } }));
-      await PlayerGameService.handleAutoBattle({ ...ctx, monsterId: 1, getPlayersInRoom: ctx.getPlayersInRoom });
+      await PlayerGameService.handleAutoBattle({ ...ctx, monsterId: 1, getPlayersInRoom: ctx.getPlayersInRoom, sendInventory: ctx.sendInventory });
       jest.runOnlyPendingTimers();
       await Promise.resolve(); await Promise.resolve(); await Promise.resolve();
       expect(ctx.respawnMonsterWithDeps).toHaveBeenCalled();
@@ -325,7 +325,7 @@ describe('PlayerGameService', () => {
       }));
       ctx.battleIntervals = {};
       ctx.processBattle = jest.fn(() => ({ log: [], monsterDead: false, playerDead: true }));
-      await PlayerGameService.handleAutoBattle({ ...ctx, monsterId: 1, getPlayersInRoom: ctx.getPlayersInRoom });
+      await PlayerGameService.handleAutoBattle({ ...ctx, monsterId: 1, getPlayersInRoom: ctx.getPlayersInRoom, sendInventory: ctx.sendInventory });
       jest.runOnlyPendingTimers();
       await Promise.resolve(); // flush microtasks
       expect(ctx.sendRoomInfoToAllInRoom).toHaveBeenCalled();
