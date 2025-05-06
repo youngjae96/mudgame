@@ -7,9 +7,7 @@ mongoose.connect(mongoUri, {
   // 최신 mongoose에서는 useNewUrlParser, useUnifiedTopology 옵션이 필요 없음
 });
 
-mongoose.connection.on('connected', () => {
-  console.log('MongoDB connected');
-});
+//   console.log('MongoDB connected');
 mongoose.connection.on('error', (err) => {
-  console.error('MongoDB connection error:', err);
+  //   console.error('MongoDB connection error:', err);
 }); 

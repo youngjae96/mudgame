@@ -72,6 +72,12 @@ class ShopService {
       if (foundItem) break;
     }
     if (!foundItem) {
+      const { ITEM_POOL } = require('../data/items');
+      if (Array.isArray(ITEM_POOL)) {
+        foundItem = ITEM_POOL.find(i => i.name === itemName);
+      }
+    }
+    if (!foundItem || !foundItem.price) {
       ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '상점에서 판매할 수 없는 아이템입니다.' }));
       return;
     }

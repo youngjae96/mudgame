@@ -1,7 +1,9 @@
 // PlayerGameService: 게임 내 실시간 플레이어 관련 로직(이동, 채팅, 명령어, 아이템, 전투 등)
 
+const { PlayerManager } = require('../playerManager');
+
 const PlayerGameService = {
-  async handleMove({ ws, playerName, dx, dy, PlayerManager, RoomManager, getRoom, getPlayersInRoom, sendRoomInfoToAllInRoom, savePlayerData, sendInventory, sendCharacterInfo, MAP_SIZE, VILLAGE_POS, battleIntervals }) {
+  async handleMove({ ws, playerName, dx, dy, RoomManager, getRoom, getPlayersInRoom, sendRoomInfoToAllInRoom, savePlayerData, sendInventory, sendCharacterInfo, MAP_SIZE, VILLAGE_POS, battleIntervals }) {
     const player = PlayerManager.getPlayer(playerName);
     if (!player) return;
     const { x, y } = player.position;
@@ -41,11 +43,16 @@ const PlayerGameService = {
         sendInventory(player);
         sendCharacterInfo(player);
       }
+      // 클랜힐 자동 비활성화
+      if (player.clanHealOn) {
+        player.clanHealOn = false;
+        ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '맵 이동으로 클랜힐이 비활성화되었습니다.' }));
+      }
     } else {
       ws.send(JSON.stringify({ type: 'error', message: '잘못된 좌표입니다.' }));
     }
   },
-  async handleChat({ ws, playerName, message, PlayerManager, broadcast, wss, getRoom, getPlayersInRoom, sendPlayerList, sendRoomInfoToAllInRoom, savePlayerData, sendInventory, sendCharacterInfo, commandHandlers, SHOP_ITEMS, MAP_SIZE, VILLAGE_POS, battleIntervals, parseChatCommand }) {
+  async handleChat({ ws, playerName, message, broadcast, wss, getRoom, getPlayersInRoom, sendPlayerList, sendRoomInfoToAllInRoom, savePlayerData, sendInventory, sendCharacterInfo, commandHandlers, SHOP_ITEMS, MAP_SIZE, VILLAGE_POS, battleIntervals, parseChatCommand }) {
     const trimmed = message.trim();
     const player = PlayerManager.getPlayer(playerName);
     if (!player) return;
@@ -89,15 +96,15 @@ const PlayerGameService = {
     }
     if (chatType === 'command') {
       if (process.env.DEBUG === 'true') console.log('DEBUG handleChat command:', command, args);
-      await this.handleCommand({ ws, playerName, command, args, PlayerManager, RoomManager: null, getRoom, getPlayersInRoom, sendRoomInfoToAllInRoom, savePlayerData, sendInventory, sendCharacterInfo, broadcast, SHOP_ITEMS, MAP_SIZE, VILLAGE_POS, commandHandlers, sendRoomInfo: sendRoomInfoToAllInRoom });
+      await this.handleCommand({ ws, playerName, command, args, RoomManager: null, getRoom, getPlayersInRoom, sendRoomInfoToAllInRoom, savePlayerData, sendInventory, sendCharacterInfo, broadcast, SHOP_ITEMS, MAP_SIZE, VILLAGE_POS, commandHandlers, sendRoomInfo: sendRoomInfoToAllInRoom });
       return;
     }
     if (chatType === 'move') {
-      await this.handleMove({ ws, playerName, dx, dy, PlayerManager, RoomManager: null, getRoom, getPlayersInRoom, sendRoomInfoToAllInRoom, savePlayerData, sendInventory, sendCharacterInfo, MAP_SIZE, VILLAGE_POS, battleIntervals });
+      await this.handleMove({ ws, playerName, dx, dy, RoomManager: null, getRoom, getPlayersInRoom, sendRoomInfoToAllInRoom, savePlayerData, sendInventory, sendCharacterInfo, MAP_SIZE, VILLAGE_POS, battleIntervals });
       return;
     }
   },
-  async handleCommand({ ws, playerName, command, args, PlayerManager, RoomManager, getRoom, getPlayersInRoom, sendRoomInfoToAllInRoom, savePlayerData, sendInventory, sendCharacterInfo, broadcast, SHOP_ITEMS, MAP_SIZE, VILLAGE_POS, commandHandlers, sendRoomInfo }) {
+  async handleCommand({ ws, playerName, command, args, RoomManager, getRoom, getPlayersInRoom, sendRoomInfoToAllInRoom, savePlayerData, sendInventory, sendCharacterInfo, broadcast, SHOP_ITEMS, MAP_SIZE, VILLAGE_POS, commandHandlers, sendRoomInfo }) {
     if (process.env.DEBUG === 'true') console.log('DEBUG commandHandlers:', commandHandlers);
     if (process.env.DEBUG === 'true') console.log('DEBUG command:', command);
     if (process.env.DEBUG === 'true') console.log('DEBUG commandHandlers[command]:', commandHandlers && commandHandlers[command]);
@@ -150,7 +157,7 @@ const PlayerGameService = {
       ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '알 수 없는 명령어입니다.' }));
     }
   },
-  async handlePickup({ ws, playerName, itemId, PlayerManager, getRoom, getPlayersInRoom, sendRoomInfoToAllInRoom, savePlayerData, sendInventory, sendCharacterInfo, MAP_SIZE, VILLAGE_POS }) {
+  async handlePickup({ ws, playerName, itemId, getRoom, getPlayersInRoom, sendRoomInfoToAllInRoom, savePlayerData, sendInventory, sendCharacterInfo, MAP_SIZE, VILLAGE_POS }) {
     const player = PlayerManager.getPlayer(playerName);
     if (!player) return;
     const { x, y } = player.position;
@@ -182,7 +189,7 @@ const PlayerGameService = {
       ws.send(JSON.stringify({ type: 'error', message: '해당 아이템이 없습니다.' }));
     }
   },
-  async handleAttack({ ws, playerName, monsterId, PlayerManager, getRoom, getPlayersInRoom, sendRoomInfoToAllInRoom, savePlayerData, sendCharacterInfo, broadcast, processBattle, respawnMonsterWithDeps, MAP_SIZE, VILLAGE_POS, sendInventory }) {
+  async handleAttack({ ws, playerName, monsterId, getRoom, getPlayersInRoom, sendRoomInfoToAllInRoom, savePlayerData, sendCharacterInfo, broadcast, processBattle, respawnMonsterWithDeps, MAP_SIZE, VILLAGE_POS, sendInventory }) {
     const player = PlayerManager.getPlayer(playerName);
     if (!player) return;
     const { x, y } = player.position;
@@ -190,6 +197,11 @@ const PlayerGameService = {
     const mIdx = room.monsters.findIndex((m) => m.id === monsterId);
     if (mIdx !== -1) {
       const monster = room.monsters[mIdx];
+      // 클랜힐 자동 비활성화
+      if (player.clanHealOn) {
+        player.clanHealOn = false;
+        ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '전투로 클랜힐이 비활성화되었습니다.' }));
+      }
       const result = processBattle(player, monster, room, VILLAGE_POS);
       await savePlayerData(playerName);
       if (Array.isArray(result.log)) {
@@ -219,7 +231,7 @@ const PlayerGameService = {
       ws.send(JSON.stringify({ type: 'error', message: '해당 몬스터가 없습니다.' }));
     }
   },
-  async handleAutoBattle({ ws, playerName, monsterId, PlayerManager, getRoom, sendRoomInfoToAllInRoom, savePlayerData, sendCharacterInfo, broadcast, processBattle, respawnMonsterWithDeps, battleIntervals, MAP_SIZE, VILLAGE_POS, getPlayersInRoom, sendInventory }) {
+  async handleAutoBattle({ ws, playerName, monsterId, getRoom, sendRoomInfoToAllInRoom, savePlayerData, sendCharacterInfo, broadcast, processBattle, respawnMonsterWithDeps, battleIntervals, MAP_SIZE, VILLAGE_POS, getPlayersInRoom, sendInventory }) {
     const player = PlayerManager.getPlayer(playerName);
     if (!player) return;
     const { x, y } = player.position;
@@ -234,6 +246,11 @@ const PlayerGameService = {
       return;
     }
     const _sendInventory = sendInventory;
+    // 클랜힐 자동 비활성화
+    if (player.clanHealOn) {
+      player.clanHealOn = false;
+      ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '전투로 클랜힐이 비활성화되었습니다.' }));
+    }
     battleIntervals[playerName] = setInterval(async () => {
       const curRoom = getRoom(player.world, player.position.x, player.position.y);
       const curIdx = curRoom.monsters.findIndex((m) => m.id === monsterId);
@@ -292,7 +309,7 @@ const PlayerGameService = {
     }, 1200);
     ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '자동전투를 시작합니다!' }));
   },
-  async handleStat({ ws, playerName, PlayerManager }) {
+  async handleStat({ ws, playerName }) {
     const player = PlayerManager.getPlayer(playerName);
     if (!player) return;
     const statMsg =
@@ -302,7 +319,7 @@ const PlayerGameService = {
       `공격력: ${player.getAtk()}   방어력: ${player.getDef()}`;
     ws.send(JSON.stringify({ type: 'system', subtype: 'info', message: statMsg }));
   },
-  async handleEquipInfo({ ws, playerName, PlayerManager }) {
+  async handleEquipInfo({ ws, playerName }) {
     const player = PlayerManager.getPlayer(playerName);
     if (!player) return;
     let msg = '[장비 정보]\n';
@@ -329,7 +346,7 @@ const PlayerGameService = {
     }
     ws.send(JSON.stringify({ type: 'system', subtype: 'info', message: msg }));
   },
-  async handleShop({ ws, playerName, PlayerManager, getRoom, SHOP_ITEMS, MAP_SIZE, VILLAGE_POS, message }) {
+  async handleShop({ ws, playerName, getRoom, SHOP_ITEMS, MAP_SIZE, VILLAGE_POS, message }) {
     const player = PlayerManager.getPlayer(playerName);
     if (!player) return;
     const { x, y } = player.position;
@@ -377,7 +394,7 @@ const PlayerGameService = {
     ws.send(JSON.stringify({ type: 'system', subtype: 'info', message: msg }));
   },
   // /상점판매 [페이지]
-  async handleShopSell({ ws, playerName, PlayerManager, getRoom, SHOP_ITEMS, message }) {
+  async handleShopSell({ ws, playerName, getRoom, SHOP_ITEMS, message }) {
     const player = PlayerManager.getPlayer(playerName);
     if (!player) return;
     const { x, y } = player.position;
@@ -404,7 +421,7 @@ const PlayerGameService = {
     msg += '\n판매: /판매 아이템명 (예: /판매 나무검)';
     ws.send(JSON.stringify({ type: 'system', subtype: 'info', message: msg }));
   },
-  async handleClose({ ws, playerName, PlayerManager, wss, sendPlayerList, broadcast, sendRoomInfoToAllInRoom, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS }) {
+  async handleClose({ ws, playerName, wss, sendPlayerList, broadcast, sendRoomInfoToAllInRoom, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS }) {
     if (playerName && PlayerManager.getPlayer(playerName)) {
       const prevWorld = PlayerManager.getPlayer(playerName).world;
       const prevX = PlayerManager.getPlayer(playerName).position.x;

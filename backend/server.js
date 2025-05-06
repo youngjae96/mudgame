@@ -44,12 +44,13 @@ const playerRouter = require('./routes/player');
 const shopRouter = require('./routes/shop');
 const battleRouter = require('./routes/battle');
 const docsRouter = require('./routes/docs');
-const PlayerManager = require('./playerManager');
+const { PlayerManager, clanHealTick } = require('./playerManager');
 const RoomManager = require('./roomManager');
 const ShopService = require('./services/ShopService');
 const PlayerService = require('./services/PlayerService');
 const { setupCommands } = require('./commands');
 const PlayerGameService = require('./services/PlayerGameService');
+const Guild = require('./models/Guild');
 
 const app = express();
 app.use(cors());
@@ -229,6 +230,11 @@ const commandHandlers = {
   '/정보': (args) => handleStatCommand(args),
   '/귓': (args) => handleWhisperCommand(args),
   '/귀환': (args) => require('./commands').handleReturnCommand({ ...args, PlayerManager }),
+  '/랭킹': (args) => require('./commands').handleRankingCommand(args),
+  '/클랜힐': (args) => {
+    const player = PlayerManager.getPlayer(args.playerName);
+    return require('./commands').handleClanHealCommand({ ...args, player });
+  },
 };
 
 // 서비스 인스턴스 생성 및 의존성 주입
@@ -319,6 +325,13 @@ wss.on('connection', (ws) => {
         player.intExpMax = pdata.intExpMax || 10;
         player.equipWeapon = pdata.equipWeapon || null;
         player.equipArmor = pdata.equipArmor || null;
+        // 길드 정보 동기화
+        const guild = await Guild.findOne({ members: playerName });
+        if (guild) {
+          player.guildName = guild.name;
+        } else {
+          player.guildName = undefined;
+        }
         PlayerManager.addPlayer(playerName, player);
         broadcast(wss, { type: 'system', subtype: 'event', message: `${playerName}님이 입장했습니다.` });
         sendPlayerList(wss, PlayerManager.getAllPlayers());
@@ -509,6 +522,11 @@ setInterval(() => {
     savePlayerData(playerName).catch(() => {}); // 예외 무시
   });
 }, 40000); // 40초마다
+
+// 4초마다 클랜힐 효과 적용
+setInterval(() => {
+  clanHealTick(PlayerManager, Guild);
+}, 4000);
 
 if (require.main === module) {
   global.wss = wss;

@@ -32,21 +32,21 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>38/38</span>
+                <span class='fraction'>42/42</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>4/4</span>
+                <span class='fraction'>5/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>52/52</span>
+                <span class='fraction'>51/51</span>
             </div>
         
             
@@ -199,7 +199,11 @@
 <a name='L134'></a><a href='#L134'>134</a>
 <a name='L135'></a><a href='#L135'>135</a>
 <a name='L136'></a><a href='#L136'>136</a>
-<a name='L137'></a><a href='#L137'>137</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -270,21 +274,25 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">60x</span>
+<span class="cline-any cline-yes">56x</span>
 <span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">26x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -399,7 +407,7 @@ class BattleService {
       monsterDead = true;
       // 아이템 드랍 처리
       if (monster.dropItems &amp;&amp; monster.dropItems.length &gt; 0) {
-        const { SHOP_ITEMS } = require('../data/items');
+        const { SHOP_ITEMS, ITEM_POOL } = require('../data/items');
         monster.dropItems.forEach((itemName, idx) =&gt; {
           const rate = monster.dropRates &amp;&amp; monster.dropRates[idx] ? monster.dropRates[idx] : 0;
           if (Math.random() &lt; rate) {
@@ -409,18 +417,22 @@ class BattleService {
               found = arr.find(i =&gt; i.name === itemName);
               if (found) break;
             }
+            // SHOP_ITEMS에 없으면 ITEM_POOL에서 찾기
+            if (!found &amp;&amp; Array.isArray(ITEM_POOL)) {
+              found = ITEM_POOL.find(i =&gt; i.name === itemName);
+            }
             // 디버깅용 로그 추가
-            console.log('[드랍시도]', { itemName, found, inventoryLen: player.inventory.length });
+            // console.log('[드랍시도]', { itemName, found, inventoryLen: player.inventory.length });
             if (found) {
               player.inventory.push({ ...found });
-              console.log('[드랍성공]', { itemName, inventoryLen: player.inventory.length });
+              // console.log('[드랍성공]', { itemName, inventoryLen: player.inventory.length });
               log.push({
                 type: 'system',
                 subtype: 'event',
                 message: `${monster.name}이(가) ${itemName}을(를) 드랍!`
               });
             } else {
-              console.log('[드랍실패]', { itemName });
+              // console.log('[드랍실패]', { itemName });
             }
           }
         });
@@ -478,7 +490,7 @@ module.exports = BattleService; </pre></td></tr></table></pre>
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-06T12:49:11.672Z
+                at 2025-05-06T14:37:46.127Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

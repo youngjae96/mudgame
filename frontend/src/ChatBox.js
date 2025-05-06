@@ -126,6 +126,16 @@ function SystemMessage({ msg }) {
   if (typeof message === 'object') {
     message = JSON.stringify(message);
   }
+  if (
+    msg.subtype === 'error' &&
+    typeof message === 'string' &&
+    message.includes('획득했습니다!')
+  ) {
+    return <NoticeMsg>{message.split('\n').map((line, idx) => (<React.Fragment key={idx}>{line}<br /></React.Fragment>))}</NoticeMsg>;
+  }
+  if (msg.subtype === 'error') {
+    return <SystemMsg>{message.split('\n').map((line, idx) => (<React.Fragment key={idx}>{line}<br /></React.Fragment>))}</SystemMsg>;
+  }
   if (typeof message === 'string' && message.startsWith('[공지]')) {
     return <NoticeMsg>{message.split('\n').map((line, idx) => (<React.Fragment key={idx}>{line}<br /></React.Fragment>))}</NoticeMsg>;
   }

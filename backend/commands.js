@@ -5,13 +5,14 @@ const { ITEM_TYPE } = require('./data/items');
 const { ISLAND_VILLAGE_POS } = require('./data/map');
 const PlayerController = require('./controllers/PlayerController');
 const ShopService = require('./services/ShopService');
-const PlayerManager = require('./playerManager');
+const { PlayerManager } = require('./playerManager');
 const RoomManager = require('./roomManager');
 const { sendRoomInfoToAllInRoom, broadcast } = require('./utils/broadcast');
 const Guild = require('./models/Guild');
 const PlayerGameService = require('./services/PlayerGameService');
 const { getRoom } = require('./data/map');
 const { SHOP_ITEMS } = require('./data/items');
+const PlayerData = require('./models/PlayerData');
 
 let shopServiceInstance = null;
 
@@ -39,6 +40,11 @@ function handleTeleportCommand({ ws, playerName, message, players, getRoom, getP
   const dest = args[1];
   if (dest === '무인도') {
     if (player.world === 1 && player.position.x === 4 && player.position.y === 4) {
+      // 클랜힐 자동 비활성화
+      if (player.clanHealOn) {
+        player.clanHealOn = false;
+        ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '텔레포트로 클랜힐이 비활성화되었습니다.' }));
+      }
       RoomManager.removePlayerFromRoom(playerName, player.world, player.position.x, player.position.y);
       player.world = 2;
       player.position = { x: ISLAND_VILLAGE_POS.x, y: ISLAND_VILLAGE_POS.y };
@@ -55,6 +61,11 @@ function handleTeleportCommand({ ws, playerName, message, players, getRoom, getP
     return;
   } else if (dest === '마을') {
     if (player.world === 2 && player.position.x === ISLAND_VILLAGE_POS.x && player.position.y === ISLAND_VILLAGE_POS.y) {
+      // 클랜힐 자동 비활성화
+      if (player.clanHealOn) {
+        player.clanHealOn = false;
+        ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '텔레포트로 클랜힐이 비활성화되었습니다.' }));
+      }
       RoomManager.removePlayerFromRoom(playerName, player.world, player.position.x, player.position.y);
       player.world = 1;
       player.position = { x: 4, y: 4 };
@@ -71,6 +82,11 @@ function handleTeleportCommand({ ws, playerName, message, players, getRoom, getP
     return;
   } else if (dest === '동굴') {
     if (player.world === 2 && player.position.x === 2 && player.position.y === 6) {
+      // 클랜힐 자동 비활성화
+      if (player.clanHealOn) {
+        player.clanHealOn = false;
+        ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '텔레포트로 클랜힐이 비활성화되었습니다.' }));
+      }
       RoomManager.removePlayerFromRoom(playerName, player.world, player.position.x, player.position.y);
       player.world = 3;
       player.position = { x: 0, y: 0 };
@@ -319,6 +335,9 @@ async function handleGuildCommand({ ws, playerName, message, players }) {
     }
     const guild = new Guild({ name: guildName, master: playerName, members: [playerName] });
     await guild.save();
+    // Player 객체에 guildName 세팅
+    const playerObj = PlayerManager.getPlayer(playerName);
+    if (playerObj) playerObj.guildName = guildName;
     ws.send(JSON.stringify({ type: 'system', message: `[길드] '${guildName}' 길드가 생성되었습니다!` }));
     return;
   }
@@ -393,11 +412,18 @@ async function handleGuildCommand({ ws, playerName, message, players }) {
       // joinRequests에서 제거
       guild.joinRequests = guild.joinRequests.filter(n => n !== targetName);
       await guild.save();
+      // Player 객체에 guildName 세팅
+      const targetPlayerObj = PlayerManager.getPlayer(targetName);
+      if (targetPlayerObj) targetPlayerObj.guildName = guild.name;
+      ws.send(JSON.stringify({ type: 'system', message: `[길드] ${targetName}님의 가입을 수락했습니다.` }));
       return;
     }
     guild.members.push(targetName);
     guild.joinRequests = guild.joinRequests.filter(n => n !== targetName);
     await guild.save();
+    // Player 객체에 guildName 세팅
+    const targetPlayerObj = PlayerManager.getPlayer(targetName);
+    if (targetPlayerObj) targetPlayerObj.guildName = guild.name;
     ws.send(JSON.stringify({ type: 'system', message: `[길드] ${targetName}님의 가입을 수락했습니다.` }));
     return;
   }
@@ -415,6 +441,9 @@ async function handleGuildCommand({ ws, playerName, message, players }) {
     guild.members = guild.members.filter(n => n !== playerName);
     guild.joinRequests = guild.joinRequests.filter(n => n !== playerName);
     await guild.save();
+    // Player 객체에 guildName 해제
+    const playerObj = PlayerManager.getPlayer(playerName);
+    if (playerObj) playerObj.guildName = undefined;
     ws.send(JSON.stringify({ type: 'system', message: '[길드] 길드에서 탈퇴했습니다.' }));
     return;
   }
@@ -443,6 +472,9 @@ async function handleGuildCommand({ ws, playerName, message, players }) {
     guild.members = guild.members.filter(n => n !== targetName);
     guild.joinRequests = guild.joinRequests.filter(n => n !== targetName);
     await guild.save();
+    // Player 객체에 guildName 해제
+    const targetPlayerObj = PlayerManager.getPlayer(targetName);
+    if (targetPlayerObj) targetPlayerObj.guildName = undefined;
     ws.send(JSON.stringify({ type: 'system', message: `[길드] ${targetName}님을 길드에서 추방했습니다.` }));
     return;
   }
@@ -469,6 +501,11 @@ async function handleGuildCommand({ ws, playerName, message, players }) {
     if (!guild) {
       ws.send(JSON.stringify({ type: 'system', message: '[길드] 길드장만 해체가 가능합니다.' }));
       return;
+    }
+    // 모든 길드원 Player 객체에 guildName 해제
+    for (const memberName of guild.members) {
+      const memberObj = PlayerManager.getPlayer(memberName);
+      if (memberObj) memberObj.guildName = undefined;
     }
     await Guild.deleteOne({ _id: guild._id });
     ws.send(JSON.stringify({ type: 'system', message: '[길드] 길드가 해체되었습니다.' }));
@@ -532,11 +569,12 @@ async function handleHelpCommand({ ws }) {
     '/정보 : 내 능력치 확인',
     '/정보 <닉네임> : 다른 유저 능력치 확인',
     '/귓 <닉네임> <메시지> : 귓속말',
-    '/귀환 : 1번 마을(마을 광장)로 즉시 이동',
+    '/귀환 : 1번 마을(마을 광장)으로 귀환',
     '/장비 : 내 장비 정보',
     '/지도 : 전체 맵 보기',
     '/텔포 <지역> : 월드 이동(예: 무인도, 마을)',
     '/길드 <생성|가입|수락|탈퇴|추방|공지|정보|목록|해체|채팅|채팅로그> ... : 길드 관련 명령어',
+    '/랭킹 : TOP 10 스탯 랭킹',
     '/저장 : 내 상태 즉시 저장',
     '/도움말 : 명령어 전체 안내',
   ].join('\n');
@@ -628,6 +666,44 @@ async function handleReturnCommand({ ws, playerName, PlayerManager, getRoom, get
   sendRoomInfoToAllInRoom(PlayerManager.getAllPlayers(), player.world, player.position.x, player.position.y, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
 }
 
+// /랭킹: 힘+민첩+지능 합산 Top 10 랭킹
+async function handleRankingCommand({ ws }) {
+  try {
+    // 모든 유저의 name, str, dex, int만 조회
+    const players = await PlayerData.find({}, 'name str dex int').lean();
+    const ranked = players
+      .map(p => ({
+        name: p.name,
+        total: (p.str || 0) + (p.dex || 0) + (p.int || 0),
+        str: p.str || 0,
+        dex: p.dex || 0,
+        int: p.int || 0,
+      }))
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 10);
+    if (!ranked.length) {
+      ws.send(JSON.stringify({ type: 'system', message: '[랭킹] 랭킹에 등록된 유저가 없습니다.' }));
+      return;
+    }
+    const msg = '[TOP 10 스탯 랭킹]\n' +
+      ranked.map((p, i) => `${i + 1}. ${p.name} (힘:${p.str} 민첩:${p.dex} 인트:${p.int})`).join('\n');
+    ws.send(JSON.stringify({ type: 'system', message: msg }));
+  } catch (err) {
+    ws.send(JSON.stringify({ type: 'system', message: '[랭킹] 랭킹 조회 중 오류가 발생했습니다.' }));
+  }
+}
+
+// /클랜힐: 클랜힐 ON/OFF 토글 (클랜힐 스크롤 보유 시만 가능)
+async function handleClanHealCommand({ ws, player }) {
+  const hasScroll = player.inventory && player.inventory.some(i => i.name === '클랜힐 스크롤');
+  if (!hasScroll) {
+    ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '클랜힐 스크롤이 있어야 클랜힐을 사용할 수 있습니다.' }));
+    return;
+  }
+  player.clanHealOn = !player.clanHealOn;
+  ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: player.clanHealOn ? '클랜힐이 활성화되었습니다! (인트 경험치가 오릅니다)' : '클랜힐이 비활성화되었습니다.' }));
+}
+
 // 명령어 핸들러 등록
 const commandHandlers = {
   '/정보': handleStatCommand,
@@ -646,6 +722,8 @@ const commandHandlers = {
   '/구매': handleShopCommand,
   '/판매': handleShopSellCommand,
   '/귀환': handleReturnCommand,
+  '/랭킹': handleRankingCommand,
+  '/클랜힐': handleClanHealCommand,
 };
 
 module.exports = {
@@ -665,4 +743,6 @@ module.exports = {
   handleStatCommand,
   handleWhisperCommand,
   handleReturnCommand,
+  handleRankingCommand,
+  handleClanHealCommand,
 }; 

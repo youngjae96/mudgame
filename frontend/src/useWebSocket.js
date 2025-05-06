@@ -77,11 +77,11 @@ function useWebSocket(onDisconnect) {
         } else if (data.type === 'battle') {
           setMessages((msgs) => {
             if (Array.isArray(data.log)) {
-              const logs = data.log.map((log) => ({ ...log, type: 'battle' }));
+              const logs = data.log.map((log) => ({ ...log }));
               const next = [...msgs.flat(), ...logs];
               return next.length > 100 ? next.slice(next.length - 100) : next;
             } else {
-              const next = [...msgs.flat(), { ...data, type: 'battle' }];
+              const next = [...msgs.flat(), { ...data }];
               return next.length > 100 ? next.slice(next.length - 100) : next;
             }
           });
@@ -188,11 +188,11 @@ function useWebSocket(onDisconnect) {
       } else if (data.type === 'battle') {
         setMessages((msgs) => {
           if (Array.isArray(data.log)) {
-            const logs = data.log.map((log) => ({ ...log, type: 'battle' }));
+            const logs = data.log.map((log) => ({ ...log }));
             const next = [...msgs.flat(), ...logs];
             return next.length > 100 ? next.slice(next.length - 100) : next;
           } else {
-            const next = [...msgs.flat(), { ...data, type: 'battle' }];
+            const next = [...msgs.flat(), { ...data }];
             return next.length > 100 ? next.slice(next.length - 100) : next;
           }
         });

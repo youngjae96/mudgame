@@ -37,14 +37,14 @@ const ITEM_POOL = [
   { name: '회복 물약', description: '마시면 체력이 회복됩니다.' },
   { name: '무적검', description: '어드민 전용. 공격력 500.', atk: 500, type: '무기' },
   { name: '무적갑옷', description: '어드민 전용. 방어력 500.', def: 500, type: '방어구' },
-  { name: ITEM_NAME_FLAME_SWORD, description: '불꽃의 힘이 깃든 검', atk: 28, str: 4, dex: 2, type: ITEM_TYPE.WEAPON },
-  { name: ITEM_NAME_FLAME_ARMOR, description: '불꽃의 힘이 깃든 갑옷', def: 22, str: 2, dex: 2, type: ITEM_TYPE.ARMOR },
-  { name: ITEM_NAME_FROST_SWORD, description: '얼음의 힘이 깃든 검', atk: 24, str: 2, dex: 4, type: ITEM_TYPE.WEAPON },
-  { name: ITEM_NAME_FROST_ARMOR, description: '얼음의 힘이 깃든 갑옷', def: 18, str: 1, dex: 3, type: ITEM_TYPE.ARMOR },
-  { name: ITEM_NAME_DRAGON_SWORD, description: '드래곤의 힘이 깃든 검', atk: 36, str: 5, dex: 3, type: ITEM_TYPE.WEAPON },
-  { name: ITEM_NAME_DRAGON_ARMOR, description: '드래곤의 힘이 깃든 갑옷', def: 28, str: 3, dex: 2, type: ITEM_TYPE.ARMOR },
-  { name: ITEM_NAME_DARK_SWORD, description: '어둠의 힘이 깃든 검', atk: 32, str: 3, dex: 5, type: ITEM_TYPE.WEAPON },
-  { name: ITEM_NAME_DARK_ARMOR, description: '어둠의 힘이 깃든 갑옷', def: 25, str: 2, dex: 4, type: ITEM_TYPE.ARMOR },
+  { name: ITEM_NAME_FLAME_SWORD, description: '불꽃의 힘이 깃든 검', atk: 28, str: 4, dex: 2, type: ITEM_TYPE.WEAPON, price: 1500 },
+  { name: ITEM_NAME_FLAME_ARMOR, description: '불꽃의 힘이 깃든 갑옷', def: 22, str: 2, dex: 2, type: ITEM_TYPE.ARMOR, price: 1400 },
+  { name: ITEM_NAME_FROST_SWORD, description: '얼음의 힘이 깃든 검', atk: 24, str: 2, dex: 4, type: ITEM_TYPE.WEAPON, price: 1600 },
+  { name: ITEM_NAME_FROST_ARMOR, description: '얼음의 힘이 깃든 갑옷', def: 18, str: 1, dex: 3, type: ITEM_TYPE.ARMOR, price: 1500 },
+  { name: ITEM_NAME_DRAGON_SWORD, description: '드래곤의 힘이 깃든 검', atk: 36, str: 5, dex: 3, type: ITEM_TYPE.WEAPON, price: 2500 },
+  { name: ITEM_NAME_DRAGON_ARMOR, description: '드래곤의 힘이 깃든 갑옷', def: 28, str: 3, dex: 2, type: ITEM_TYPE.ARMOR, price: 2600 },
+  { name: ITEM_NAME_DARK_SWORD, description: '어둠의 힘이 깃든 검', atk: 32, str: 3, dex: 5, type: ITEM_TYPE.WEAPON, price: 2100 },
+  { name: ITEM_NAME_DARK_ARMOR, description: '어둠의 힘이 깃든 갑옷', def: 25, str: 2, dex: 4, type: ITEM_TYPE.ARMOR, price: 2200 },
 ];
 
 const FIELD_MONSTERS = [
@@ -96,13 +96,14 @@ const SHOP_ITEMS = {
   [ITEM_TYPE.CONSUMABLE]: [
     { name: '초소형 물약', type: ITEM_TYPE.CONSUMABLE, price: 10, desc: 'HP 10 회복', total: 500, perUse: 10 },
     { name: '소형 물약', type: ITEM_TYPE.CONSUMABLE, price: 25, desc: 'HP 15 회복', total: 1000, perUse: 15 },
-    { name: '중형 물약', type: ITEM_TYPE.CONSUMABLE, price: 60, desc: 'HP 20 회복', total: 2000, perUse: 20 }
+    { name: '중형 물약', type: ITEM_TYPE.CONSUMABLE, price: 60, desc: 'HP 20 회복', total: 2000, perUse: 20 },
+    { name: '클랜힐 스크롤', type: ITEM_TYPE.CONSUMABLE, price: 50000, desc: '클랜힐 스킬을 사용할 수 있게 해주는 신비한 두루마리' },
   ]
 };
 
 const ISLAND_MONSTERS = [
   // 해변(중간~강, 기존의 2~2.5배)
-  { name: '해변의 크랩킹', maxHp: 220, atk: 45, def: 28, gold: 50, dropItems: [ITEM_NAME_FLAME_SWORD], dropRates: [0.02] },
+  { name: '해변의 크랩킹', maxHp: 220, atk: 45, def: 28, gold: 50, dropItems: [ITEM_NAME_FLAME_SWORD], dropRates: [1.0] },
   { name: '거대 조개괴수', maxHp: 260, atk: 40, def: 34, gold: 55, dropItems: [ITEM_NAME_FLAME_ARMOR], dropRates: [0.03] },
   // 정글(강~매우강, 기존의 2.5~3배)
   { name: '정글 히드라', maxHp: 420, atk: 70, def: 40, gold: 80, dropItems: [ITEM_NAME_FROST_SWORD], dropRates: [0.02] },
