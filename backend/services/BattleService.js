@@ -62,7 +62,7 @@ class BattleService {
       monsterDead = true;
       // 아이템 드랍 처리
       if (monster.dropItems && monster.dropItems.length > 0) {
-        const { SHOP_ITEMS } = require('../data/items');
+        const { SHOP_ITEMS, ITEM_POOL } = require('../data/items');
         monster.dropItems.forEach((itemName, idx) => {
           const rate = monster.dropRates && monster.dropRates[idx] ? monster.dropRates[idx] : 0;
           if (Math.random() < rate) {
@@ -71,6 +71,10 @@ class BattleService {
             for (const arr of Object.values(SHOP_ITEMS)) {
               found = arr.find(i => i.name === itemName);
               if (found) break;
+            }
+            // SHOP_ITEMS에 없으면 ITEM_POOL에서 찾기
+            if (!found && Array.isArray(ITEM_POOL)) {
+              found = ITEM_POOL.find(i => i.name === itemName);
             }
             // 디버깅용 로그 추가
             console.log('[드랍시도]', { itemName, found, inventoryLen: player.inventory.length });
