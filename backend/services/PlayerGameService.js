@@ -51,10 +51,30 @@ const PlayerGameService = {
       return;
     }
     if (chatType === 'global') {
+      const now = Date.now();
+      if (typeof chatMsg === 'string' && chatMsg.length > 80) {
+        ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '전체채팅은 80자까지 입력할 수 있습니다.' }));
+        return;
+      }
+      if (player.lastGlobalChat && now - player.lastGlobalChat < 2000) {
+        ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '전체채팅은 2초에 한 번만 입력할 수 있습니다.' }));
+        return;
+      }
+      player.lastGlobalChat = now;
       broadcast(wss, { type: 'chat', chatType: 'global', name: playerName, message: chatMsg });
       return;
     }
     if (chatType === 'local') {
+      const now = Date.now();
+      if (typeof chatMsg === 'string' && chatMsg.length > 60) {
+        ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '지역채팅은 60자까지 입력할 수 있습니다.' }));
+        return;
+      }
+      if (player.lastLocalChat && now - player.lastLocalChat < 2000) {
+        ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '지역채팅은 2초에 한 번만 입력할 수 있습니다.' }));
+        return;
+      }
+      player.lastLocalChat = now;
       const { x, y } = player.position;
       Object.values(PlayerManager.getAllPlayers()).forEach((p) => {
         if (p.position && p.position.x === x && p.position.y === y) {

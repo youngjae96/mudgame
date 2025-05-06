@@ -32,6 +32,9 @@ class Player {
     this.gold = 100;
     this.equipWeapon = null;
     this.equipArmor = null;
+    // 채팅 쿨타임
+    this.lastGlobalChat = 0;
+    this.lastLocalChat = 0;
   }
 
   gainStrExp(amount = 1) {

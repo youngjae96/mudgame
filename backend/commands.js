@@ -229,7 +229,7 @@ function handleAdminCommand({ ws, playerName, message, players, getRoom, sendInv
     }
     return;
   }
-  // /운영자 차단 닉네임: 해당 유저를 영구 차단(로그인/회원가입 불가)
+  // /운영자 차단 닉네임: 해당 유저를 영구 차단(로그인/회원가입 불가) + IP도 차단
   if (subcmd === '차단') {
     const target = args[2];
     if (!target) {
@@ -238,17 +238,42 @@ function handleAdminCommand({ ws, playerName, message, players, getRoom, sendInv
     }
     // User 모델에서 차단 처리
     const User = require('./models/User');
-    User.findOneAndUpdate({ username: target }, { banned: true }, { new: true }, (err, userDoc) => {
+    const BannedIp = require('./models/BannedIp');
+    User.findOneAndUpdate({ username: target }, { banned: true }, { new: true }, async (err, userDoc) => {
       if (err || !userDoc) {
         ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: `[운영자] 해당 닉네임의 유저(User)가 없습니다: ${target}` }));
         return;
+      }
+      // IP도 차단
+      const ips = [userDoc.createdIp, userDoc.lastLoginIp].filter(Boolean);
+      for (const ip of ips) {
+        if (ip) {
+          await BannedIp.findOneAndUpdate({ ip }, { ip }, { upsert: true, new: true });
+        }
       }
       // 접속 중이면 강제 접속 종료
       const targetPlayer = players[target];
       if (targetPlayer && targetPlayer.ws) {
         targetPlayer.ws.close();
       }
-      ws.send(JSON.stringify({ type: 'system', message: `[운영자] ${target}님을 영구 차단(로그인/회원가입 불가) 처리했습니다.` }));
+      ws.send(JSON.stringify({ type: 'system', message: `[운영자] ${target}님을 영구 차단(계정+IP) 처리했습니다.` }));
+    });
+    return;
+  }
+  // /운영자 ip차단 <IP주소>: 해당 IP를 영구 차단(회원가입/로그인 불가)
+  if (subcmd === 'ip차단') {
+    const targetIp = args[2];
+    if (!targetIp) {
+      ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[운영자] 사용법: /운영자 ip차단 IP주소' }));
+      return;
+    }
+    const BannedIp = require('./models/BannedIp');
+    BannedIp.findOneAndUpdate({ ip: targetIp }, { ip: targetIp }, { upsert: true, new: true }, (err, doc) => {
+      if (err) {
+        ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: `[운영자] IP 차단 실패: ${err.message}` }));
+        return;
+      }
+      ws.send(JSON.stringify({ type: 'system', message: `[운영자] ${targetIp} IP를 영구 차단 처리했습니다.` }));
     });
     return;
   }
