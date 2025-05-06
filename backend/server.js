@@ -3,8 +3,8 @@ const http = require('http');
 const { WebSocketServer } = require('ws');
 const cors = require('cors');
 const Player = require('./models/Player');
-const { ITEM_POOL, FIELD_MONSTERS, FOREST_MONSTERS, CAVE_MONSTERS, SHOP_ITEMS } = require('./data/items');
-const { MAP_SIZE, VILLAGE_POS, rooms, getRoom } = require('./data/map');
+const { ITEM_POOL, FIELD_MONSTERS, FOREST_MONSTERS, CAVE_MONSTERS, SHOP_ITEMS, ISLAND_MONSTERS } = require('./data/items');
+const { MAP_SIZE, VILLAGE_POS, rooms, getRoom, roomsIsland, ISLAND_VILLAGE_POS, roomsCave, MAP_SIZE_CAVE } = require('./data/map');
 const Monster = require('./models/Monster');
 const {
   broadcast,
@@ -35,6 +35,8 @@ const {
   handleHelpCommand,
   handleShopCommand,
   handleShopSellCommand,
+  handleStatCommand,
+  handleWhisperCommand,
 } = require('./commands');
 const logger = require('./middlewares/logger');
 const errorHandler = require('./middlewares/errorHandler');
@@ -110,10 +112,7 @@ function getPlayersInRoom(world, x, y) {
 function parseChatCommand(msg) {
   const trimmed = msg.trim();
   if (trimmed.startsWith('/우리')) {
-    return { type: 'invalid', message: '[알림] /우리(파티채팅)는 현재 지원하지 않습니다. [채팅 명령어 안내] /전체 또는 /전 : 전체채팅, /지역 또는 /지 : 지역채팅(기본)' };
-  }
-  if (trimmed.startsWith('/전체 ')) {
-    return { type: 'global', message: trimmed.replace(/^\/전체 /, '') };
+    return { type: 'invalid', message: '[알림] /우리(파티채팅)는 현재 지원하지 않습니다. [채팅 명령어 안내] /전 : 전체채팅, /지역 또는 /지 : 지역채팅(기본)' };
   }
   if (trimmed.startsWith('/전 ')) {
     return { type: 'global', message: trimmed.replace(/^\/전 /, '') };
@@ -147,12 +146,28 @@ function parseChatCommand(msg) {
 
 // respawnMonster 래퍼 함수: getRoom을 항상 첫 인자로 넘겨줌
 function respawnMonsterWithDeps(world, x, y) {
-  respawnMonster(
-    world, x, y,
-    getRoom,
-    FIELD_MONSTERS, FOREST_MONSTERS, CAVE_MONSTERS, Monster,
-    getPlayersInRoom, sendRoomInfo, MAP_SIZE, VILLAGE_POS, PlayerManager.getAllPlayers()
-  );
+  if (world === 2) {
+    respawnMonster(
+      world, x, y,
+      getRoom,
+      ISLAND_MONSTERS, ISLAND_MONSTERS, ISLAND_MONSTERS, Monster,
+      getPlayersInRoom, sendRoomInfo, MAP_SIZE, ISLAND_VILLAGE_POS, PlayerManager.getAllPlayers()
+    );
+  } else if (world === 3) {
+    respawnMonster(
+      world, x, y,
+      getRoom,
+      CAVE_MONSTERS, CAVE_MONSTERS, CAVE_MONSTERS, Monster,
+      getPlayersInRoom, sendRoomInfo, MAP_SIZE_CAVE, { x: 0, y: 9 }, PlayerManager.getAllPlayers()
+    );
+  } else {
+    respawnMonster(
+      world, x, y,
+      getRoom,
+      FIELD_MONSTERS, FOREST_MONSTERS, CAVE_MONSTERS, Monster,
+      getPlayersInRoom, sendRoomInfo, MAP_SIZE, VILLAGE_POS, PlayerManager.getAllPlayers()
+    );
+  }
 }
 
 // PlayerData 저장 함수
@@ -209,6 +224,8 @@ const commandHandlers = {
   '/길드': (args) => handleGuildCommand(args),
   '/누구': (args) => handleWhoCommand(args),
   '/도움말': (args) => handleHelpCommand(args),
+  '/정보': (args) => handleStatCommand(args),
+  '/귓': (args) => handleWhisperCommand(args),
 };
 
 // 서비스 인스턴스 생성 및 의존성 주입

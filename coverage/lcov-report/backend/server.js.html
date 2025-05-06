@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">43.14% </span>
+                <span class="strong">42.12% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>107/248</span>
+                <span class='fraction'>107/254</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">28.57% </span>
+                <span class="strong">25.45% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>28/98</span>
+                <span class='fraction'>28/110</span>
             </div>
         
             
@@ -1309,9 +1309,9 @@ wss.on('connection', <span class="fstat-no" title="function not covered" >(w</sp
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (data.type === 'join') {</span>
       const { name, token } = <span class="cstat-no" title="statement not covered" >data;</span>
-<span class="cstat-no" title="statement not covered" >      console.log('[서버] join 요청:', { name, token });</span>
+<span class="cstat-no" title="statement not covered" >      if (process.env.DEBUG === 'true') <span class="cstat-no" title="statement not covered" >console.log('[서버] join 요청:', { name, token });</span></span>
 <span class="cstat-no" title="statement not covered" >      if (!token) {</span>
-<span class="cstat-no" title="statement not covered" >        console.log('[서버] 인증 토큰 없음');</span>
+<span class="cstat-no" title="statement not covered" >        if (process.env.DEBUG === 'true') <span class="cstat-no" title="statement not covered" >console.log('[서버] 인증 토큰 없음');</span></span>
 <span class="cstat-no" title="statement not covered" >        ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '인증 토큰이 필요합니다.' }));</span>
 <span class="cstat-no" title="statement not covered" >        ws.close();</span>
 <span class="cstat-no" title="statement not covered" >        return;</span>
@@ -1320,13 +1320,13 @@ wss.on('connection', <span class="fstat-no" title="function not covered" >(w</sp
 <span class="cstat-no" title="statement not covered" >      try {</span>
 <span class="cstat-no" title="statement not covered" >        decoded = jwt.verify(token, SECRET);</span>
 <span class="cstat-no" title="statement not covered" >        if (decoded.username !== name) {</span>
-<span class="cstat-no" title="statement not covered" >          console.log('[서버] 토큰 username 불일치', decoded.username, name);</span>
+<span class="cstat-no" title="statement not covered" >          if (process.env.DEBUG === 'true') <span class="cstat-no" title="statement not covered" >console.log('[서버] 토큰 username 불일치', decoded.username, name);</span></span>
 <span class="cstat-no" title="statement not covered" >          ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '토큰 정보가 일치하지 않습니다.' }));</span>
 <span class="cstat-no" title="statement not covered" >          ws.close();</span>
 <span class="cstat-no" title="statement not covered" >          return;</span>
         }
       } catch (e) {
-<span class="cstat-no" title="statement not covered" >        console.log('[서버] 유효하지 않은 토큰', e);</span>
+<span class="cstat-no" title="statement not covered" >        if (process.env.DEBUG === 'true') <span class="cstat-no" title="statement not covered" >console.log('[서버] 유효하지 않은 토큰', e);</span></span>
 <span class="cstat-no" title="statement not covered" >        ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '유효하지 않은 토큰입니다.' }));</span>
 <span class="cstat-no" title="statement not covered" >        ws.close();</span>
 <span class="cstat-no" title="statement not covered" >        return;</span>
@@ -1335,7 +1335,7 @@ wss.on('connection', <span class="fstat-no" title="function not covered" >(w</sp
 <span class="cstat-no" title="statement not covered" >      (<span class="fstat-no" title="function not covered" >as</span>ync () =&gt; {</span>
         let pdata = <span class="cstat-no" title="statement not covered" >await PlayerData.findOne({ userId: decoded.userId });</span>
 <span class="cstat-no" title="statement not covered" >        if (!pdata) {</span>
-<span class="cstat-no" title="statement not covered" >          console.log('[서버] PlayerData 없음, 새로 생성', decoded.userId, playerName);</span>
+<span class="cstat-no" title="statement not covered" >          if (process.env.DEBUG === 'true') <span class="cstat-no" title="statement not covered" >console.log('[서버] PlayerData 없음, 새로 생성', decoded.userId, playerName);</span></span>
 <span class="cstat-no" title="statement not covered" >          pdata = await PlayerData.create({</span>
             userId: decoded.userId,
             name: playerName,
@@ -1346,7 +1346,7 @@ wss.on('connection', <span class="fstat-no" title="function not covered" >(w</sp
             inventory: [],
           });
         } else {
-<span class="cstat-no" title="statement not covered" >          console.log('[서버] PlayerData 불러옴', pdata);</span>
+<span class="cstat-no" title="statement not covered" >          if (process.env.DEBUG === 'true') <span class="cstat-no" title="statement not covered" >console.log('[서버] PlayerData 불러옴', pdata);</span></span>
         }
         const player = <span class="cstat-no" title="statement not covered" >new Player(playerName, ws);</span>
 <span class="cstat-no" title="statement not covered" >        player.world = pdata.world;</span>
@@ -1579,7 +1579,7 @@ module.exports = {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-06T04:26:14.107Z
+                at 2025-05-06T05:04:38.317Z
             </div>
         <script src="../prettify.js"></script>
         <script>

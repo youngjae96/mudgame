@@ -121,7 +121,7 @@ function handleAdminCommand({ ws, playerName, message, players, getRoom, sendInv
   // /운영자 <subcmd> ...
   const args = message.trim().split(' ');
   if (args.length < 2) {
-    ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[운영자] 사용법: /운영자 <공지|골드지급|아이템지급|텔포|서버저장> ...' }));
+    ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[운영자] 사용법: /운영자 <공지|골드지급|아이템지급|텔포|서버저장|차단> ...' }));
     return;
   }
   const subcmd = args[1];
@@ -227,6 +227,29 @@ function handleAdminCommand({ ws, playerName, message, players, getRoom, sendInv
       const { sendRoomInfo } = require('./utils/broadcast');
       sendRoomInfo(adminPlayer, global.getRoom, global.getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
     }
+    return;
+  }
+  // /운영자 차단 닉네임: 해당 유저를 영구 차단(로그인/회원가입 불가)
+  if (subcmd === '차단') {
+    const target = args[2];
+    if (!target) {
+      ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[운영자] 사용법: /운영자 차단 닉네임' }));
+      return;
+    }
+    // User 모델에서 차단 처리
+    const User = require('./models/User');
+    User.findOneAndUpdate({ username: target }, { banned: true }, { new: true }, (err, userDoc) => {
+      if (err || !userDoc) {
+        ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: `[운영자] 해당 닉네임의 유저(User)가 없습니다: ${target}` }));
+        return;
+      }
+      // 접속 중이면 강제 접속 종료
+      const targetPlayer = players[target];
+      if (targetPlayer && targetPlayer.ws) {
+        targetPlayer.ws.close();
+      }
+      ws.send(JSON.stringify({ type: 'system', message: `[운영자] ${target}님을 영구 차단(로그인/회원가입 불가) 처리했습니다.` }));
+    });
     return;
   }
   ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[운영자] 지원하지 않는 서브명령어입니다.' }));
@@ -464,7 +487,6 @@ async function handleWhoCommand({ ws, players }) {
 async function handleHelpCommand({ ws }) {
   const msg = [
     '[명령어 안내]',
-    '/전체 <메시지> : 전체 채팅',
     '/전 <메시지> : 전체 채팅(축약)',
     '<메시지> : 지역 채팅(명령어 없이 입력)',
     '/동 /서 /남 /북 : 방향 이동(오른쪽/왼쪽/아래/위, 또는 맵 터치)',
@@ -510,6 +532,62 @@ function handleShopSellCommand(args) {
   });
 }
 
+// /정보 <닉네임> : 다른 유저 스탯 조회
+async function handleStatCommand({ ws, playerName, message, players }) {
+  const args = message.trim().split(' ');
+  const targetName = args[1] || playerName;
+  const target = players[targetName];
+  if (!target) {
+    ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: `[정보] 해당 유저가 없습니다: ${targetName}` }));
+    return;
+  }
+  const statMsg =
+    `[능력치: ${targetName}]\n` +
+    `HP  : ${target.hp} / ${target.maxHp}    MP  : ${target.mp} / ${target.maxMp}\n` +
+    `STR : ${target.str} (Exp: ${Number(target.strExp).toFixed(2)}/${Number(target.strExpMax).toFixed(2)})   DEX: ${target.dex} (Exp: ${Number(target.dexExp).toFixed(2)}/${Number(target.dexExpMax).toFixed(2)})   INT: ${target.int} (Exp: ${Number(target.intExp).toFixed(2)}/${Number(target.intExpMax).toFixed(2)})\n` +
+    `공격력: ${target.getAtk ? target.getAtk() : target.atk}   방어력: ${target.getDef ? target.getDef() : target.def}`;
+  ws.send(JSON.stringify({ type: 'system', subtype: 'info', message: statMsg }));
+}
+
+// /귓 <닉네임> <메시지> : 귓속말
+async function handleWhisperCommand({ ws, playerName, message, players }) {
+  const args = message.trim().split(' ');
+  const targetName = args[1];
+  const msg = args.slice(2).join(' ');
+  if (!targetName || !msg) {
+    ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[귓속말] /귓 닉네임 메시지' }));
+    return;
+  }
+  const target = players[targetName];
+  if (!target || !target.ws) {
+    ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: `[귓속말] 해당 유저가 없습니다: ${targetName}` }));
+    return;
+  }
+  // 보내는 사람에게도 알림
+  ws.send(JSON.stringify({ type: 'chat', chatType: 'whisper', name: playerName, message: `[귓→${targetName}] ${msg}` }));
+  // 받는 사람에게 전달
+  target.ws.send(JSON.stringify({ type: 'chat', chatType: 'whisper', name: playerName, message: `[귓] ${msg}` }));
+}
+
+// 명령어 핸들러 등록
+const commandHandlers = {
+  '/정보': handleStatCommand,
+  '/귓': handleWhisperCommand,
+  '/구매': handleBuyCommand,
+  '/판매': handleSellCommand,
+  '/장착': PlayerController.handleEquipCommand,
+  '/해제': PlayerController.handleUnequipCommand,
+  '/정보': handleStatCommand,
+  '/장비': PlayerController.handleEquipCommand,
+  '/지도': PlayerController.handleMapCommand,
+  '/텔포': handleTeleportCommand,
+  '/길드': handleGuildCommand,
+  '/저장': PlayerController.handleSaveCommand,
+  '/도움말': handleHelpCommand,
+  '/구매': handleShopCommand,
+  '/판매': handleShopSellCommand,
+};
+
 module.exports = {
   setupCommands,
   handleBuyCommand,
@@ -524,4 +602,6 @@ module.exports = {
   handleHelpCommand,
   handleShopCommand,
   handleShopSellCommand,
+  handleStatCommand,
+  handleWhisperCommand,
 }; 

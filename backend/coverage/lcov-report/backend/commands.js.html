@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">65.71% </span>
+                <span class="strong">63.94% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>230/350</span>
+                <span class='fraction'>227/355</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">68.5% </span>
+                <span class="strong">62.17% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>124/181</span>
+                <span class='fraction'>120/193</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">67.65% </span>
+                <span class="strong">66.17% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>228/337</span>
+                <span class='fraction'>225/340</span>
             </div>
         
             
@@ -585,7 +585,11 @@
 <a name='L520'></a><a href='#L520'>520</a>
 <a name='L521'></a><a href='#L521'>521</a>
 <a name='L522'></a><a href='#L522'>522</a>
-<a name='L523'></a><a href='#L523'>523</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L523'></a><a href='#L523'>523</a>
+<a name='L524'></a><a href='#L524'>524</a>
+<a name='L525'></a><a href='#L525'>525</a>
+<a name='L526'></a><a href='#L526'>526</a>
+<a name='L527'></a><a href='#L527'>527</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
@@ -957,14 +961,16 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1073,10 +1079,12 @@
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1478,15 +1486,17 @@ async function handleGuildCommand({ ws, playerName, message, players }) {
 <span class="cstat-no" title="statement not covered" >      return;</span>
     }
     const guild = await Guild.findOne({ master: playerName });
-    if (!guild) {
+    <span class="missing-if-branch" title="else path not taken" >E</span>if (!guild) {
       ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[길드] 길드장만 추방이 가능합니다.' }));
       return;
     }
-    <span class="missing-if-branch" title="if path not taken" >I</span>if (targetName === playerName) {
+<span class="cstat-no" title="statement not covered" >    if (!guild.members || !Array.isArray(guild.members)) <span class="cstat-no" title="statement not covered" >guild.members = [];</span></span>
+<span class="cstat-no" title="statement not covered" >    if (!guild.joinRequests || !Array.isArray(guild.joinRequests)) <span class="cstat-no" title="statement not covered" >guild.joinRequests = [];</span></span>
+<span class="cstat-no" title="statement not covered" >    if (targetName === playerName) {</span>
 <span class="cstat-no" title="statement not covered" >      ws.send(JSON.stringify({ type: 'system', message: '[길드] 자신은 추방할 수 없습니다.' }));</span>
 <span class="cstat-no" title="statement not covered" >      return;</span>
     }
-    if (!guild.members.includes(targetName)) {
+<span class="cstat-no" title="statement not covered" >    if (!guild.members.includes(targetName)) {</span>
 <span class="cstat-no" title="statement not covered" >      ws.send(JSON.stringify({ type: 'system', message: '[길드] 해당 유저는 길드 멤버가 아닙니다.' }));</span>
 <span class="cstat-no" title="statement not covered" >      return;</span>
     }
@@ -1584,7 +1594,7 @@ async function <span class="fstat-no" title="function not covered" >handleHelpCo
     '/장비 : 내 장비 정보',
     '/지도 : 전체 맵 보기',
     '/텔포 &lt;지역&gt; : 월드 이동(예: 무인도, 마을)',
-    '/길드 &lt;생성|가입|수락|탈퇴|추방|공지|정보|목록|해체|채팅|채팅로그&gt; ...',
+    '/길드 &lt;생성|가입|수락|탈퇴|추방|공지|정보|목록|해체|채팅|채팅로그&gt; ... : 길드 관련 명령어',
     '/저장 : 내 상태 즉시 저장',
     '/도움말 : 명령어 전체 안내',
   ].join('\n');
@@ -1592,10 +1602,12 @@ async function <span class="fstat-no" title="function not covered" >handleHelpCo
 }
 &nbsp;
 function handleShopCommand(args) {
-  const SHOP_ITEMS = args.SHOP_ITEMS || {};
+  const SHOP_ITEMS = args.SHOP_ITEMS || <span class="branch-1 cbranch-no" title="branch not covered" >{};</span>
   const categories = Object.keys(SHOP_ITEMS);
-  if (!categories.length) {
-    args.ws.send(JSON.stringify({ type: 'system', subtype: 'info', message: '[상점 카테고리]\n(카테고리가 없습니다)' }));
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (!categories.length) {
+<span class="cstat-no" title="statement not covered" >    if (args.ws &amp;&amp; typeof args.ws.send === 'function') {</span>
+<span class="cstat-no" title="statement not covered" >      args.ws.send(JSON.stringify({ type: 'system', subtype: 'info', message: '[상점 카테고리]\n(카테고리가 없습니다)' }));</span>
+    }
 <span class="cstat-no" title="statement not covered" >    return;</span>
   }
   return PlayerGameService.handleShop({
@@ -1636,7 +1648,7 @@ module.exports = {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-06T04:23:43.063Z
+                at 2025-05-06T05:10:48.862Z
             </div>
         <script src="../prettify.js"></script>
         <script>

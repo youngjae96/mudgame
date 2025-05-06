@@ -10,8 +10,13 @@ const auth = require('../middlewares/auth');
 router.post('/register', async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) return res.status(400).json({ error: '필수 입력값 누락' });
-  const hash = await bcrypt.hash(password, 10);
   const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip;
+  // banned: true인 유저의 createdIp, lastLoginIp와 동일한 IP는 차단
+  const bannedIpUsers = await User.find({ banned: true, $or: [ { createdIp: ip }, { lastLoginIp: ip } ] });
+  if (bannedIpUsers.length > 0) return res.status(403).json({ error: '이 IP는 차단되어 회원가입이 불가합니다.' });
+  const bannedUser = await User.findOne({ username, banned: true });
+  if (bannedUser) return res.status(403).json({ error: '이 계정은 차단되어 회원가입이 불가합니다.' });
+  const hash = await bcrypt.hash(password, 10);
   try {
     const user = await User.create({ username, password: hash, createdIp: ip });
     await PlayerData.create({
@@ -49,10 +54,14 @@ router.post('/login', async (req, res) => {
   const { username, password } = req.body;
   const user = await User.findOne({ username });
   if (!user) return res.status(400).json({ error: '존재하지 않는 계정입니다.' });
+  const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip;
+  // banned: true인 유저의 createdIp, lastLoginIp와 동일한 IP는 차단
+  const bannedIpUsers = await User.find({ banned: true, $or: [ { createdIp: ip }, { lastLoginIp: ip } ] });
+  if (bannedIpUsers.length > 0) return res.status(403).json({ error: '이 IP는 차단되어 로그인할 수 없습니다.' });
+  if (user.banned) return res.status(403).json({ error: '이 계정은 차단되어 로그인할 수 없습니다.' });
   const ok = await bcrypt.compare(password, user.password);
   if (!ok) return res.status(400).json({ error: '비밀번호가 일치하지 않습니다.' });
   const token = jwt.sign({ userId: user._id, username: user.username }, SECRET, { expiresIn: '7d' });
-  const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip;
   user.lastLoginIp = ip;
   user.lastLoginAt = new Date();
   await user.save();

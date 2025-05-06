@@ -24,11 +24,6 @@ describe('parseChatCommand', () => {
     const res = parseChatCommand('/우리 파티');
     expect(res.type).toBe('invalid');
   });
-  it('/전체 명령어', () => {
-    const res = parseChatCommand('/전체 안녕');
-    expect(res.type).toBe('global');
-    expect(res.message).toBe('안녕');
-  });
   it('/전 명령어', () => {
     const res = parseChatCommand('/전 하이');
     expect(res.type).toBe('global');

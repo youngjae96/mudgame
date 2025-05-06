@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">78.32% </span>
+                <span class="strong">77.81% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>206/263</span>
+                <span class='fraction'>214/275</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">68.32% </span>
+                <span class="strong">65.68% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>110/161</span>
+                <span class='fraction'>111/169</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">82.2% </span>
+                <span class="strong">82.78% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>194/236</span>
+                <span class='fraction'>202/244</span>
             </div>
         
             
@@ -428,7 +428,17 @@
 <a name='L363'></a><a href='#L363'>363</a>
 <a name='L364'></a><a href='#L364'>364</a>
 <a name='L365'></a><a href='#L365'>365</a>
-<a name='L366'></a><a href='#L366'>366</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L366'></a><a href='#L366'>366</a>
+<a name='L367'></a><a href='#L367'>367</a>
+<a name='L368'></a><a href='#L368'>368</a>
+<a name='L369'></a><a href='#L369'>369</a>
+<a name='L370'></a><a href='#L370'>370</a>
+<a name='L371'></a><a href='#L371'>371</a>
+<a name='L372'></a><a href='#L372'>372</a>
+<a name='L373'></a><a href='#L373'>373</a>
+<a name='L374'></a><a href='#L374'>374</a>
+<a name='L375'></a><a href='#L375'>375</a>
+<a name='L376'></a><a href='#L376'>376</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -593,6 +603,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
@@ -651,6 +666,11 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -859,7 +879,7 @@ const PlayerGameService = {
       return;
     }
     <span class="missing-if-branch" title="if path not taken" >I</span>if (chatType === 'command') {
-<span class="cstat-no" title="statement not covered" >      console.log('DEBUG handleChat command:', command, args);</span>
+<span class="cstat-no" title="statement not covered" >      if (process.env.DEBUG === 'true') <span class="cstat-no" title="statement not covered" >console.log('DEBUG handleChat command:', command, args);</span></span>
 <span class="cstat-no" title="statement not covered" >      await this.handleCommand({ ws, playerName, command, args, PlayerManager, RoomManager: null, getRoom, getPlayersInRoom, sendRoomInfoToAllInRoom, savePlayerData, sendInventory, sendCharacterInfo, broadcast, SHOP_ITEMS, MAP_SIZE, VILLAGE_POS, commandHandlers, sendRoomInfo: sendRoomInfoToAllInRoom });</span>
 <span class="cstat-no" title="statement not covered" >      return;</span>
     }
@@ -869,9 +889,9 @@ const PlayerGameService = {
     }
   },
   async handleCommand({ ws, playerName, command, args, PlayerManager, RoomManager, getRoom, getPlayersInRoom, sendRoomInfoToAllInRoom, savePlayerData, sendInventory, sendCharacterInfo, broadcast, SHOP_ITEMS, MAP_SIZE, VILLAGE_POS, commandHandlers, sendRoomInfo }) {
-    console.log('DEBUG commandHandlers:', commandHandlers);
-    console.log('DEBUG command:', command);
-    console.log('DEBUG commandHandlers[command]:', commandHandlers &amp;&amp; commandHandlers[command]);
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (process.env.DEBUG === 'true') <span class="cstat-no" title="statement not covered" >console.log('DEBUG commandHandlers:', commandHandlers);</span>
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (process.env.DEBUG === 'true') <span class="cstat-no" title="statement not covered" >console.log('DEBUG command:', command);</span>
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (process.env.DEBUG === 'true') <span class="cstat-no" title="statement not covered" >console.log('DEBUG commandHandlers[command]:', commandHandlers &amp;&amp; commandHandlers[command]);</span>
     if (!commandHandlers) {
       ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '명령어 핸들러가 정의되어 있지 않습니다.' }));
       return;
@@ -958,6 +978,11 @@ const PlayerGameService = {
         });
         respawnMonsterWithDeps(player.world, player.position.x, player.position.y);
       } else if (result.playerDead) {
+        // 리스폰: 1번 마을로 이동, HP 20%로 설정
+        player.world = 1;
+        player.position = { x: 4, y: 4 };
+        player.hp = Math.max(1, Math.floor(player.maxHp * 0.2));
+        await savePlayerData(playerName);
         await sendRoomInfoToAllInRoom(PlayerManager.getAllPlayers(), player.world, player.position.x, player.position.y, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
       }
       await sendRoomInfoToAllInRoom(PlayerManager.getAllPlayers(), player.world, player.position.x, player.position.y, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
@@ -1016,6 +1041,11 @@ const PlayerGameService = {
           respawnMonsterWithDeps(player.world, player.position.x, player.position.y);
         }
         if (result.playerDead) {
+          // 리스폰: 1번 마을로 이동, HP 20%로 설정
+          player.world = 1;
+          player.position = { x: 4, y: 4 };
+          player.hp = Math.max(1, Math.floor(player.maxHp * 0.2));
+          await savePlayerData(playerName);
           await sendRoomInfoToAllInRoom(
             PlayerManager.getAllPlayers(),
             player.world, player.position.x, player.position.y,
@@ -1165,7 +1195,7 @@ module.exports = PlayerGameService; </pre></td></tr></table></pre>
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-06T04:23:43.063Z
+                at 2025-05-06T05:10:48.862Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

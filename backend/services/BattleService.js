@@ -44,7 +44,9 @@ class BattleService {
     let goldDrop = 0;
 
     if (monster.hp <= 0 && playerDmg > 0) {
-      room.monsters = room.monsters.filter(m => m.id !== monster.id);
+      if (room.monsters && Array.isArray(room.monsters)) {
+        room.monsters = room.monsters.filter(m => m.id !== monster.id);
+      }
       goldDrop = calcGoldDrop(monster);
       player.gold += goldDrop;
       log.push({

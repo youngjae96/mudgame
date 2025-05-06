@@ -8,7 +8,7 @@ export const COMMANDS = {
   EQUIP: '/착용',
   UNEQUIP: '/해제',
   MAP: '/지도',
-  GLOBAL: ['/전체', '/전'],
+  GLOBAL: ['/전'],
   LOCAL: ['/지역', '/지'],
   HELP: ['/도움말', '/help'],
 };
@@ -17,7 +17,7 @@ export const SYSTEM_MESSAGES = {
   DISCONNECTED: '서버와 연결이 끊어졌습니다.',
   SHOP_GUIDE: '[상점 명령어 안내] /상점 [카테고리] [페이지], /상점판매 [페이지], /구매 아이템명, /판매 아이템명',
   INN_GUIDE: '[여관] 체력과 마나를 모두 회복할 수 있습니다. (추후 구현 예정)',
-  CHAT_GUIDE: '[채팅 명령어 안내] /전체 전체채팅, /전 전체채팅, /동/서/남/북 : 방향 이동, /지역 지역채팅, /지 지역채팅(기본)',
+  CHAT_GUIDE: '[채팅 명령어 안내] /전 전체채팅, /동/서/남/북 : 방향 이동, /지역 지역채팅, /지 지역채팅(기본)',
   INVALID_COMMAND: '[알림] 지원하지 않는 명령어입니다.',
   // 필요시 추가
 };
@@ -52,4 +52,13 @@ export const MAP_EMOJI = {
 export const WORLDS = {
   MAIN: 1,
   ISLAND: 2,
-}; 
+};
+
+export const HELP_COMMANDS = [
+  '/전 <메시지> : 전체 채팅(축약)',
+  '/동/서/남/북 : 방향 이동',
+  '/지역 지역채팅',
+  '/지 지역채팅(기본)',
+];
+
+export const CHAT_GUIDE = '[채팅 명령어 안내] /전 전체채팅, /동/서/남/북 : 방향 이동, /지역 지역채팅, /지 지역채팅(기본)'; 

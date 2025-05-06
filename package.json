@@ -3,12 +3,13 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently -n \"FRONTEND,BACKEND\" -c \"red,blue\" \"npm run start --prefix frontend\" \"npm run dev --prefix backend\"",
+    "dev": "nodemon backend/server.js",
     "start": "concurrently -n \"FRONTEND,BACKEND\" -c \"red,blue\" \"npm run start --prefix frontend\" \"npm run start --prefix backend\""
   },
   "devDependencies": {
     "concurrently": "^9.1.2",
     "jest": "^29.7.0",
-    "supertest": "^7.1.0"
+    "supertest": "^7.1.0",
+    "nodemon": "^3.0.0"
   }
 }

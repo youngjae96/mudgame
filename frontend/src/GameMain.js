@@ -123,7 +123,6 @@ function GameMain({
   const [showHelp, setShowHelp] = useState(false);
 
   const commandList = [
-    { cmd: '/전체 <메시지>', desc: '전체 채팅' },
     { cmd: '/전 <메시지>', desc: '전체 채팅(축약)' },
     { cmd: '<메시지>', desc: '지역 채팅(명령어 없이 입력)' },
     { cmd: '/동 /서 /남 /북', desc: '방향 이동(오른쪽/왼쪽/아래/위, 또는 맵 터치)' },
@@ -201,7 +200,7 @@ function GameMain({
               </Button>
             </form>
             <div style={{ fontSize: '0.92rem', color: '#aaa', marginTop: 4, marginLeft: 2 }}>
-              [채팅 명령어 안내] <b>/전체 전체채팅</b>, <b>/전 전체채팅</b>, <b>메시지만 입력: 지역채팅</b>
+              [채팅 명령어 안내] <b>/전 전체채팅</b>, <b>메시지만 입력: 지역채팅</b>
             </div>
             <Modal open={showHelp} onClose={() => setShowHelp(false)} title="명령어 안내">
               <div style={{ maxHeight: 380, overflowY: 'auto', width: 360 }}>
