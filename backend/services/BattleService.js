@@ -118,6 +118,7 @@ class BattleService {
           result: 'playerDead',
           text: `당신은 쓰러졌으나 마을에서 깨어났습니다.`,
         });
+        player.world = 1;
         player.position = { ...VILLAGE_POS };
         playerDead = true;
       }
