@@ -5,7 +5,7 @@ const PlayerData = require('./models/PlayerData');
 const User = require('./models/User');
 
 const TEST_USER = {
-  username: 'testuser_' + Date.now(),
+  username: '테123',
   password: 'pw1234'
 };
 

@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">42.24% </span>
+                <span class="strong">41.47% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>109/258</span>
+                <span class='fraction'>107/258</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">26.31% </span>
+                <span class="strong">25% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>30/114</span>
+                <span class='fraction'>28/112</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">16.66% </span>
+                <span class="strong">15% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>3/18</span>
+                <span class='fraction'>3/20</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">42.97% </span>
+                <span class="strong">42.16% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>107/249</span>
+                <span class='fraction'>105/249</span>
             </div>
         
             
@@ -582,7 +582,8 @@
 <a name='L517'></a><a href='#L517'>517</a>
 <a name='L518'></a><a href='#L518'>518</a>
 <a name='L519'></a><a href='#L519'>519</a>
-<a name='L520'></a><a href='#L520'>520</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">3x</span>
+<a name='L520'></a><a href='#L520'>520</a>
+<a name='L521'></a><a href='#L521'>521</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
@@ -606,6 +607,8 @@
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -692,10 +695,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -805,6 +805,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1106,8 +1108,8 @@ const http = require('http');
 const { WebSocketServer } = require('ws');
 const cors = require('cors');
 const Player = require('./models/Player');
-const { ITEM_POOL, FIELD_MONSTERS, FOREST_MONSTERS, CAVE_MONSTERS, SHOP_ITEMS } = require('./data/items');
-const { MAP_SIZE, VILLAGE_POS, rooms, getRoom } = require('./data/map');
+const { ITEM_POOL, FIELD_MONSTERS, FOREST_MONSTERS, CAVE_MONSTERS, SHOP_ITEMS, ISLAND_MONSTERS } = require('./data/items');
+const { MAP_SIZE, VILLAGE_POS, rooms, getRoom, roomsIsland, ISLAND_VILLAGE_POS, roomsCave, MAP_SIZE_CAVE } = require('./data/map');
 const Monster = require('./models/Monster');
 const {
   broadcast,
@@ -1138,6 +1140,8 @@ const {
   handleHelpCommand,
   handleShopCommand,
   handleShopSellCommand,
+  handleStatCommand,
+  handleWhisperCommand,
 } = require('./commands');
 const logger = require('./middlewares/logger');
 const errorHandler = require('./middlewares/errorHandler');
@@ -1213,10 +1217,7 @@ function <span class="fstat-no" title="function not covered" >getPlayersInRoom(<
 function parseChatCommand(msg) {
   const trimmed = msg.trim();
   if (trimmed.startsWith('/우리')) {
-    return { type: 'invalid', message: '[알림] /우리(파티채팅)는 현재 지원하지 않습니다. [채팅 명령어 안내] /전체 또는 /전 : 전체채팅, /지역 또는 /지 : 지역채팅(기본)' };
-  }
-  if (trimmed.startsWith('/전체 ')) {
-    return { type: 'global', message: trimmed.replace(/^\/전체 /, '') };
+    return { type: 'invalid', message: '[알림] /우리(파티채팅)는 현재 지원하지 않습니다. [채팅 명령어 안내] /전 : 전체채팅, /지역 또는 /지 : 지역채팅(기본)' };
   }
   if (trimmed.startsWith('/전 ')) {
     return { type: 'global', message: trimmed.replace(/^\/전 /, '') };
@@ -1328,6 +1329,8 @@ const commandHandlers = {
   '/길드': <span class="fstat-no" title="function not covered" >(a</span>rgs) =&gt; <span class="cstat-no" title="statement not covered" >handleGuildCommand(args),</span>
   '/누구': <span class="fstat-no" title="function not covered" >(a</span>rgs) =&gt; <span class="cstat-no" title="statement not covered" >handleWhoCommand(args),</span>
   '/도움말': <span class="fstat-no" title="function not covered" >(a</span>rgs) =&gt; <span class="cstat-no" title="statement not covered" >handleHelpCommand(args),</span>
+  '/정보': <span class="fstat-no" title="function not covered" >(a</span>rgs) =&gt; <span class="cstat-no" title="statement not covered" >handleStatCommand(args),</span>
+  '/귓': <span class="fstat-no" title="function not covered" >(a</span>rgs) =&gt; <span class="cstat-no" title="statement not covered" >handleWhisperCommand(args),</span>
 };
 &nbsp;
 // 서비스 인스턴스 생성 및 의존성 주입
@@ -1627,7 +1630,7 @@ module.exports = {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-06T05:10:48.862Z
+                at 2025-05-06T09:37:07.708Z
             </div>
         <script src="../prettify.js"></script>
         <script>

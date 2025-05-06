@@ -12,6 +12,10 @@ router.post('/register', async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) return res.status(400).json({ error: '필수 입력값 누락' });
   if (username.length > 5) return res.status(400).json({ error: '닉네임은 5글자까지 가능합니다.' });
+  // 한글, 영어, 숫자만 허용 (공백, 특수문자 제한)
+  if (!/^[a-zA-Z0-9가-힣]+$/.test(username)) {
+    return res.status(400).json({ error: '닉네임은 한글, 영어, 숫자만 사용할 수 있습니다.' });
+  }
   const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip;
   // BannedIp 컬렉션에 등록된 IP 차단
   const bannedIp = await BannedIp.findOne({ ip });
@@ -21,6 +25,11 @@ router.post('/register', async (req, res) => {
   if (bannedIpUsers.length > 0) return res.status(403).json({ error: '이 IP는 차단되어 회원가입이 불가합니다.' });
   const bannedUser = await User.findOne({ username, banned: true });
   if (bannedUser) return res.status(403).json({ error: '이 계정은 차단되어 회원가입이 불가합니다.' });
+  // 같은 IP로 이미 가입된 계정이 있으면 거부
+  const existingUserByIp = await User.findOne({ createdIp: ip });
+  if (existingUserByIp) {
+    return res.status(400).json({ error: '이 IP에서는 이미 계정이 생성되었습니다.' });
+  }
   const hash = await bcrypt.hash(password, 10);
   let user;
   try {
@@ -65,6 +74,8 @@ router.post('/login', async (req, res) => {
   const { username, password } = req.body;
   const user = await User.findOne({ username });
   if (!user) return res.status(400).json({ error: '존재하지 않는 계정입니다.' });
+  const pdata = await PlayerData.findOne({ userId: user._id });
+  if (!pdata) return res.status(400).json({ error: '플레이어 데이터가 존재하지 않습니다. 관리자에게 문의하세요.' });
   const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip;
   // BannedIp 컬렉션에 등록된 IP 차단
   const bannedIp = await BannedIp.findOne({ ip });

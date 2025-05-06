@@ -296,6 +296,11 @@ async function handleGuildCommand({ ws, playerName, message, players }) {
       ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[길드] 생성할 길드 이름을 입력하세요.' }));
       return;
     }
+    // 길드명 8글자 이하 제한
+    if (guildName.length > 8) {
+      ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[길드] 길드 이름은 8글자 이하만 가능합니다.' }));
+      return;
+    }
     // 추가: 이미 길드 소속 여부 체크
     const already = await Guild.findOne({ members: playerName });
     if (already) {
