@@ -103,7 +103,7 @@ const PlayerGameService = {
     }
     if (commandHandlers[command]) {
       if (command === '/여관') {
-        return commandHandlers[command]({
+        return await commandHandlers[command]({
           ws,
           playerName,
           players: PlayerManager.getAllPlayers(),
@@ -113,7 +113,7 @@ const PlayerGameService = {
           sendCharacterInfo
         });
       }
-      return commandHandlers[command]({
+      return await commandHandlers[command]({
         ws,
         playerName,
         message: [command, ...args].join(' '),

@@ -117,7 +117,7 @@ function handleInnCommand({ ws, playerName, players, getRoom, savePlayerData, se
   ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `[여관] HP/MP가 모두 회복되었습니다! (-${INN_PRICE}G)` }));
 }
 
-function handleAdminCommand({ ws, playerName, message, players, getRoom, sendInventory, sendCharacterInfo, savePlayerData }) {
+async function handleAdminCommand({ ws, playerName, message, players, getRoom, sendInventory, sendCharacterInfo, savePlayerData }) {
   // /운영자 <subcmd> ...
   const args = message.trim().split(' ');
   if (args.length < 2) {
@@ -128,10 +128,8 @@ function handleAdminCommand({ ws, playerName, message, players, getRoom, sendInv
   // /운영자 서버저장: 모든 플레이어 DB 저장
   if (subcmd === '서버저장') {
     const allPlayers = Object.keys(players);
-    Promise.all(allPlayers.map(name => savePlayerData(name).catch(() => {})))
-      .then(() => {
-        ws.send(JSON.stringify({ type: 'system', message: '[운영자] 모든 플레이어 데이터가 DB에 저장되었습니다.' }));
-      });
+    await Promise.all(allPlayers.map(name => savePlayerData(name).catch(() => {})));
+    ws.send(JSON.stringify({ type: 'system', message: '[운영자] 모든 플레이어 데이터가 DB에 저장되었습니다.' }));
     return;
   }
   // /운영자 공지 메시지
@@ -239,8 +237,9 @@ function handleAdminCommand({ ws, playerName, message, players, getRoom, sendInv
     // User 모델에서 차단 처리
     const User = require('./models/User');
     const BannedIp = require('./models/BannedIp');
-    User.findOneAndUpdate({ username: target }, { banned: true }, { new: true }, async (err, userDoc) => {
-      if (err || !userDoc) {
+    try {
+      const userDoc = await User.findOneAndUpdate({ username: target }, { banned: true }, { new: true });
+      if (!userDoc) {
         ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: `[운영자] 해당 닉네임의 유저(User)가 없습니다: ${target}` }));
         return;
       }
@@ -257,7 +256,9 @@ function handleAdminCommand({ ws, playerName, message, players, getRoom, sendInv
         targetPlayer.ws.close();
       }
       ws.send(JSON.stringify({ type: 'system', message: `[운영자] ${target}님을 영구 차단(계정+IP) 처리했습니다.` }));
-    });
+    } catch (err) {
+      ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: `[운영자] 차단 처리 중 오류: ${err.message}` }));
+    }
     return;
   }
   // /운영자 ip차단 <IP주소>: 해당 IP를 영구 차단(회원가입/로그인 불가)
@@ -268,13 +269,12 @@ function handleAdminCommand({ ws, playerName, message, players, getRoom, sendInv
       return;
     }
     const BannedIp = require('./models/BannedIp');
-    BannedIp.findOneAndUpdate({ ip: targetIp }, { ip: targetIp }, { upsert: true, new: true }, (err, doc) => {
-      if (err) {
-        ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: `[운영자] IP 차단 실패: ${err.message}` }));
-        return;
-      }
+    try {
+      await BannedIp.findOneAndUpdate({ ip: targetIp }, { ip: targetIp }, { upsert: true, new: true });
       ws.send(JSON.stringify({ type: 'system', message: `[운영자] ${targetIp} IP를 영구 차단 처리했습니다.` }));
-    });
+    } catch (err) {
+      ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: `[운영자] IP 차단 실패: ${err.message}` }));
+    }
     return;
   }
   ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[운영자] 지원하지 않는 서브명령어입니다.' }));

@@ -11,6 +11,7 @@ const auth = require('../middlewares/auth');
 router.post('/register', async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) return res.status(400).json({ error: '필수 입력값 누락' });
+  if (username.length > 5) return res.status(400).json({ error: '닉네임은 5글자까지 가능합니다.' });
   const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip;
   // BannedIp 컬렉션에 등록된 IP 차단
   const bannedIp = await BannedIp.findOne({ ip });

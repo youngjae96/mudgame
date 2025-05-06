@@ -33,7 +33,7 @@ npm run dev   # 서버와 클라이언트가 동시에 실행됨
 - 백엔드(WebSocket): ws://localhost:4000
 
 ### 2. 서버 코드 수정 시 자동 재시작
-- `npm run dev --prefix backend` (nodemon 사용)
+- `npm run dev--prefix backend` (nodemon 사용)
 
 ### 3. 개별 실행 (기존 방식)
 - 백엔드: `cd backend && npm install && npm start`

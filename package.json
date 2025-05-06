@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "nodemon backend/server.js",
+    "dev": "concurrently -n \"FRONTEND,BACKEND\" -c \"red,blue\" \"npm run start --prefix frontend\" \"npm run dev --prefix backend\"",
     "start": "concurrently -n \"FRONTEND,BACKEND\" -c \"red,blue\" \"npm run start --prefix frontend\" \"npm run start --prefix backend\""
   },
   "devDependencies": {
