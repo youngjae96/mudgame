@@ -135,6 +135,13 @@ class Player {
       (item) => !(item.type === ITEM_TYPE.CONSUMABLE && item.total !== undefined && item.total <= 0)
     );
   }
+
+  addToInventory(item) {
+    this.inventory.push(item);
+    if (this.inventory.length > 200) {
+      this.inventory = this.inventory.slice(-200);
+    }
+  }
 }
 
 module.exports = Player; 

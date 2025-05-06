@@ -36,6 +36,10 @@ class ShopService {
       ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '골드가 부족합니다.' }));
       return;
     }
+    if (player.inventory.length >= 200) {
+      ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '인벤토리는 최대 200개까지만 보관할 수 있습니다.' }));
+      return;
+    }
     player.gold -= foundItem.price;
     player.inventory.push({ ...foundItem });
     await this.savePlayerData(playerName).catch(() => {});

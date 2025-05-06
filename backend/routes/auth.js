@@ -22,8 +22,13 @@ router.post('/register', async (req, res) => {
   const bannedUser = await User.findOne({ username, banned: true });
   if (bannedUser) return res.status(403).json({ error: '이 계정은 차단되어 회원가입이 불가합니다.' });
   const hash = await bcrypt.hash(password, 10);
+  let user;
   try {
-    const user = await User.create({ username, password: hash, createdIp: ip });
+    user = await User.create({ username, password: hash, createdIp: ip });
+  } catch (e) {
+    return res.status(400).json({ error: '이미 존재하는 닉네임입니다.' });
+  }
+  try {
     await PlayerData.create({
       userId: user._id,
       name: user.username,
@@ -51,7 +56,8 @@ router.post('/register', async (req, res) => {
     });
     res.json({ success: true, userId: user._id });
   } catch (e) {
-    res.status(400).json({ error: '이미 존재하는 닉네임입니다.' });
+    await User.deleteOne({ _id: user._id });
+    res.status(500).json({ error: '회원가입 중 오류가 발생했습니다. 다시 시도해 주세요.' });
   }
 });
 
