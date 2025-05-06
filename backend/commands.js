@@ -445,6 +445,40 @@ async function handleGuildCommand({ ws, playerName, message, players }) {
   ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[길드] 지원하지 않는 서브명령어입니다.' }));
 }
 
+// /누구: 현재 접속중인 플레이어 목록
+async function handleWhoCommand({ ws, players }) {
+  const names = Object.keys(players);
+  if (!names.length) {
+    ws.send(JSON.stringify({ type: 'system', message: '[누구] 현재 접속 중인 플레이어가 없습니다.' }));
+    return;
+  }
+  ws.send(JSON.stringify({ type: 'system', message: `[누구] 현재 접속중: ${names.join(', ')}` }));
+}
+
+// /도움말: 명령어 안내 메시지
+async function handleHelpCommand({ ws }) {
+  const msg = [
+    '[명령어 안내]',
+    '/전체 <메시지> : 전체 채팅',
+    '/전 <메시지> : 전체 채팅(축약)',
+    '<메시지> : 지역 채팅(명령어 없이 입력)',
+    '/동 /서 /남 /북 : 방향 이동(오른쪽/왼쪽/아래/위, 또는 맵 터치)',
+    '/누구 : 현재 접속중인 플레이어 목록 보기',
+    '/구매 <아이템명> : 아이템 구매',
+    '/판매 <아이템명> : 아이템 판매',
+    '/장착 <아이템명> : 장비 장착',
+    '/해제 <아이템명> : 장비 해제',
+    '/정보 : 내 능력치 확인',
+    '/장비 : 내 장비 정보',
+    '/지도 : 전체 맵 보기',
+    '/텔포 <지역> : 월드 이동(예: 무인도, 마을)',
+    '/길드 <생성|가입|수락|탈퇴|추방|공지|정보|목록|해체|채팅|채팅로그> ...',
+    '/저장 : 내 상태 즉시 저장',
+    '/도움말 : 명령어 전체 안내',
+  ].join('\n');
+  ws.send(JSON.stringify({ type: 'system', message: msg }));
+}
+
 module.exports = {
   setupCommands,
   handleBuyCommand,
@@ -455,4 +489,6 @@ module.exports = {
   handleInnCommand,
   handleAdminCommand,
   handleGuildCommand,
+  handleWhoCommand,
+  handleHelpCommand,
 }; 

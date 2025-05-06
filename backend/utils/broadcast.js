@@ -92,7 +92,7 @@ function sendRoomInfo(player, getRoom, getPlayersInRoom, _MAP_SIZE, VILLAGE_POS)
     player.ws.send(
       JSON.stringify({
         type: 'system',
-        message: '[마을 명령어 안내]\n/상점 : 상점 이용\n/여관 : 여관 이용(체력/마나 회복)\n/정보 : 내 능력치 확인\n/지도 : 전체맵 보기\n/텔포 : 월드 이동(예: /텔포 무인도, /텔포 마을)'
+        message: '[마을 명령어 안내]\n/상점 : 상점 이용\n/여관 : 여관 이용(체력/마나 회복)\n/텔포 : 월드 이동(예: /텔포 무인도, /텔포 마을)\n/도움말 : 명령어 전체 안내'
       })
     );
   }

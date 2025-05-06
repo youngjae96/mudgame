@@ -31,6 +31,8 @@ const {
   handleInnCommand,
   handleAdminCommand,
   handleGuildCommand,
+  handleWhoCommand,
+  handleHelpCommand,
 } = require('./commands');
 const logger = require('./middlewares/logger');
 const errorHandler = require('./middlewares/errorHandler');
@@ -201,6 +203,8 @@ const commandHandlers = {
   '/여관': handleInnCommand,
   '/운영자': (args) => handleAdminCommand({ ...args, savePlayerData }),
   '/길드': (args) => handleGuildCommand(args),
+  '/누구': (args) => handleWhoCommand(args),
+  '/도움말': (args) => handleHelpCommand(args),
 };
 
 // 서비스 인스턴스 생성 및 의존성 주입
