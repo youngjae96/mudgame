@@ -226,6 +226,7 @@ const commandHandlers = {
   '/도움말': (args) => handleHelpCommand(args),
   '/정보': (args) => handleStatCommand(args),
   '/귓': (args) => handleWhisperCommand(args),
+  '/귀환': (args) => require('./commands').handleReturnCommand({ ...args, PlayerManager }),
 };
 
 // 서비스 인스턴스 생성 및 의존성 주입
@@ -456,6 +457,7 @@ wss.on('connection', (ws) => {
         getPlayersInRoom,
         sendRoomInfoToAllInRoom,
         savePlayerData,
+        sendInventory,
         sendCharacterInfo,
         broadcast,
         processBattle,

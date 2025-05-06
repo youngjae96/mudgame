@@ -117,6 +117,20 @@ const PlayerGameService = {
           sendCharacterInfo
         });
       }
+      if (command === '/귀환') {
+        return await commandHandlers[command]({
+          ws,
+          playerName,
+          PlayerManager,
+          getRoom,
+          getPlayersInRoom,
+          sendRoomInfo,
+          sendInventory,
+          sendCharacterInfo,
+          MAP_SIZE,
+          VILLAGE_POS
+        });
+      }
       return await commandHandlers[command]({
         ws,
         playerName,
@@ -199,12 +213,13 @@ const PlayerGameService = {
         await sendRoomInfoToAllInRoom(PlayerManager.getAllPlayers(), player.world, player.position.x, player.position.y, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
       }
       await sendRoomInfoToAllInRoom(PlayerManager.getAllPlayers(), player.world, player.position.x, player.position.y, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+      sendInventory(player);
       sendCharacterInfo(player);
     } else {
       ws.send(JSON.stringify({ type: 'error', message: '해당 몬스터가 없습니다.' }));
     }
   },
-  async handleAutoBattle({ ws, playerName, monsterId, PlayerManager, getRoom, sendRoomInfoToAllInRoom, savePlayerData, sendCharacterInfo, broadcast, processBattle, respawnMonsterWithDeps, battleIntervals, MAP_SIZE, VILLAGE_POS, getPlayersInRoom }) {
+  async handleAutoBattle({ ws, playerName, monsterId, PlayerManager, getRoom, sendRoomInfoToAllInRoom, savePlayerData, sendCharacterInfo, broadcast, processBattle, respawnMonsterWithDeps, battleIntervals, MAP_SIZE, VILLAGE_POS, getPlayersInRoom, sendInventory }) {
     const player = PlayerManager.getPlayer(playerName);
     if (!player) return;
     const { x, y } = player.position;
@@ -218,6 +233,7 @@ const PlayerGameService = {
       ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '이미 자동전투 중입니다.' }));
       return;
     }
+    const _sendInventory = sendInventory;
     battleIntervals[playerName] = setInterval(async () => {
       const curRoom = getRoom(player.world, player.position.x, player.position.y);
       const curIdx = curRoom.monsters.findIndex((m) => m.id === monsterId);
@@ -252,8 +268,7 @@ const PlayerGameService = {
             }
           });
           respawnMonsterWithDeps(player.world, player.position.x, player.position.y);
-        }
-        if (result.playerDead) {
+        } else if (result.playerDead) {
           // 리스폰: 1번 마을로 이동, HP 20%로 설정
           player.world = 1;
           player.position = { x: 4, y: 4 };
@@ -270,8 +285,10 @@ const PlayerGameService = {
           player.world, player.position.x, player.position.y,
           getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS
         );
+        _sendInventory(player);
         sendCharacterInfo(player);
       }
+      _sendInventory(player);
     }, 1200);
     ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '자동전투를 시작합니다!' }));
   },

@@ -11,6 +11,8 @@ class Monster {
     this.gold = base.gold || 0;
     this.id = `${x},${y},m,${Date.now()}-${Math.random()}`;
     if (base.desc) this.desc = base.desc;
+    if (base.dropItems) this.dropItems = base.dropItems;
+    if (base.dropRates) this.dropRates = base.dropRates;
   }
 }
 

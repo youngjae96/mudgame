@@ -72,13 +72,18 @@ class BattleService {
               found = arr.find(i => i.name === itemName);
               if (found) break;
             }
+            // 디버깅용 로그 추가
+            console.log('[드랍시도]', { itemName, found, inventoryLen: player.inventory.length });
             if (found) {
               player.inventory.push({ ...found });
+              console.log('[드랍성공]', { itemName, inventoryLen: player.inventory.length });
               log.push({
                 type: 'system',
                 subtype: 'event',
                 message: `${monster.name}이(가) ${itemName}을(를) 드랍!`
               });
+            } else {
+              console.log('[드랍실패]', { itemName });
             }
           }
         });

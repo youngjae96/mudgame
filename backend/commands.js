@@ -526,6 +526,9 @@ async function handleHelpCommand({ ws }) {
     '/장착 <아이템명> : 장비 장착',
     '/해제 <아이템명> : 장비 해제',
     '/정보 : 내 능력치 확인',
+    '/정보 <닉네임> : 다른 유저 능력치 확인',
+    '/귓 <닉네임> <메시지> : 귓속말',
+    '/귀환 : 1번 마을(마을 광장)로 즉시 이동',
     '/장비 : 내 장비 정보',
     '/지도 : 전체 맵 보기',
     '/텔포 <지역> : 월드 이동(예: 무인도, 마을)',
@@ -599,6 +602,28 @@ async function handleWhisperCommand({ ws, playerName, message, players }) {
   target.ws.send(JSON.stringify({ type: 'chat', chatType: 'whisper', name: playerName, message: `[귓] ${msg}` }));
 }
 
+// /귀환: 1번 마을(마을 광장)로 즉시 이동
+async function handleReturnCommand({ ws, playerName, PlayerManager, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS, sendRoomInfo, sendInventory, sendCharacterInfo }) {
+  const player = PlayerManager.getPlayer(playerName);
+  if (!player) return;
+  console.log(`[귀환] BEFORE: name=${playerName}, world=${player.world}, pos=(${player.position.x},${player.position.y})`);
+  // 마을로 이동
+  RoomManager.removePlayerFromRoom(playerName, player.world, player.position.x, player.position.y);
+  console.log(`[귀환] AFTER REMOVE: name=${playerName}, world=${player.world}, pos=(${player.position.x},${player.position.y})`);
+  player.world = 1;
+  player.position.x = 4;
+  player.position.y = 4;
+  RoomManager.addPlayerToRoom(playerName, player.world, player.position.x, player.position.y);
+  console.log(`[귀환] AFTER ADD: name=${playerName}, world=${player.world}, pos=(${player.position.x},${player.position.y})`);
+  PlayerManager.addPlayer(playerName, player); // 상태 갱신
+  ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '[귀환] 1번 마을(마을 광장)으로 귀환합니다!' }));
+  sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+  sendInventory(player);
+  sendCharacterInfo(player);
+  // 강제 동기화: 이동 후 방 정보 전체 갱신
+  sendRoomInfoToAllInRoom(PlayerManager.getAllPlayers(), player.world, player.position.x, player.position.y, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+}
+
 // 명령어 핸들러 등록
 const commandHandlers = {
   '/정보': handleStatCommand,
@@ -616,6 +641,7 @@ const commandHandlers = {
   '/도움말': handleHelpCommand,
   '/구매': handleShopCommand,
   '/판매': handleShopSellCommand,
+  '/귀환': handleReturnCommand,
 };
 
 module.exports = {
@@ -634,4 +660,5 @@ module.exports = {
   handleShopSellCommand,
   handleStatCommand,
   handleWhisperCommand,
+  handleReturnCommand,
 }; 

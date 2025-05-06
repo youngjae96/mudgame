@@ -67,7 +67,7 @@ const SHOP_ITEMS = {
     { name: ITEM_NAME_SILVER_SWORD, type: ITEM_TYPE.WEAPON, price: 500, desc: '은으로 만든 고급 검', atk: 12, str: 2, dex: 1 },
     { name: ITEM_NAME_GOLD_SWORD, type: ITEM_TYPE.WEAPON, price: 1200, desc: '황금으로 만든 최고의 검', atk: 20, str: 3, dex: 2 },
     { name: ITEM_NAME_MONGHWA, type: ITEM_TYPE.WEAPON, price: 100, desc: '공격해도 몬스터 HP가 깎이지 않음. 스탯 경험치만 오름.', atk: 0 },
-    // { name: ITEM_NAME_FLAME_SWORD, type: ITEM_TYPE.WEAPON, price: 3000, desc: '불꽃의 힘이 깃든 검', atk: 28, str: 4, dex: 2 },
+    { name: ITEM_NAME_FLAME_SWORD, type: ITEM_TYPE.WEAPON, price: 3000, desc: '불꽃의 힘이 깃든 검', atk: 28, str: 4, dex: 2 },
     // { name: ITEM_NAME_FROST_SWORD, type: ITEM_TYPE.WEAPON, price: 3200, desc: '얼음의 힘이 깃든 검', atk: 24, str: 2, dex: 4 },
     // { name: ITEM_NAME_DRAGON_SWORD, type: ITEM_TYPE.WEAPON, price: 5000, desc: '드래곤의 힘이 깃든 검', atk: 36, str: 5, dex: 3 },
     // { name: ITEM_NAME_DARK_SWORD, type: ITEM_TYPE.WEAPON, price: 4200, desc: '어둠의 힘이 깃든 검', atk: 32, str: 3, dex: 5 },
