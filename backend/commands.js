@@ -8,6 +8,7 @@ const ShopService = require('./services/ShopService');
 const PlayerManager = require('./playerManager');
 const RoomManager = require('./roomManager');
 const { sendRoomInfoToAllInRoom, broadcast } = require('./utils/broadcast');
+const Guild = require('./models/Guild');
 
 let shopServiceInstance = null;
 
@@ -228,6 +229,222 @@ function handleAdminCommand({ ws, playerName, message, players, getRoom, sendInv
   ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[운영자] 지원하지 않는 서브명령어입니다.' }));
 }
 
+// 길드 명령어 핸들러
+async function handleGuildCommand({ ws, playerName, message, players }) {
+  // /길드 <subcmd> ...
+  const args = message.trim().split(' ');
+  const subcmd = args[1];
+  if (!subcmd) {
+    ws.send(JSON.stringify({ type: 'system', subtype: 'guide', message: '[길드] 사용법: /길드 <생성|가입|수락|탈퇴|추방|공지|정보|목록> ...' }));
+    return;
+  }
+  // /길드 생성 <길드이름>
+  if (subcmd === '생성') {
+    const guildName = args[2];
+    if (!guildName) {
+      ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[길드] 생성할 길드 이름을 입력하세요.' }));
+      return;
+    }
+    // 추가: 이미 길드 소속 여부 체크
+    const already = await Guild.findOne({ members: playerName });
+    if (already) {
+      ws.send(JSON.stringify({ type: 'system', message: '[길드] 이미 다른 길드에 소속되어 있습니다. 탈퇴 후 다시 시도하세요.' }));
+      return;
+    }
+    // GuildService로 분리 예정, 여기선 DB에 중복 체크 및 생성만
+    const exists = await Guild.findOne({ name: guildName });
+    if (exists) {
+      ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[길드] 이미 존재하는 길드명입니다.' }));
+      return;
+    }
+    const guild = new Guild({ name: guildName, master: playerName, members: [playerName] });
+    await guild.save();
+    ws.send(JSON.stringify({ type: 'system', message: `[길드] '${guildName}' 길드가 생성되었습니다!` }));
+    return;
+  }
+  // /길드 목록: 전체 길드 목록 조회
+  if (subcmd === '목록') {
+    const guilds = await Guild.find({}, 'name master members');
+    if (!guilds.length) {
+      ws.send(JSON.stringify({ type: 'system', message: '[길드] 생성된 길드가 없습니다.' }));
+      return;
+    }
+    const list = guilds.map(g => `• ${g.name} (길드장: ${g.master}, 인원: ${g.members.length})`).join('\n');
+    ws.send(JSON.stringify({ type: 'system', message: `[길드 목록]\n${list}` }));
+    return;
+  }
+  // /길드 정보: 내 길드 정보 확인
+  if (subcmd === '정보') {
+    const guild = await Guild.findOne({ members: playerName });
+    if (!guild) {
+      ws.send(JSON.stringify({ type: 'system', message: '[길드] 소속된 길드가 없습니다.' }));
+      return;
+    }
+    const memberList = guild.members.join(', ');
+    ws.send(JSON.stringify({
+      type: 'system',
+      message: `[길드 정보]\n이름: ${guild.name}\n길드장: ${guild.master}\n인원: ${guild.members.length}\n멤버: ${memberList}\n공지: ${guild.notice || '(없음)'}`
+    }));
+    return;
+  }
+  // /길드 가입 <길드이름>: 길드 가입 신청
+  if (subcmd === '가입') {
+    const guildName = args[2];
+    if (!guildName) {
+      ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[길드] 가입할 길드 이름을 입력하세요.' }));
+      return;
+    }
+    const guild = await Guild.findOne({ name: guildName });
+    if (!guild) {
+      ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[길드] 해당 이름의 길드가 없습니다.' }));
+      return;
+    }
+    if (guild.members.includes(playerName)) {
+      ws.send(JSON.stringify({ type: 'system', message: '[길드] 이미 해당 길드의 멤버입니다.' }));
+      return;
+    }
+    if (guild.joinRequests.includes(playerName)) {
+      ws.send(JSON.stringify({ type: 'system', message: '[길드] 이미 가입 신청 중입니다.' }));
+      return;
+    }
+    guild.joinRequests.push(playerName);
+    await guild.save();
+    ws.send(JSON.stringify({ type: 'system', message: `[길드] '${guildName}' 길드에 가입 신청이 완료되었습니다.` }));
+    return;
+  }
+  // /길드 수락 <유저명>: 길드장이 가입 신청을 수락
+  if (subcmd === '수락') {
+    const targetName = args[2];
+    if (!targetName) {
+      ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[길드] 수락할 유저명을 입력하세요.' }));
+      return;
+    }
+    const guild = await Guild.findOne({ master: playerName });
+    if (!guild) {
+      ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[길드] 길드장만 가입 수락이 가능합니다.' }));
+      return;
+    }
+    if (!guild.joinRequests.includes(targetName)) {
+      ws.send(JSON.stringify({ type: 'system', message: '[길드] 해당 유저는 가입 신청을 하지 않았습니다.' }));
+      return;
+    }
+    if (guild.members.includes(targetName)) {
+      ws.send(JSON.stringify({ type: 'system', message: '[길드] 이미 멤버입니다.' }));
+      // joinRequests에서 제거
+      guild.joinRequests = guild.joinRequests.filter(n => n !== targetName);
+      await guild.save();
+      return;
+    }
+    guild.members.push(targetName);
+    guild.joinRequests = guild.joinRequests.filter(n => n !== targetName);
+    await guild.save();
+    ws.send(JSON.stringify({ type: 'system', message: `[길드] ${targetName}님의 가입을 수락했습니다.` }));
+    return;
+  }
+  // /길드 탈퇴: 내 길드에서 탈퇴
+  if (subcmd === '탈퇴') {
+    const guild = await Guild.findOne({ members: playerName });
+    if (!guild) {
+      ws.send(JSON.stringify({ type: 'system', message: '[길드] 소속된 길드가 없습니다.' }));
+      return;
+    }
+    if (guild.master === playerName) {
+      ws.send(JSON.stringify({ type: 'system', message: '[길드] 길드장은 탈퇴할 수 없습니다. (길드장 위임/해체 기능은 추후 지원)' }));
+      return;
+    }
+    guild.members = guild.members.filter(n => n !== playerName);
+    guild.joinRequests = guild.joinRequests.filter(n => n !== playerName);
+    await guild.save();
+    ws.send(JSON.stringify({ type: 'system', message: '[길드] 길드에서 탈퇴했습니다.' }));
+    return;
+  }
+  // /길드 추방 <유저명>: 길드장이 멤버를 강제 탈퇴
+  if (subcmd === '추방') {
+    const targetName = args[2];
+    if (!targetName) {
+      ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[길드] 추방할 유저명을 입력하세요.' }));
+      return;
+    }
+    const guild = await Guild.findOne({ master: playerName });
+    if (!guild) {
+      ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[길드] 길드장만 추방이 가능합니다.' }));
+      return;
+    }
+    if (targetName === playerName) {
+      ws.send(JSON.stringify({ type: 'system', message: '[길드] 자신은 추방할 수 없습니다.' }));
+      return;
+    }
+    if (!guild.members.includes(targetName)) {
+      ws.send(JSON.stringify({ type: 'system', message: '[길드] 해당 유저는 길드 멤버가 아닙니다.' }));
+      return;
+    }
+    guild.members = guild.members.filter(n => n !== targetName);
+    guild.joinRequests = guild.joinRequests.filter(n => n !== targetName);
+    await guild.save();
+    ws.send(JSON.stringify({ type: 'system', message: `[길드] ${targetName}님을 길드에서 추방했습니다.` }));
+    return;
+  }
+  // /길드 공지 <내용>: 길드장이 공지 등록/수정
+  if (subcmd === '공지') {
+    const notice = args.slice(2).join(' ');
+    if (!notice) {
+      ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[길드] 등록할 공지 내용을 입력하세요.' }));
+      return;
+    }
+    const guild = await Guild.findOne({ master: playerName });
+    if (!guild) {
+      ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[길드] 길드장만 공지 등록/수정이 가능합니다.' }));
+      return;
+    }
+    guild.notice = notice;
+    await guild.save();
+    ws.send(JSON.stringify({ type: 'system', message: '[길드] 공지가 등록/수정되었습니다.' }));
+    return;
+  }
+  // /길드 해체: 길드장만 길드 삭제
+  if (subcmd === '해체') {
+    const guild = await Guild.findOne({ master: playerName });
+    if (!guild) {
+      ws.send(JSON.stringify({ type: 'system', message: '[길드] 길드장만 해체가 가능합니다.' }));
+      return;
+    }
+    await Guild.deleteOne({ _id: guild._id });
+    ws.send(JSON.stringify({ type: 'system', message: '[길드] 길드가 해체되었습니다.' }));
+    return;
+  }
+  // /길드채팅 <메시지>: 길드 채팅 (최대 15개 저장)
+  if (subcmd === '채팅') {
+    const chatMsg = args.join(' ').trim();
+    if (!chatMsg) {
+      ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[길드채팅] 보낼 메시지를 입력하세요.' }));
+      return;
+    }
+    const guild = await Guild.findOne({ members: playerName });
+    if (!guild) {
+      ws.send(JSON.stringify({ type: 'system', message: '[길드채팅] 소속된 길드가 없습니다.' }));
+      return;
+    }
+    guild.chatLog.push({ name: playerName, message: chatMsg, time: new Date() });
+    if (guild.chatLog.length > 15) guild.chatLog = guild.chatLog.slice(-15);
+    await guild.save();
+    ws.send(JSON.stringify({ type: 'system', message: '[길드채팅] 메시지가 전송되었습니다.' }));
+    return;
+  }
+  // /길드채팅로그: 최근 15개 길드채팅 내역 조회
+  if (subcmd === '로그') {
+    const guild = await Guild.findOne({ members: playerName });
+    if (!guild || !guild.chatLog.length) {
+      ws.send(JSON.stringify({ type: 'system', message: '[길드채팅] 채팅 내역이 없습니다.' }));
+      return;
+    }
+    const log = guild.chatLog.map(c => `[${c.name}] ${c.message}`).join('\n');
+    ws.send(JSON.stringify({ type: 'system', message: `[길드채팅 최근 15개]\n${log}` }));
+    return;
+  }
+  // TODO: 가입, 수락, 탈퇴, 추방, 공지, 정보, 목록 등 구현
+  ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[길드] 지원하지 않는 서브명령어입니다.' }));
+}
+
 module.exports = {
   setupCommands,
   handleBuyCommand,
@@ -237,4 +454,5 @@ module.exports = {
   handleTeleportCommand,
   handleInnCommand,
   handleAdminCommand,
+  handleGuildCommand,
 }; 
