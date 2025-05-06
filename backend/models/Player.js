@@ -138,8 +138,8 @@ class Player {
 
   addToInventory(item) {
     this.inventory.push(item);
-    if (this.inventory.length > 200) {
-      this.inventory = this.inventory.slice(-200);
+    if (this.inventory.length > 50) {
+      this.inventory = this.inventory.slice(-50);
     }
   }
 }
