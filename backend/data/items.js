@@ -97,7 +97,7 @@ const SHOP_ITEMS = {
     { name: '초소형 물약', type: ITEM_TYPE.CONSUMABLE, price: 10, desc: 'HP 10 회복', total: 500, perUse: 10 },
     { name: '소형 물약', type: ITEM_TYPE.CONSUMABLE, price: 25, desc: 'HP 15 회복', total: 1000, perUse: 15 },
     { name: '중형 물약', type: ITEM_TYPE.CONSUMABLE, price: 60, desc: 'HP 20 회복', total: 2000, perUse: 20 },
-    { name: '클랜힐 스크롤', type: ITEM_TYPE.CONSUMABLE, price: 50000, desc: '클랜힐 스킬을 사용할 수 있게 해주는 신비한 두루마리' },
+    { name: '클랜힐 스크롤', type: ITEM_TYPE.CONSUMABLE, price: 80000, desc: '클랜힐 스킬을 사용할 수 있게 해주는 신비한 두루마리' },
   ]
 };
 
