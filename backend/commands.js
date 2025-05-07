@@ -13,6 +13,7 @@ const PlayerGameService = require('./services/PlayerGameService');
 const { getRoom } = require('./data/map');
 const { SHOP_ITEMS } = require('./data/items');
 const PlayerData = require('./models/PlayerData');
+const Guestbook = require('./models/Guestbook');
 
 let shopServiceInstance = null;
 
@@ -134,6 +135,11 @@ function handleInnCommand({ ws, playerName, players, getRoom, savePlayerData, se
 }
 
 async function handleAdminCommand({ ws, playerName, message, players, getRoom, sendInventory, sendCharacterInfo, savePlayerData }) {
+  // admin 권한 체크
+  if (playerName !== 'admin') {
+    ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[운영자] 권한이 없습니다. (admin만 사용 가능)' }));
+    return;
+  }
   // /운영자 <subcmd> ...
   const args = message.trim().split(' ');
   if (args.length < 2) {
@@ -205,8 +211,15 @@ async function handleAdminCommand({ ws, playerName, message, players, getRoom, s
       return;
     }
     // 아이템 풀에서 이름으로 검색
-    const { ITEM_POOL } = require('./data/items');
-    const item = ITEM_POOL.find(i => i.name === itemName);
+    const { ITEM_POOL, SHOP_ITEMS } = require('./data/items');
+    let item = ITEM_POOL.find(i => i.name === itemName);
+    if (!item) {
+      // SHOP_ITEMS의 모든 카테고리에서 검색
+      for (const cat of Object.keys(SHOP_ITEMS)) {
+        item = SHOP_ITEMS[cat].find(i => i.name === itemName);
+        if (item) break;
+      }
+    }
     if (!item) {
       ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: `[운영자] 해당 이름의 아이템이 없습니다: ${itemName}` }));
       return;
@@ -366,7 +379,7 @@ async function handleGuildCommand({ ws, playerName, message, players }) {
     }));
     return;
   }
-  // /길드 가입 <길드이름>: 길드 가입 신청
+  // /길드 가입 <길드이름>: 길드 자유가입(수락 없이 바로 가입)
   if (subcmd === '가입') {
     const guildName = args[2];
     if (!guildName) {
@@ -382,13 +395,17 @@ async function handleGuildCommand({ ws, playerName, message, players }) {
       ws.send(JSON.stringify({ type: 'system', message: '[길드] 이미 해당 길드의 멤버입니다.' }));
       return;
     }
-    if (guild.joinRequests.includes(playerName)) {
-      ws.send(JSON.stringify({ type: 'system', message: '[길드] 이미 가입 신청 중입니다.' }));
-      return;
+    // 자유가입: 바로 멤버로 추가
+    guild.members.push(playerName);
+    // 혹시 joinRequests에 남아있으면 제거
+    if (guild.joinRequests && Array.isArray(guild.joinRequests)) {
+      guild.joinRequests = guild.joinRequests.filter(n => n !== playerName);
     }
-    guild.joinRequests.push(playerName);
     await guild.save();
-    ws.send(JSON.stringify({ type: 'system', message: `[길드] '${guildName}' 길드에 가입 신청이 완료되었습니다.` }));
+    // Player 객체에 guildName 세팅
+    const playerObj = PlayerManager.getPlayer(playerName);
+    if (playerObj) playerObj.guildName = guild.name;
+    ws.send(JSON.stringify({ type: 'system', message: `[길드] '${guildName}' 길드에 가입되었습니다!` }));
     return;
   }
   // /길드 수락 <유저명>: 길드장이 가입 신청을 수락
@@ -672,6 +689,7 @@ async function handleRankingCommand({ ws }) {
     // 모든 유저의 name, str, dex, int만 조회
     const players = await PlayerData.find({}, 'name str dex int').lean();
     const ranked = players
+      .filter(p => p.name !== 'admin') // admin 제외
       .map(p => ({
         name: p.name,
         total: (p.str || 0) + (p.dex || 0) + (p.int || 0),
@@ -704,6 +722,57 @@ async function handleClanHealCommand({ ws, player }) {
   ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: player.clanHealOn ? '클랜힐이 활성화되었습니다! (인트 경험치가 오릅니다)' : '클랜힐이 비활성화되었습니다.' }));
 }
 
+// /방명록 [페이지]
+async function handleGuestbookCommand({ ws, message }) {
+  const args = message.trim().split(' ');
+  const page = Math.max(1, parseInt(args[1] || '1', 10));
+  const PAGE_SIZE = 10;
+  const total = await Guestbook.countDocuments();
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const entries = await Guestbook.find({})
+    .sort({ createdAt: -1 })
+    .skip((page - 1) * PAGE_SIZE)
+    .limit(PAGE_SIZE)
+    .lean();
+  if (!entries.length) {
+    ws.send(JSON.stringify({ type: 'system', message: '[방명록] 등록된 메시지가 없습니다.\n/방명록쓰기 <메시지> : 방명록에 글 남기기 (150자 제한)\n/방명록 [페이지번호] : 방명록 목록 보기' }));
+    return;
+  }
+  let msg = `[방명록] (총 ${total}개, ${page}/${totalPages}페이지)\n`;
+  entries.forEach((e, i) => {
+    const date = new Date(e.createdAt).toLocaleString('ko-KR', { hour12: false });
+    msg += '────────────────────────────\n';
+    msg += `${(page-1)*PAGE_SIZE + i + 1}. [${e.name}] (${date})\n  ${e.message}\n`;
+  });
+  msg += '────────────────────────────\n';
+  msg += `/방명록 [페이지번호]로 페이지 이동\n/방명록쓰기 <메시지> : 방명록에 글 남기기 (150자 제한)\n/방명록 [페이지번호] : 방명록 목록 보기`;
+  ws.send(JSON.stringify({ type: 'system', message: msg }));
+}
+
+// /방명록쓰기 <메시지>
+const guestbookCooldown = {};
+async function handleGuestbookWriteCommand({ ws, playerName, message, req }) {
+  const ip = req && req.ip ? req.ip : '';
+  const text = message.replace('/방명록쓰기', '').trim();
+  if (!text) {
+    ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[방명록] 메시지를 입력하세요.' }));
+    return;
+  }
+  if (text.length > 150) {
+    ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[방명록] 메시지는 150자 이내로 작성하세요.' }));
+    return;
+  }
+  const now = Date.now();
+  const key = playerName + '_' + ip;
+  if (guestbookCooldown[key] && now - guestbookCooldown[key] < 30000) {
+    ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[방명록] 도배 방지: 30초 후 다시 시도하세요.' }));
+    return;
+  }
+  guestbookCooldown[key] = now;
+  await Guestbook.create({ name: playerName, message: text, ip });
+  ws.send(JSON.stringify({ type: 'system', message: '[방명록] 메시지가 등록되었습니다.' }));
+}
+
 // 명령어 핸들러 등록
 const commandHandlers = {
   '/정보': handleStatCommand,
@@ -724,6 +793,9 @@ const commandHandlers = {
   '/귀환': handleReturnCommand,
   '/랭킹': handleRankingCommand,
   '/클랜힐': handleClanHealCommand,
+  '/운영자': handleAdminCommand,
+  '/방명록': handleGuestbookCommand,
+  '/방명록쓰기': handleGuestbookWriteCommand,
 };
 
 module.exports = {
@@ -745,4 +817,6 @@ module.exports = {
   handleReturnCommand,
   handleRankingCommand,
   handleClanHealCommand,
+  handleGuestbookCommand,
+  handleGuestbookWriteCommand,
 }; 

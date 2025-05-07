@@ -2,7 +2,7 @@
  * BattleService: 전투 관련 비즈니스 로직 서비스
  * - processBattle: 플레이어와 몬스터의 전투 처리 및 결과 반환
  */
-const { ITEM_NAME_MONGHWA } = require('../data/items');
+const { ITEM_NAME_MONGHWA, ITEM_NAME_KKUM, ITEM_NAME_HWAN, ITEM_NAME_YOUNG } = require('../data/items');
 const { calcExpBonus, calcGoldDrop } = require('../utils/expUtils');
 
 class BattleService {
@@ -12,10 +12,11 @@ class BattleService {
   static processBattle(player, monster, room, VILLAGE_POS) {
     let log = [];
     let playerDmg;
-    if (player.equipWeapon && player.equipWeapon.name === ITEM_NAME_MONGHWA) {
+    const zeroAtkWeapons = [ITEM_NAME_MONGHWA, ITEM_NAME_KKUM, ITEM_NAME_HWAN, ITEM_NAME_YOUNG];
+    if (player.equipWeapon && zeroAtkWeapons.includes(player.equipWeapon.name)) {
       playerDmg = 0;
     } else {
-      playerDmg = Math.max(player.getAtk() - (monster.def || 0), 1);
+      playerDmg = Math.max(player.getAtk() - (monster.def || 0), 0);
     }
     monster.hp -= playerDmg;
     log.push({
@@ -34,6 +35,10 @@ class BattleService {
     let expBonus = 1.0;
     if (monster.gold !== undefined) {
       expBonus = calcExpBonus(monster.gold);
+    }
+    // 인벤토리 내 모든 무기의 expBonus를 곱해서 추가 보정
+    if (typeof player.getTotalExpBonus === 'function') {
+      expBonus *= player.getTotalExpBonus();
     }
 
     if (player.gainStrExp) player.gainStrExp(1 * expBonus);

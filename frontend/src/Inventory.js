@@ -22,6 +22,24 @@ const InventoryUl = styled.ul`
   list-style: none;
   padding: 0;
   margin: 0;
+  max-height: 220px;
+  overflow-y: auto;
+  /* 스크롤바 커스텀 */
+  scrollbar-width: thin;
+  scrollbar-color: #7ecfff #23272f;
+  &::-webkit-scrollbar {
+    width: 8px;
+    background: #23272f;
+    border-radius: 8px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: linear-gradient(120deg, #7ecfff 60%, #4fa3e3 100%);
+    border-radius: 8px;
+    min-height: 40px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: #4fa3e3;
+  }
 `;
 const InventoryLi = styled.li`
   padding: 6px 0 4px 0;
@@ -45,7 +63,10 @@ function Inventory({ inventory, gold }) {
             <InventoryLi key={idx}>
               {typeof item === 'string' ? item : (
                 <>
-                  <span style={{ fontWeight: 'bold', color: '#ffe066' }}>{item.name}</span>
+                  <span style={{ fontWeight: 'bold', color: '#ffe066' }}>
+                    {item.name}
+                    {item.type && (item.type.toLowerCase() === 'consumable' || item.type === '잡화') && item.count ? ` x${item.count} (남은 사용: ${item.total})` : ''}
+                  </span>
                   {item.desc && <span style={{ color: '#b3c6e0', fontSize: '0.95em' }}>{item.desc}</span>}
                 </>
               )}

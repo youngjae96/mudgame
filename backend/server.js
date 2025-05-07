@@ -37,6 +37,8 @@ const {
   handleShopSellCommand,
   handleStatCommand,
   handleWhisperCommand,
+  handleGuestbookCommand,
+  handleGuestbookWriteCommand,
 } = require('./commands');
 const logger = require('./middlewares/logger');
 const errorHandler = require('./middlewares/errorHandler');
@@ -235,6 +237,8 @@ const commandHandlers = {
     const player = PlayerManager.getPlayer(args.playerName);
     return require('./commands').handleClanHealCommand({ ...args, player });
   },
+  '/방명록': (args) => handleGuestbookCommand(args),
+  '/방명록쓰기': (args) => handleGuestbookWriteCommand(args),
 };
 
 // 서비스 인스턴스 생성 및 의존성 주입
@@ -250,251 +254,306 @@ const playerService = new PlayerService({
 });
 setupCommands({ shopService, playerService });
 
+// === 글로벌 예외 핸들러 추가 ===
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection:', reason);
+});
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+});
+
 wss.on('connection', (ws) => {
   let playerName = '';
 
   ws.on('message', async (message) => {
-    let data;
     try {
-      data = JSON.parse(message);
-    } catch {
-      ws.send(JSON.stringify({ type: 'error', message: 'Invalid JSON' }));
-      return;
-    }
-
-    if (data.type === 'join') {
-      const { name, token } = data;
-      if (process.env.DEBUG === 'true') console.log('[서버] join 요청:', { name, token });
-      if (!token) {
-        if (process.env.DEBUG === 'true') console.log('[서버] 인증 토큰 없음');
-        ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '인증 토큰이 필요합니다.' }));
-        ws.close();
+      let data;
+      try {
+        data = JSON.parse(message);
+      } catch {
+        ws.send(JSON.stringify({ type: 'error', message: 'Invalid JSON' }));
         return;
       }
-      let decoded;
-      try {
-        decoded = jwt.verify(token, SECRET);
-        if (decoded.username !== name) {
-          if (process.env.DEBUG === 'true') console.log('[서버] 토큰 username 불일치', decoded.username, name);
-          ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '토큰 정보가 일치하지 않습니다.' }));
+
+      if (data.type === 'join') {
+        const { name, token } = data;
+        if (process.env.DEBUG === 'true') console.log('[서버] join 요청:', { name, token });
+        if (!token) {
+          if (process.env.DEBUG === 'true') console.log('[서버] 인증 토큰 없음');
+          ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '인증 토큰이 필요합니다.' }));
           ws.close();
           return;
         }
-      } catch (e) {
-        if (process.env.DEBUG === 'true') console.log('[서버] 유효하지 않은 토큰', e);
-        ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '유효하지 않은 토큰입니다.' }));
-        ws.close();
-        return;
-      }
-      playerName = name;
-      (async () => {
-        let pdata = await PlayerData.findOne({ userId: decoded.userId });
-        if (!pdata) {
-          if (process.env.DEBUG === 'true') console.log('[서버] PlayerData 없음, 새로 생성', decoded.userId, playerName);
-          pdata = await PlayerData.create({
-            userId: decoded.userId,
-            name: playerName,
-            world: 1,
-            position: { x: 4, y: 4 },
-            hp: 30, maxHp: 30, mp: 10, maxMp: 10,
-            str: 5, dex: 5, int: 5, atk: 3, def: 1, gold: 100,
-            inventory: [],
-          });
-        } else {
-          if (process.env.DEBUG === 'true') console.log('[서버] PlayerData 불러옴', pdata);
+        let decoded;
+        try {
+          decoded = jwt.verify(token, SECRET);
+          if (decoded.username !== name) {
+            if (process.env.DEBUG === 'true') console.log('[서버] 토큰 username 불일치', decoded.username, name);
+            ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '토큰 정보가 일치하지 않습니다.' }));
+            ws.close();
+            return;
+          }
+        } catch (e) {
+          if (process.env.DEBUG === 'true') console.log('[서버] 유효하지 않은 토큰', e);
+          ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '유효하지 않은 토큰입니다.' }));
+          ws.close();
+          return;
         }
-        const player = new Player(playerName, ws);
-        player.world = pdata.world;
-        player.position = pdata.position;
-        player.hp = pdata.hp;
-        player.maxHp = pdata.maxHp;
-        player.mp = pdata.mp;
-        player.maxMp = pdata.maxMp;
-        player.str = pdata.str;
-        player.dex = pdata.dex;
-        player.int = pdata.int;
-        player.atk = pdata.atk;
-        player.def = pdata.def;
-        player.gold = pdata.gold;
-        player.inventory = pdata.inventory;
-        player.strExp = pdata.strExp || 0;
-        player.strExpMax = pdata.strExpMax || 10;
-        player.dexExp = pdata.dexExp || 0;
-        player.dexExpMax = pdata.dexExpMax || 10;
-        player.intExp = pdata.intExp || 0;
-        player.intExpMax = pdata.intExpMax || 10;
-        player.equipWeapon = pdata.equipWeapon || null;
-        player.equipArmor = pdata.equipArmor || null;
-        // 길드 정보 동기화
-        const guild = await Guild.findOne({ members: playerName });
-        if (guild) {
-          player.guildName = guild.name;
-        } else {
-          player.guildName = undefined;
-        }
-        PlayerManager.addPlayer(playerName, player);
-        broadcast(wss, { type: 'system', subtype: 'event', message: `${playerName}님이 입장했습니다.` });
-        sendPlayerList(wss, PlayerManager.getAllPlayers());
-        RoomManager.addPlayerToRoom(playerName, player.world, player.position.x, player.position.y);
-        sendInventory(PlayerManager.getPlayer(playerName));
-        sendCharacterInfo(PlayerManager.getPlayer(playerName));
-        sendRoomInfo(PlayerManager.getPlayer(playerName), getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
-        // 공지 전송
-        if (global.currentNotice) {
-          ws.send(JSON.stringify({ type: 'notice', notice: global.currentNotice }));
-        }
-      })();
-    } else if (data.type === 'chat') {
-      // 운영자 명령어, /입장, /나가기 등은 기존 분기 유지
-      const player = PlayerManager.getPlayer(playerName);
-      if (!player) return;
-      const msg = data.message.trim();
-      // 동굴 입장
-      if (msg === '/입장') {
-        // 무인도 동굴 입구(월드2, 2,6)에서만 동굴로 입장
-        if (player.world === 2 && player.position.x === 2 && player.position.y === 6) {
-          RoomManager.removePlayerFromRoom(playerName, player.world, player.position.x, player.position.y);
-          player.world = 3;
-          player.position = { x: 0, y: 0 };
-          RoomManager.addPlayerToRoom(playerName, player.world, player.position.x, player.position.y);
+        playerName = name;
+        (async () => {
+          let pdata = await PlayerData.findOne({ userId: decoded.userId });
+          if (!pdata) {
+            if (process.env.DEBUG === 'true') console.log('[서버] PlayerData 없음, 새로 생성', decoded.userId, playerName);
+            pdata = await PlayerData.create({
+              userId: decoded.userId,
+              name: playerName,
+              world: 1,
+              position: { x: 4, y: 4 },
+              hp: 30, maxHp: 30, mp: 10, maxMp: 10,
+              str: 5, dex: 5, int: 5, atk: 3, def: 1, gold: 100,
+              inventory: [],
+            });
+          } else {
+            if (process.env.DEBUG === 'true') console.log('[서버] PlayerData 불러옴', pdata);
+          }
+          const player = new Player(playerName, ws);
+          player.world = pdata.world;
+          player.position = pdata.position;
+          player.hp = pdata.hp;
+          player.maxHp = pdata.maxHp;
+          player.mp = pdata.mp;
+          player.maxMp = pdata.maxMp;
+          player.str = pdata.str;
+          player.dex = pdata.dex;
+          player.int = pdata.int;
+          player.atk = pdata.atk;
+          player.def = pdata.def;
+          player.gold = pdata.gold;
+          player.inventory = pdata.inventory;
+          player.strExp = pdata.strExp || 0;
+          player.strExpMax = pdata.strExpMax || 10;
+          player.dexExp = pdata.dexExp || 0;
+          player.dexExpMax = pdata.dexExpMax || 10;
+          player.intExp = pdata.intExp || 0;
+          player.intExpMax = pdata.intExpMax || 10;
+          player.equipWeapon = pdata.equipWeapon || null;
+          player.equipArmor = pdata.equipArmor || null;
+          // 길드 정보 동기화
+          const guild = await Guild.findOne({ members: playerName });
+          if (guild) {
+            player.guildName = guild.name;
+          } else {
+            player.guildName = undefined;
+          }
           PlayerManager.addPlayer(playerName, player);
-          sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
-          sendInventory(player);
-          sendCharacterInfo(player);
-          ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '[동굴] 동굴로 입장합니다!' }));
-        } else {
-          ws.send(JSON.stringify({ type: 'system', subtype: 'guide', message: '[동굴] 무인도 동굴 입구(2,6)에서만 입장할 수 있습니다.' }));
-        }
-        return;
-      }
-      // 동굴 나가기
-      if (msg === '/나가기') {
-        // 동굴 사다리방(월드3, 0,9)에서만 무인도 동굴 입구로 나감
-        if (player.world === 3 && player.position.x === 0 && player.position.y === 9) {
-          RoomManager.removePlayerFromRoom(playerName, player.world, player.position.x, player.position.y);
-          player.world = 2;
-          player.position = { x: 2, y: 6 };
+          broadcast(wss, { type: 'system', subtype: 'event', message: `${playerName}님이 입장했습니다.` });
+          sendPlayerList(wss, PlayerManager.getAllPlayers());
           RoomManager.addPlayerToRoom(playerName, player.world, player.position.x, player.position.y);
-          PlayerManager.addPlayer(playerName, player);
-          sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
-          sendInventory(player);
-          sendCharacterInfo(player);
-          ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '[동굴] 무인도 동굴 입구로 나갑니다!' }));
-        } else {
-          ws.send(JSON.stringify({ type: 'system', subtype: 'guide', message: '[동굴] 동굴 사다리방(0,9)에서만 나갈 수 있습니다.' }));
+          sendInventory(PlayerManager.getPlayer(playerName));
+          sendCharacterInfo(PlayerManager.getPlayer(playerName));
+          sendRoomInfo(PlayerManager.getPlayer(playerName), getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+          // 공지 전송
+          if (global.currentNotice) {
+            ws.send(JSON.stringify({ type: 'notice', notice: global.currentNotice }));
+          }
+        })();
+      } else if (data.type === 'chat') {
+        const player = PlayerManager.getPlayer(playerName);
+        if (!player) {
+          ws.send(JSON.stringify({ type: 'error', message: '플레이어 정보를 찾을 수 없습니다. 다시 로그인 해주세요.' }));
+          return;
         }
+        const msg = data.message.trim();
+        // 동굴 입장
+        if (msg === '/입장') {
+          // 무인도 동굴 입구(월드2, 2,6)에서만 동굴로 입장
+          if (player.world === 2 && player.position.x === 2 && player.position.y === 6) {
+            RoomManager.removePlayerFromRoom(playerName, player.world, player.position.x, player.position.y);
+            player.world = 3;
+            player.position = { x: 0, y: 0 };
+            RoomManager.addPlayerToRoom(playerName, player.world, player.position.x, player.position.y);
+            PlayerManager.addPlayer(playerName, player);
+            sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+            sendInventory(player);
+            sendCharacterInfo(player);
+            ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '[동굴] 동굴로 입장합니다!' }));
+          } else {
+            ws.send(JSON.stringify({ type: 'system', subtype: 'guide', message: '[동굴] 무인도 동굴 입구(2,6)에서만 입장할 수 있습니다.' }));
+          }
+          return;
+        }
+        // 동굴 나가기
+        if (msg === '/나가기') {
+          // 동굴 사다리방(월드3, 0,9)에서만 무인도 동굴 입구로 나감
+          if (player.world === 3 && player.position.x === 0 && player.position.y === 9) {
+            RoomManager.removePlayerFromRoom(playerName, player.world, player.position.x, player.position.y);
+            player.world = 2;
+            player.position = { x: 2, y: 6 };
+            RoomManager.addPlayerToRoom(playerName, player.world, player.position.x, player.position.y);
+            PlayerManager.addPlayer(playerName, player);
+            sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+            sendInventory(player);
+            sendCharacterInfo(player);
+            ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '[동굴] 무인도 동굴 입구로 나갑니다!' }));
+          } else {
+            ws.send(JSON.stringify({ type: 'system', subtype: 'guide', message: '[동굴] 동굴 사다리방(0,9)에서만 나갈 수 있습니다.' }));
+          }
+          return;
+        }
+        // 나머지 채팅/명령어/이동은 PlayerGameService로 위임
+        await PlayerGameService.handleChat({
+          ws,
+          playerName,
+          message: data.message,
+          PlayerManager,
+          broadcast,
+          wss,
+          getRoom,
+          getPlayersInRoom,
+          sendPlayerList,
+          sendRoomInfoToAllInRoom,
+          savePlayerData,
+          sendInventory,
+          sendCharacterInfo,
+          commandHandlers,
+          SHOP_ITEMS,
+          MAP_SIZE,
+          VILLAGE_POS,
+          battleIntervals,
+          parseChatCommand
+        });
         return;
       }
-      // 나머지 채팅/명령어/이동은 PlayerGameService로 위임
-      await PlayerGameService.handleChat({
-        ws,
-        playerName,
-        message: data.message,
-        PlayerManager,
-        broadcast,
-        wss,
-        getRoom,
-        getPlayersInRoom,
-        sendPlayerList,
-        sendRoomInfoToAllInRoom,
-        savePlayerData,
-        sendInventory,
-        sendCharacterInfo,
-        commandHandlers,
-        SHOP_ITEMS,
-        MAP_SIZE,
-        VILLAGE_POS,
-        battleIntervals,
-        parseChatCommand
-      });
-      return;
-    }
-    if (data.type === 'move') {
-      await PlayerGameService.handleMove({
-        ws,
-        playerName,
-        dx: data.x - PlayerManager.getPlayer(playerName).position.x,
-        dy: data.y - PlayerManager.getPlayer(playerName).position.y,
-        PlayerManager,
-        RoomManager,
-        getRoom,
-        getPlayersInRoom,
-        sendRoomInfoToAllInRoom,
-        savePlayerData,
-        sendInventory,
-        sendCharacterInfo,
-        MAP_SIZE,
-        VILLAGE_POS,
-        battleIntervals
-      });
-      return;
-    }
-    if (data.type === 'pickup') {
-      await PlayerGameService.handlePickup({
-        ws,
-        playerName,
-        itemId: data.itemId,
-        PlayerManager,
-        getRoom,
-        getPlayersInRoom,
-        sendRoomInfoToAllInRoom,
-        savePlayerData,
-        sendInventory,
-        sendCharacterInfo,
-        MAP_SIZE,
-        VILLAGE_POS
-      });
-      return;
-    }
-    if (data.type === 'attack') {
-      await PlayerGameService.handleAttack({
-        ws,
-        playerName,
-        monsterId: data.monsterId,
-        PlayerManager,
-        getRoom,
-        getPlayersInRoom,
-        sendRoomInfoToAllInRoom,
-        savePlayerData,
-        sendCharacterInfo,
-        broadcast,
-        processBattle,
-        respawnMonsterWithDeps,
-        MAP_SIZE,
-        VILLAGE_POS
-      });
-      return;
-    }
-    if (data.type === 'autobattle') {
-      await PlayerGameService.handleAutoBattle({
-        ws,
-        playerName,
-        monsterId: data.monsterId,
-        PlayerManager,
-        getRoom,
-        getPlayersInRoom,
-        sendRoomInfoToAllInRoom,
-        savePlayerData,
-        sendInventory,
-        sendCharacterInfo,
-        broadcast,
-        processBattle,
-        respawnMonsterWithDeps,
-        battleIntervals,
-        MAP_SIZE,
-        VILLAGE_POS
-      });
-      return;
-    }
-    if (data.type === 'stat') {
-      await PlayerGameService.handleStat({ ws, playerName, PlayerManager });
-    } else if (data.type === 'equipinfo') {
-      await PlayerGameService.handleEquipInfo({ ws, playerName, PlayerManager });
-    } else if (data.type === 'shop') {
-      await PlayerGameService.handleShop({ ws, playerName, PlayerManager, getRoom, SHOP_ITEMS, MAP_SIZE, VILLAGE_POS });
-    } else if (data.type === 'close') {
-      await PlayerGameService.handleClose({ ws, playerName, PlayerManager, wss, sendPlayerList, broadcast, sendRoomInfoToAllInRoom, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS });
-      return;
+      if (data.type === 'move') {
+        const player = PlayerManager.getPlayer(playerName);
+        if (!player) {
+          ws.send(JSON.stringify({ type: 'error', message: '플레이어 정보를 찾을 수 없습니다. 다시 로그인 해주세요.' }));
+          return;
+        }
+        await PlayerGameService.handleMove({
+          ws,
+          playerName,
+          dx: data.x - player.position.x,
+          dy: data.y - player.position.y,
+          PlayerManager,
+          RoomManager,
+          getRoom,
+          getPlayersInRoom,
+          sendRoomInfoToAllInRoom,
+          savePlayerData,
+          sendInventory,
+          sendCharacterInfo,
+          MAP_SIZE,
+          VILLAGE_POS,
+          battleIntervals
+        });
+        return;
+      }
+      if (data.type === 'pickup') {
+        const player = PlayerManager.getPlayer(playerName);
+        if (!player) {
+          ws.send(JSON.stringify({ type: 'error', message: '플레이어 정보를 찾을 수 없습니다. 다시 로그인 해주세요.' }));
+          return;
+        }
+        await PlayerGameService.handlePickup({
+          ws,
+          playerName,
+          itemId: data.itemId,
+          PlayerManager,
+          getRoom,
+          getPlayersInRoom,
+          sendRoomInfoToAllInRoom,
+          savePlayerData,
+          sendInventory,
+          sendCharacterInfo,
+          MAP_SIZE,
+          VILLAGE_POS
+        });
+        return;
+      }
+      if (data.type === 'attack') {
+        const player = PlayerManager.getPlayer(playerName);
+        if (!player) {
+          ws.send(JSON.stringify({ type: 'error', message: '플레이어 정보를 찾을 수 없습니다. 다시 로그인 해주세요.' }));
+          return;
+        }
+        await PlayerGameService.handleAttack({
+          ws,
+          playerName,
+          monsterId: data.monsterId,
+          PlayerManager,
+          getRoom,
+          getPlayersInRoom,
+          sendRoomInfoToAllInRoom,
+          savePlayerData,
+          sendCharacterInfo,
+          broadcast,
+          processBattle,
+          respawnMonsterWithDeps,
+          MAP_SIZE,
+          VILLAGE_POS
+        });
+        return;
+      }
+      if (data.type === 'autobattle') {
+        const player = PlayerManager.getPlayer(playerName);
+        if (!player) {
+          ws.send(JSON.stringify({ type: 'error', message: '플레이어 정보를 찾을 수 없습니다. 다시 로그인 해주세요.' }));
+          return;
+        }
+        await PlayerGameService.handleAutoBattle({
+          ws,
+          playerName,
+          monsterId: data.monsterId,
+          PlayerManager,
+          getRoom,
+          getPlayersInRoom,
+          sendRoomInfoToAllInRoom,
+          savePlayerData,
+          sendInventory,
+          sendCharacterInfo,
+          broadcast,
+          processBattle,
+          respawnMonsterWithDeps,
+          battleIntervals,
+          MAP_SIZE,
+          VILLAGE_POS
+        });
+        return;
+      }
+      if (data.type === 'stat') {
+        const player = PlayerManager.getPlayer(playerName);
+        if (!player) {
+          ws.send(JSON.stringify({ type: 'error', message: '플레이어 정보를 찾을 수 없습니다. 다시 로그인 해주세요.' }));
+          return;
+        }
+        await PlayerGameService.handleStat({ ws, playerName, PlayerManager });
+      } else if (data.type === 'equipinfo') {
+        const player = PlayerManager.getPlayer(playerName);
+        if (!player) {
+          ws.send(JSON.stringify({ type: 'error', message: '플레이어 정보를 찾을 수 없습니다. 다시 로그인 해주세요.' }));
+          return;
+        }
+        await PlayerGameService.handleEquipInfo({ ws, playerName, PlayerManager });
+      } else if (data.type === 'shop') {
+        const player = PlayerManager.getPlayer(playerName);
+        if (!player) {
+          ws.send(JSON.stringify({ type: 'error', message: '플레이어 정보를 찾을 수 없습니다. 다시 로그인 해주세요.' }));
+          return;
+        }
+        await PlayerGameService.handleShop({ ws, playerName, PlayerManager, getRoom, SHOP_ITEMS, MAP_SIZE, VILLAGE_POS });
+      } else if (data.type === 'close') {
+        const player = PlayerManager.getPlayer(playerName);
+        if (!player) {
+          ws.send(JSON.stringify({ type: 'error', message: '플레이어 정보를 찾을 수 없습니다. 다시 로그인 해주세요.' }));
+          return;
+        }
+        await PlayerGameService.handleClose({ ws, playerName, PlayerManager, wss, sendPlayerList, broadcast, sendRoomInfoToAllInRoom, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS });
+        return;
+      }
+    } catch (err) {
+      console.error('[WebSocket 에러]', err);
+      ws.send(JSON.stringify({ type: 'error', message: '서버 내부 오류가 발생했습니다.' }));
     }
   });
 

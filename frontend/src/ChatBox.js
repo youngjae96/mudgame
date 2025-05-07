@@ -13,6 +13,22 @@ const ChatBoxWrapper = styled.div`
   box-shadow: 0 2px 8px #0004;
   overflow-x: auto;
   word-break: break-all;
+  /* 스크롤바 커스텀 */
+  scrollbar-width: thin;
+  scrollbar-color: #7ecfff #23272f;
+  &::-webkit-scrollbar {
+    width: 8px;
+    background: #23272f;
+    border-radius: 8px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: linear-gradient(120deg, #7ecfff 60%, #4fa3e3 100%);
+    border-radius: 8px;
+    min-height: 40px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: #4fa3e3;
+  }
   @media (max-width: 600px) {
     height: 100%;
     min-height: 0;
@@ -105,6 +121,11 @@ const NoticeMsg = styled.div`
   font-size: 1.08rem;
   letter-spacing: 0.5px;
   text-shadow: 0 2px 8px #000a, 0 0 4px #fff200;
+`;
+const WhisperMsg = styled.div`
+  margin-bottom: 4px;
+  color: #2ecc40;
+  font-weight: bold;
 `;
 
 function getBattleIcon(subtype) {
@@ -205,6 +226,7 @@ function getMessageComponent(msg, i) {
     case MESSAGE_TYPES.CHAT:
       if (msg.chatType === 'global') return <GlobalChatMessage key={i} msg={msg} />;
       if (msg.chatType === 'local') return <LocalChatMessage key={i} msg={msg} />;
+      if (msg.chatType === 'whisper') return <WhisperMsg key={i}><span><b>{msg.name}</b>: {msg.message}</span></WhisperMsg>;
       return <DefaultChatMessage key={i} msg={msg} />;
     case MESSAGE_TYPES.BATTLE:
       return <BattleMessage key={i} msg={msg} />;

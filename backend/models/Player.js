@@ -4,7 +4,7 @@
 // 앞으로 스킬, 퀘스트, 파티 등은 별도 클래스로 분리 권장
 
 const { VILLAGE_POS } = require('../data/map');
-const { ITEM_NAME_MONGHWA, ITEM_TYPE } = require('../data/items');
+const { ITEM_NAME_MONGHWA, ITEM_NAME_KKUM, ITEM_NAME_HWAN, ITEM_NAME_YOUNG, ITEM_TYPE } = require('../data/items');
 const { calcNextStatExp } = require('../utils/expUtils');
 
 class Player {
@@ -85,7 +85,8 @@ class Player {
 
   // 실제 전투/표시에는 getAtk()만 사용할 것
   getAtk() {
-    if (this.equipWeapon && this.equipWeapon.name === ITEM_NAME_MONGHWA) {
+    const zeroAtkWeapons = [ITEM_NAME_MONGHWA, ITEM_NAME_KKUM, ITEM_NAME_HWAN, ITEM_NAME_YOUNG];
+    if (this.equipWeapon && zeroAtkWeapons.includes(this.equipWeapon.name)) {
       return 0;
     }
     let base = 2 + this.str * 1.5 + this.dex * 0.5;
@@ -141,6 +142,11 @@ class Player {
     if (this.inventory.length > 50) {
       this.inventory = this.inventory.slice(-50);
     }
+  }
+
+  // 인벤토리 내 모든 무기의 expBonus를 곱해서 반환 → 장착한 무기만 적용
+  getTotalExpBonus() {
+    return this.equipWeapon && this.equipWeapon.expBonus ? this.equipWeapon.expBonus : 1;
   }
 }
 

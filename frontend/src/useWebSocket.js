@@ -9,6 +9,14 @@ const WS_URL = process.env.REACT_APP_WS_URL || (
     : (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.hostname
 );
 
+// parseStat를 루트에 선언
+function parseStat(str) {
+  if (!str) return 0;
+  const match = str.match(/([\d.]+)\s*(?:\(\+([\d.]+)\))?/);
+  if (match) return Number(match[1]) + (match[2] ? Number(match[2]) : 0);
+  return Number(str);
+}
+
 /**
  * 게임 WebSocket 및 상태 관리 커스텀 훅
  * @param {function} onDisconnect - 서버 연결 끊김 시 콜백
@@ -60,18 +68,20 @@ function useWebSocket(onDisconnect) {
           });
           if (typeof data.text === 'string') {
             const stat = {};
-            const hpMatch = data.text.match(/HP\s*:\s*([\d.]+)\s*\/\s*([\d.]+)/);
-            const mpMatch = data.text.match(/MP\s*:\s*([\d.]+)\s*\/\s*([\d.]+)/);
-            const strMatch = data.text.match(/STR\s*:\s*([\d.]+)/) || data.text.match(/공격력\s*:\s*([\d.]+)/);
-            const defMatch = data.text.match(/DEF\s*:\s*([\d.]+)/) || data.text.match(/방어력\s*:\s*([\d.]+)/);
-            const dexMatch = data.text.match(/DEX\s*:\s*([\d.]+)/) || data.text.match(/민첩\s*:\s*([\d.]+)/);
-            const intMatch = data.text.match(/INT\s*:\s*([\d.]+)/) || data.text.match(/지능\s*:\s*([\d.]+)/);
-            if (hpMatch) { stat.hp = Number(hpMatch[1]); stat.maxHp = Number(hpMatch[2]); }
-            if (mpMatch) { stat.mp = Number(mpMatch[1]); stat.maxMp = Number(mpMatch[2]); }
-            if (strMatch) stat.atk = Number(strMatch[1]);
-            if (defMatch) stat.def = Number(defMatch[1]);
-            if (dexMatch) stat.dex = Number(dexMatch[1]);
-            if (intMatch) stat.int = Number(intMatch[1]);
+            const hpMatch = data.text.match(/HP\s*:\s*([\d.]+)\s*\/\s*([\d.]+(?:\s*\(\+?[\d.]+\))?)/);
+            const mpMatch = data.text.match(/MP\s*:\s*([\d.]+)\s*\/\s*([\d.]+(?:\s*\(\+?[\d.]+\))?)/);
+            const strMatch = data.text.match(/STR\s*:\s*([\d.]+(?:\s*\(\+?[\d.]+\))?)/);
+            const dexMatch = data.text.match(/DEX\s*:\s*([\d.]+(?:\s*\(\+?[\d.]+\))?)/);
+            const intMatch = data.text.match(/INT\s*:\s*([\d.]+(?:\s*\(\+?[\d.]+\))?)/);
+            const atkMatch = data.text.match(/공격력:\s*([\d.]+)(?:\s*\(\+([\d.]+)\))?/);
+            const defMatch = data.text.match(/방어력:\s*([\d.]+)(?:\s*\(\+([\d.]+)\))?/);
+            if (hpMatch) { stat.hp = Number(hpMatch[1]); stat.maxHp = parseStat(hpMatch[2]); }
+            if (mpMatch) { stat.mp = Number(mpMatch[1]); stat.maxMp = parseStat(mpMatch[2]); }
+            if (strMatch) stat.str = parseStat(strMatch[1]);
+            if (dexMatch) stat.dex = parseStat(dexMatch[1]);
+            if (intMatch) stat.int = parseStat(intMatch[1]);
+            if (atkMatch) stat.atk = Number(atkMatch[1]) + (atkMatch[2] ? Number(atkMatch[2]) : 0);
+            if (defMatch) stat.def = Number(defMatch[1]) + (defMatch[2] ? Number(defMatch[2]) : 0);
             if (Object.keys(stat).length > 0) setCharacter((prev) => ({ ...prev, ...stat }));
           }
         } else if (data.type === 'battle') {
@@ -171,18 +181,20 @@ function useWebSocket(onDisconnect) {
         });
         if (typeof data.text === 'string') {
           const stat = {};
-          const hpMatch = data.text.match(/HP\s*:\s*([\d.]+)\s*\/\s*([\d.]+)/);
-          const mpMatch = data.text.match(/MP\s*:\s*([\d.]+)\s*\/\s*([\d.]+)/);
-          const strMatch = data.text.match(/STR\s*:\s*([\d.]+)/) || data.text.match(/공격력\s*:\s*([\d.]+)/);
-          const defMatch = data.text.match(/DEF\s*:\s*([\d.]+)/) || data.text.match(/방어력\s*:\s*([\d.]+)/);
-          const dexMatch = data.text.match(/DEX\s*:\s*([\d.]+)/) || data.text.match(/민첩\s*:\s*([\d.]+)/);
-          const intMatch = data.text.match(/INT\s*:\s*([\d.]+)/) || data.text.match(/지능\s*:\s*([\d.]+)/);
-          if (hpMatch) { stat.hp = Number(hpMatch[1]); stat.maxHp = Number(hpMatch[2]); }
-          if (mpMatch) { stat.mp = Number(mpMatch[1]); stat.maxMp = Number(mpMatch[2]); }
-          if (strMatch) stat.atk = Number(strMatch[1]);
-          if (defMatch) stat.def = Number(defMatch[1]);
-          if (dexMatch) stat.dex = Number(dexMatch[1]);
-          if (intMatch) stat.int = Number(intMatch[1]);
+          const hpMatch = data.text.match(/HP\s*:\s*([\d.]+)\s*\/\s*([\d.]+(?:\s*\(\+?[\d.]+\))?)/);
+          const mpMatch = data.text.match(/MP\s*:\s*([\d.]+)\s*\/\s*([\d.]+(?:\s*\(\+?[\d.]+\))?)/);
+          const strMatch = data.text.match(/STR\s*:\s*([\d.]+(?:\s*\(\+?[\d.]+\))?)/);
+          const dexMatch = data.text.match(/DEX\s*:\s*([\d.]+(?:\s*\(\+?[\d.]+\))?)/);
+          const intMatch = data.text.match(/INT\s*:\s*([\d.]+(?:\s*\(\+?[\d.]+\))?)/);
+          const atkMatch = data.text.match(/공격력:\s*([\d.]+)(?:\s*\(\+([\d.]+)\))?/);
+          const defMatch = data.text.match(/방어력:\s*([\d.]+)(?:\s*\(\+([\d.]+)\))?/);
+          if (hpMatch) { stat.hp = Number(hpMatch[1]); stat.maxHp = parseStat(hpMatch[2]); }
+          if (mpMatch) { stat.mp = Number(mpMatch[1]); stat.maxMp = parseStat(mpMatch[2]); }
+          if (strMatch) stat.str = parseStat(strMatch[1]);
+          if (dexMatch) stat.dex = parseStat(dexMatch[1]);
+          if (intMatch) stat.int = parseStat(intMatch[1]);
+          if (atkMatch) stat.atk = Number(atkMatch[1]) + (atkMatch[2] ? Number(atkMatch[2]) : 0);
+          if (defMatch) stat.def = Number(defMatch[1]) + (defMatch[2] ? Number(defMatch[2]) : 0);
           if (Object.keys(stat).length > 0) setCharacter((prev) => ({ ...prev, ...stat }));
         }
       } else if (data.type === 'battle') {

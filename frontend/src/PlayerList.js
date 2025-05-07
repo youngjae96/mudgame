@@ -14,6 +14,22 @@ const PlayerUl = styled.ul`
   margin: 0 0 8px 0;
   max-height: 180px;
   overflow-y: auto;
+  /* 스크롤바 커스텀 */
+  scrollbar-width: thin;
+  scrollbar-color: #7ecfff #23272f;
+  &::-webkit-scrollbar {
+    width: 8px;
+    background: #23272f;
+    border-radius: 8px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: linear-gradient(120deg, #7ecfff 60%, #4fa3e3 100%);
+    border-radius: 8px;
+    min-height: 40px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: #4fa3e3;
+  }
 `;
 const PlayerLi = styled.li`
   padding: 6px 0 4px 0;
@@ -25,7 +41,7 @@ const PlayerLi = styled.li`
 function PlayerList({ players, renderCharacterInfo, inventory, gold }) {
   return (
     <>
-      <PlayerListTitle>접속 중인 플레이어</PlayerListTitle>
+      <PlayerListTitle>접속 중인 플레이어 ({players.length}명)</PlayerListTitle>
       <PlayerUl>
         {players.map((p) => (
           <PlayerLi key={p}>{p}</PlayerLi>

@@ -23,6 +23,24 @@ const RoomDesc = styled.div`
 const RoomPlayers = styled.div`
   font-size: 0.95rem;
   color: #fff;
+  max-height: 60px;
+  overflow-y: auto;
+  /* 스크롤바 커스텀 */
+  scrollbar-width: thin;
+  scrollbar-color: #7ecfff #23272f;
+  &::-webkit-scrollbar {
+    width: 8px;
+    background: #23272f;
+    border-radius: 8px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: linear-gradient(120deg, #7ecfff 60%, #4fa3e3 100%);
+    border-radius: 8px;
+    min-height: 40px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: #4fa3e3;
+  }
 `;
 const RoomItemsTitle = styled.div`
   font-weight: bold;

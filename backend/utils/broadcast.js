@@ -34,7 +34,7 @@ function sendPlayerList(wss, players) {
 /**
  * 방 정보(맵, 주변, 플레이어 등) 전송
  */
-function sendRoomInfo(player, getRoom, getPlayersInRoom, _MAP_SIZE, VILLAGE_POS) {
+function sendRoomInfo(player, getRoom, getPlayersInRoom, _MAP_SIZE, VILLAGE_POS, options = {}) {
   const { x, y } = player.position;
   const world = player.world || 1;
   const room = getRoom(world, x, y);
@@ -88,7 +88,8 @@ function sendRoomInfo(player, getRoom, getPlayersInRoom, _MAP_SIZE, VILLAGE_POS)
       nearbyRooms
     })
   );
-  if (room.type === ROOM_TYPE.VILLAGE) {
+  // 안내 메시지는 입장/갱신 유저에게만 1회 전송 (options.skipGuide가 아니면)
+  if (room.type === ROOM_TYPE.VILLAGE && !options.skipGuide) {
     player.ws.send(
       JSON.stringify({
         type: 'system',
@@ -104,7 +105,8 @@ function sendRoomInfo(player, getRoom, getPlayersInRoom, _MAP_SIZE, VILLAGE_POS)
 function sendRoomInfoToAllInRoom(players, world, x, y, getRoom, getPlayersInRoom, _MAP_SIZE, VILLAGE_POS) {
   Object.values(players).forEach((p) => {
     if (p && p.world === world && p.position && p.position.x === x && p.position.y === y) {
-      sendRoomInfo(p, getRoom, getPlayersInRoom, _MAP_SIZE, VILLAGE_POS);
+      // 안내 메시지는 반복 전송 방지 (skipGuide: true)
+      sendRoomInfo(p, getRoom, getPlayersInRoom, _MAP_SIZE, VILLAGE_POS, { skipGuide: true });
     }
   });
 }
@@ -125,14 +127,27 @@ function sendInventory(player) {
  * 캐릭터(플레이어) 정보 전송
  */
 function sendCharacterInfo(player) {
+  // 장비 옵션 합산
+  const weapon = player.equipWeapon || {};
+  const armor = player.equipArmor || {};
+  const strBonus = (weapon.str || 0) + (armor.str || 0);
+  const dexBonus = (weapon.dex || 0) + (armor.dex || 0);
+  const intBonus = (weapon.int || 0) + (armor.int || 0);
+  const hpBonus = (weapon.hp || 0) + (armor.hp || 0);
+  const mpBonus = (weapon.mp || 0) + (armor.mp || 0);
+  const realStr = player.str + strBonus;
+  const realDex = player.dex + dexBonus;
+  const realInt = player.int + intBonus;
+  const realMaxHp = player.maxHp + hpBonus;
+  const realMaxMp = player.maxMp + mpBonus;
   const info = {
     hp: player.hp,
-    maxHp: player.maxHp,
+    maxHp: realMaxHp,
     mp: player.mp,
-    maxMp: player.maxMp,
-    str: player.str,
-    dex: player.dex,
-    int: player.int,
+    maxMp: realMaxMp,
+    str: realStr,
+    dex: realDex,
+    int: realInt,
     atk: typeof player.getAtk === 'function' ? player.getAtk() : player.atk,
     def: typeof player.getDef === 'function' ? player.getDef() : player.def,
     strExp: player.strExp,

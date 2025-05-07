@@ -19,6 +19,10 @@ const ITEM_NAME_FROST_ARMOR = '서리갑옷';
 const ITEM_NAME_DRAGON_ARMOR = '용의 갑옷';
 const ITEM_NAME_DARK_ARMOR = '암흑갑옷';
 const ITEM_NAME_SKY_ARMOR = '천공의 갑옷';
+const ITEM_NAME_LARGE_POTION = '대형 물약';
+const ITEM_NAME_KKUM = '꿈결의 검';
+const ITEM_NAME_HWAN = '환상의 검';
+const ITEM_NAME_YOUNG = '영원의 검';
 
 const ITEM_TYPE = {
   WEAPON: '무기',
@@ -45,6 +49,11 @@ const ITEM_POOL = [
   { name: ITEM_NAME_DRAGON_ARMOR, description: '드래곤의 힘이 깃든 갑옷', def: 28, str: 3, dex: 2, type: ITEM_TYPE.ARMOR, price: 2600 },
   { name: ITEM_NAME_DARK_SWORD, description: '어둠의 힘이 깃든 검', atk: 32, str: 3, dex: 5, type: ITEM_TYPE.WEAPON, price: 2100 },
   { name: ITEM_NAME_DARK_ARMOR, description: '어둠의 힘이 깃든 갑옷', def: 25, str: 2, dex: 4, type: ITEM_TYPE.ARMOR, price: 2200 },
+  { name: ITEM_NAME_LARGE_POTION, type: ITEM_TYPE.CONSUMABLE, perUse: 23, total: 10000, desc: '한 번에 23 회복, 총 10000회 사용 가능', price: 300 },
+  { name: ITEM_NAME_MONGHWA, type: ITEM_TYPE.WEAPON, price: 100, desc: '공격해도 몬스터 HP가 깎이지 않음. 스탯 경험치만 오름.', atk: 0 },
+  { name: ITEM_NAME_KKUM, type: ITEM_TYPE.WEAPON, price: 20000, desc: '방치형 무기. 힘/민첩 경험치 3% 증가 (상점에서 판매 가능)', atk: 18, str: 2, dex: 2, expBonus: 1.03 },
+  { name: ITEM_NAME_HWAN, type: ITEM_TYPE.WEAPON, price: 40000, desc: '방치형 무기. 힘/민첩 경험치 5% 증가 (상점에서 판매 가능)', atk: 22, str: 3, dex: 3, expBonus: 1.05 },
+  { name: ITEM_NAME_YOUNG, type: ITEM_TYPE.WEAPON, price: 80000, desc: '방치형 무기. 힘/민첩 경험치 7% 증가 (상점에서 판매 가능)', atk: 26, str: 4, dex: 4, expBonus: 1.07 },
 ];
 
 const FIELD_MONSTERS = [
@@ -75,6 +84,9 @@ const SHOP_ITEMS = {
     { name: ITEM_NAME_SILVER_SWORD, type: ITEM_TYPE.WEAPON, price: 500, desc: '은으로 만든 고급 검', atk: 12, str: 2, dex: 1 },
     { name: ITEM_NAME_GOLD_SWORD, type: ITEM_TYPE.WEAPON, price: 1200, desc: '황금으로 만든 최고의 검', atk: 20, str: 3, dex: 2 },
     { name: ITEM_NAME_MONGHWA, type: ITEM_TYPE.WEAPON, price: 100, desc: '공격해도 몬스터 HP가 깎이지 않음. 스탯 경험치만 오름.', atk: 0 },
+    { name: ITEM_NAME_KKUM, type: ITEM_TYPE.WEAPON, price: 20000, desc: '방치형 무기. 힘/민첩 경험치 3% 증가 (상점에서 판매 가능)', atk: 18, str: 2, dex: 2, expBonus: 1.03 },
+    { name: ITEM_NAME_HWAN, type: ITEM_TYPE.WEAPON, price: 40000, desc: '방치형 무기. 힘/민첩 경험치 5% 증가 (상점에서 판매 가능)', atk: 22, str: 3, dex: 3, expBonus: 1.05 },
+    { name: ITEM_NAME_YOUNG, type: ITEM_TYPE.WEAPON, price: 80000, desc: '방치형 무기. 힘/민첩 경험치 7% 증가 (상점에서 판매 가능)', atk: 26, str: 4, dex: 4, expBonus: 1.07 },
     // { name: ITEM_NAME_FLAME_SWORD, type: ITEM_TYPE.WEAPON, price: 3000, desc: '불꽃의 힘이 깃든 검', atk: 28, str: 4, dex: 2 },
     // { name: ITEM_NAME_FROST_SWORD, type: ITEM_TYPE.WEAPON, price: 3200, desc: '얼음의 힘이 깃든 검', atk: 24, str: 2, dex: 4 },
     // { name: ITEM_NAME_DRAGON_SWORD, type: ITEM_TYPE.WEAPON, price: 5000, desc: '드래곤의 힘이 깃든 검', atk: 36, str: 5, dex: 3 },
@@ -97,7 +109,8 @@ const SHOP_ITEMS = {
     { name: '초소형 물약', type: ITEM_TYPE.CONSUMABLE, price: 10, desc: 'HP 10 회복', total: 500, perUse: 10 },
     { name: '소형 물약', type: ITEM_TYPE.CONSUMABLE, price: 25, desc: 'HP 15 회복', total: 1000, perUse: 15 },
     { name: '중형 물약', type: ITEM_TYPE.CONSUMABLE, price: 60, desc: 'HP 20 회복', total: 2000, perUse: 20 },
-    { name: '클랜힐 스크롤', type: ITEM_TYPE.CONSUMABLE, price: 80000, desc: '클랜힐 스킬을 사용할 수 있게 해주는 신비한 두루마리' },
+    { name: ITEM_NAME_LARGE_POTION, type: ITEM_TYPE.CONSUMABLE, perUse: 23, total: 10000, desc: '한 번에 23 회복, 총 10000회 사용 가능', price: 300 },
+    { name: '클랜힐 스크롤', type: ITEM_TYPE.CONSUMABLE, price: 50000, desc: '접속해있는 길드원들의 HP가 회복됩니다. /클랜힐 명령어로 사용 가능' },
   ]
 };
 
@@ -117,21 +130,21 @@ const ISLAND_MONSTERS = [
 ];
 
 const CAVE_BOSS_MONSTERS = [
-  { name: '지하 마왕', maxHp: 1200, atk: 210, def: 120, gold: 400 },
-  { name: '암흑 드래곤', maxHp: 1100, atk: 200, def: 110, gold: 380 },
-  { name: '동굴 히드라', maxHp: 1050, atk: 195, def: 105, gold: 360 },
-  { name: '심연의 골렘', maxHp: 1000, atk: 185, def: 100, gold: 340 },
-  { name: '지하 괴수왕', maxHp: 950, atk: 180, def: 95, gold: 320 },
-  { name: '암석 거대거미', maxHp: 900, atk: 170, def: 90, gold: 300 },
-  { name: '동굴 망령', maxHp: 850, atk: 165, def: 85, gold: 285 },
-  { name: '지하 불사자', maxHp: 800, atk: 160, def: 80, gold: 270 },
-  { name: '암흑 리치로드', maxHp: 780, atk: 155, def: 78, gold: 260 },
-  { name: '동굴 거대뱀', maxHp: 760, atk: 150, def: 76, gold: 250 },
-  { name: '심연의 박쥐왕', maxHp: 740, atk: 145, def: 74, gold: 240 },
-  { name: '지하 돌연변이', maxHp: 720, atk: 140, def: 72, gold: 230 },
-  { name: '암흑 슬라임킹', maxHp: 700, atk: 135, def: 70, gold: 220 },
-  { name: '동굴 불꽃정령', maxHp: 680, atk: 130, def: 68, gold: 210 },
-  { name: '심연의 맹독전갈', maxHp: 660, atk: 125, def: 66, gold: 200 },
+  { name: '지하 마왕', maxHp: 320, atk: 45, def: 36, gold: 65 },
+  { name: '암흑 드래곤', maxHp: 300, atk: 44, def: 34, gold: 63 },
+  { name: '동굴 히드라', maxHp: 280, atk: 43, def: 32, gold: 60 },
+  { name: '심연의 골렘', maxHp: 270, atk: 42, def: 32, gold: 58 },
+  { name: '지하 괴수왕', maxHp: 260, atk: 41, def: 30, gold: 56 },
+  { name: '암석 거대거미', maxHp: 250, atk: 40, def: 30, gold: 54 },
+  { name: '동굴 망령', maxHp: 240, atk: 39, def: 28, gold: 52 },
+  { name: '지하 불사자', maxHp: 230, atk: 38, def: 28, gold: 50 },
+  { name: '암흑 리치로드', maxHp: 220, atk: 37, def: 26, gold: 48 },
+  { name: '동굴 거대뱀', maxHp: 210, atk: 36, def: 26, gold: 46 },
+  { name: '심연의 박쥐왕', maxHp: 200, atk: 35, def: 24, gold: 44 },
+  { name: '지하 돌연변이', maxHp: 190, atk: 34, def: 24, gold: 42 },
+  { name: '암흑 슬라임킹', maxHp: 180, atk: 33, def: 22, gold: 40 },
+  { name: '동굴 불꽃정령', maxHp: 170, atk: 32, def: 22, gold: 38 },
+  { name: '심연의 맹독전갈', maxHp: 160, atk: 31, def: 20, gold: 36 },
 ];
 
-module.exports = { ITEM_POOL, FIELD_MONSTERS, FOREST_MONSTERS, CAVE_MONSTERS, ISLAND_MONSTERS, CAVE_BOSS_MONSTERS, SHOP_ITEMS, ITEM_TYPE, ITEM_NAME_WOOD_SWORD, ITEM_NAME_BRONZE_SWORD, ITEM_NAME_IRON_SWORD, ITEM_NAME_SILVER_SWORD, ITEM_NAME_GOLD_SWORD, ITEM_NAME_MONGHWA, ITEM_NAME_CLOTH_ARMOR, ITEM_NAME_LEATHER_ARMOR, ITEM_NAME_IRON_ARMOR, ITEM_NAME_SILVER_ARMOR, ITEM_NAME_GOLD_ARMOR, ITEM_NAME_FLAME_SWORD, ITEM_NAME_FROST_SWORD, ITEM_NAME_DRAGON_SWORD, ITEM_NAME_DARK_SWORD, ITEM_NAME_SKY_SWORD, ITEM_NAME_FLAME_ARMOR, ITEM_NAME_FROST_ARMOR, ITEM_NAME_DRAGON_ARMOR, ITEM_NAME_DARK_ARMOR, ITEM_NAME_SKY_ARMOR, ITEM_STAT_ATK, ITEM_STAT_DEF, ITEM_STAT_STR, ITEM_STAT_DEX }; 
+module.exports = { ITEM_POOL, FIELD_MONSTERS, FOREST_MONSTERS, CAVE_MONSTERS, ISLAND_MONSTERS, CAVE_BOSS_MONSTERS, SHOP_ITEMS, ITEM_TYPE, ITEM_NAME_WOOD_SWORD, ITEM_NAME_BRONZE_SWORD, ITEM_NAME_IRON_SWORD, ITEM_NAME_SILVER_SWORD, ITEM_NAME_GOLD_SWORD, ITEM_NAME_MONGHWA, ITEM_NAME_CLOTH_ARMOR, ITEM_NAME_LEATHER_ARMOR, ITEM_NAME_IRON_ARMOR, ITEM_NAME_SILVER_ARMOR, ITEM_NAME_GOLD_ARMOR, ITEM_NAME_FLAME_SWORD, ITEM_NAME_FROST_SWORD, ITEM_NAME_DRAGON_SWORD, ITEM_NAME_DARK_SWORD, ITEM_NAME_SKY_SWORD, ITEM_NAME_FLAME_ARMOR, ITEM_NAME_FROST_ARMOR, ITEM_NAME_DRAGON_ARMOR, ITEM_NAME_DARK_ARMOR, ITEM_NAME_SKY_ARMOR, ITEM_STAT_ATK, ITEM_STAT_DEF, ITEM_STAT_STR, ITEM_STAT_DEX, ITEM_NAME_KKUM, ITEM_NAME_HWAN, ITEM_NAME_YOUNG }; 

@@ -41,7 +41,21 @@ class ShopService {
       return;
     }
     player.gold -= foundItem.price;
-    player.inventory.push({ ...foundItem });
+    // 소모품(중첩 물약) 구매 로직
+    if ((foundItem.type && (foundItem.type.toLowerCase() === 'consumable' || foundItem.type === '잡화')) && foundItem.total) {
+      const existingItem = player.inventory.find(item =>
+        item.name === itemName &&
+        (item.type && (item.type.toLowerCase() === 'consumable' || item.type === '잡화'))
+      );
+      if (existingItem) {
+        existingItem.total += foundItem.total;
+        existingItem.count = (existingItem.count || 1) + 1;
+      } else {
+        player.inventory.push({ ...foundItem, count: 1 });
+      }
+    } else {
+      player.inventory.push({ ...foundItem });
+    }
     await this.savePlayerData(playerName).catch(() => {});
     this.sendInventory(player);
     this.sendCharacterInfo(player);
@@ -83,7 +97,16 @@ class ShopService {
     }
     const sellPrice = Math.floor(foundItem.price * 0.5);
     player.gold += sellPrice;
-    player.inventory.splice(idx, 1);
+    // 소모품(중첩 물약) 판매 로직
+    if ((player.inventory[idx].type && (player.inventory[idx].type.toLowerCase() === 'consumable' || player.inventory[idx].type === '잡화')) && player.inventory[idx].count) {
+      player.inventory[idx].count -= 1;
+      player.inventory[idx].total -= player.inventory[idx].perUse || 0;
+      if (player.inventory[idx].count <= 0 || player.inventory[idx].total <= 0) {
+        player.inventory.splice(idx, 1);
+      }
+    } else {
+      player.inventory.splice(idx, 1);
+    }
     await this.savePlayerData(playerName).catch(() => {});
     this.sendInventory(player);
     this.sendCharacterInfo(player);

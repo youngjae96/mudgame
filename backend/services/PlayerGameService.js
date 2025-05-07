@@ -26,6 +26,9 @@ const PlayerGameService = {
         player.inventory = player.inventory.slice(-50);
       }
       await savePlayerData(playerName);
+      // 본인에게는 안내 메시지 포함
+      await require('../utils/broadcast').sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+      // 방 전체에는 안내 없이 갱신만
       await sendRoomInfoToAllInRoom(PlayerManager.getAllPlayers(), player.world, player.position.x, player.position.y, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
       if (battleIntervals[playerName]) {
         clearInterval(battleIntervals[playerName]);
@@ -312,10 +315,24 @@ const PlayerGameService = {
   async handleStat({ ws, playerName }) {
     const player = PlayerManager.getPlayer(playerName);
     if (!player) return;
+    // 장비 옵션 증가분 계산
+    const weapon = player.equipWeapon || {};
+    const armor = player.equipArmor || {};
+    const strBonus = (weapon.str || 0) + (armor.str || 0);
+    const dexBonus = (weapon.dex || 0) + (armor.dex || 0);
+    const intBonus = (weapon.int || 0) + (armor.int || 0);
+    const hpBonus = (weapon.hp || 0) + (armor.hp || 0);
+    const mpBonus = (weapon.mp || 0) + (armor.mp || 0);
+    // 최종 합산값
+    const realStr = player.str + strBonus;
+    const realDex = player.dex + dexBonus;
+    const realInt = player.int + intBonus;
+    const realHp = player.maxHp + hpBonus;
+    const realMp = player.maxMp + mpBonus;
     const statMsg =
       `[능력치]\n` +
-      `HP  : ${player.hp} / ${player.maxHp}    MP  : ${player.mp} / ${player.maxMp}\n` +
-      `STR : ${player.str} (Exp: ${Number(player.strExp).toFixed(2)}/${Number(player.strExpMax).toFixed(2)})   DEX: ${player.dex} (Exp: ${Number(player.dexExp).toFixed(2)}/${Number(player.dexExpMax).toFixed(2)})   INT: ${player.int} (Exp: ${Number(player.intExp).toFixed(2)}/${Number(player.intExpMax).toFixed(2)})\n` +
+      `HP  : ${player.hp} / ${realHp}    MP  : ${player.mp} / ${realMp}\n` +
+      `STR : ${realStr} (Exp: ${Number(player.strExp).toFixed(2)}/${Number(player.strExpMax).toFixed(2)})   DEX: ${realDex} (Exp: ${Number(player.dexExp).toFixed(2)}/${Number(player.dexExpMax).toFixed(2)})   INT: ${realInt} (Exp: ${Number(player.intExp).toFixed(2)}/${Number(player.intExpMax).toFixed(2)})\n` +
       `공격력: ${player.getAtk()}   방어력: ${player.getDef()}`;
     ws.send(JSON.stringify({ type: 'system', subtype: 'info', message: statMsg }));
   },

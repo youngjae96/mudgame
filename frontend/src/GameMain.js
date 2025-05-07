@@ -74,6 +74,22 @@ const PlayerListPanel = styled.div`
   box-shadow: 0 2px 8px #0004;
   min-width: 200px;
   max-width: 220px;
+  /* 스크롤바 커스텀 */
+  scrollbar-width: thin;
+  scrollbar-color: #7ecfff #23272f;
+  &::-webkit-scrollbar {
+    width: 8px;
+    background: #23272f;
+    border-radius: 8px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: linear-gradient(120deg, #7ecfff 60%, #4fa3e3 100%);
+    border-radius: 8px;
+    min-height: 40px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: #4fa3e3;
+  }
 `;
 /**
  * 게임 메인 화면 컴포넌트
