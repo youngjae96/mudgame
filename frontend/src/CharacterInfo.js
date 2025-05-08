@@ -78,10 +78,10 @@ function CharacterInfo({ name, room, character }) {
         <StatRow><span>HP</span><span>{character.hp} / {character.maxHp}</span></StatRow>
         <StatRow><span>MP</span><span>{character.mp} / {character.maxMp}</span></StatRow>
         <StatRow><span>힘</span><span>{character.str}</span></StatRow>
-        <StatRow><span>공격력</span><span>{character.atk}</span></StatRow>
-        <StatRow><span>방어력</span><span>{character.def}</span></StatRow>
         <StatRow><span>민첩</span><span>{character.dex}</span></StatRow>
         <StatRow><span>지능</span><span>{character.int}</span></StatRow>
+        <StatRow><span>공격력</span><span>{character.atk}</span></StatRow>
+        <StatRow><span>방어력</span><span>{character.def}</span></StatRow>
       </CharacterStats>
     </CharacterInfoWrapper>
   );

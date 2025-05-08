@@ -239,6 +239,7 @@ const commandHandlers = {
   },
   '/방명록': (args) => handleGuestbookCommand(args),
   '/방명록쓰기': (args) => handleGuestbookWriteCommand(args),
+  '/공지쓰기': (args) => require('./commands').handleNoticeWriteCommand(args),
 };
 
 // 서비스 인스턴스 생성 및 의존성 주입
@@ -279,7 +280,7 @@ wss.on('connection', (ws) => {
         const { name, token } = data;
         if (process.env.DEBUG === 'true') console.log('[서버] join 요청:', { name, token });
         if (!token) {
-          if (process.env.DEBUG === 'true') console.log('[서버] 인증 토큰 없음');
+//          console.log('[AUTH] 인증 토큰 없음: name=', name, 'ip=', ws._socket?.remoteAddress);
           ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '인증 토큰이 필요합니다.' }));
           ws.close();
           return;
@@ -288,13 +289,13 @@ wss.on('connection', (ws) => {
         try {
           decoded = jwt.verify(token, SECRET);
           if (decoded.username !== name) {
-            if (process.env.DEBUG === 'true') console.log('[서버] 토큰 username 불일치', decoded.username, name);
+            console.log('[AUTH] 토큰 username 불일치:', decoded.username, name, 'ip=', ws._socket?.remoteAddress);
             ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '토큰 정보가 일치하지 않습니다.' }));
             ws.close();
             return;
           }
         } catch (e) {
-          if (process.env.DEBUG === 'true') console.log('[서버] 유효하지 않은 토큰', e);
+          console.log('[AUTH] 유효하지 않은 토큰:', token, '에러:', e.message, 'name=', name, 'ip=', ws._socket?.remoteAddress);
           ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '유효하지 않은 토큰입니다.' }));
           ws.close();
           return;

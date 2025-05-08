@@ -30,6 +30,19 @@ const PlayerGameService = {
       await require('../utils/broadcast').sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
       // 방 전체에는 안내 없이 갱신만
       await sendRoomInfoToAllInRoom(PlayerManager.getAllPlayers(), player.world, player.position.x, player.position.y, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
+      // [추가] 사냥(자동전투) 중인 플레이어 알림
+      const playersInRoom = Object.values(PlayerManager.getAllPlayers()).filter(
+        p => p.position && p.position.x === player.position.x && p.position.y === player.position.y && p.world === player.world && p.name !== playerName
+      );
+      const huntingPlayers = playersInRoom.filter(p => battleIntervals && battleIntervals[p.name]);
+      if (huntingPlayers.length > 0) {
+        const names = huntingPlayers.map(p => p.name).join(', ');
+        ws.send(JSON.stringify({
+          type: 'system',
+          subtype: 'alert', // 프론트에서 빨간색 처리
+          message: `⚠️ 이 방에서 ${names}님이 사냥(자동전투) 중입니다!`
+        }));
+      }
       if (battleIntervals[playerName]) {
         clearInterval(battleIntervals[playerName]);
         delete battleIntervals[playerName];

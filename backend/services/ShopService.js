@@ -100,7 +100,7 @@ class ShopService {
     // 소모품(중첩 물약) 판매 로직
     if ((player.inventory[idx].type && (player.inventory[idx].type.toLowerCase() === 'consumable' || player.inventory[idx].type === '잡화')) && player.inventory[idx].count) {
       player.inventory[idx].count -= 1;
-      player.inventory[idx].total -= player.inventory[idx].perUse || 0;
+      player.inventory[idx].total -= foundItem.total || player.inventory[idx].perUse || 0;
       if (player.inventory[idx].count <= 0 || player.inventory[idx].total <= 0) {
         player.inventory.splice(idx, 1);
       }

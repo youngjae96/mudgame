@@ -126,7 +126,7 @@ for (let y = 0; y < MAP_SIZE; y++) {
 const MAP_SIZE_CAVE = 30;
 const CAVE_ZONES = [
   { name: '동굴 입구', type: ROOM_TYPE.CAVE, yStart: 0, yEnd: 9, monsters: CAVE_MONSTERS },
-  { name: '동굴 중간', type: ROOM_TYPE.CAVE, yStart: 10, yEnd: 19, monsters: FOREST_MONSTERS },
+  { name: '동굴 중간', type: ROOM_TYPE.CAVE, yStart: 10, yEnd: 19, monsters: CAVE_MONSTERS },
   { name: '동굴 심층', type: ROOM_TYPE.CAVE, yStart: 20, yEnd: 29, monsters: CAVE_MONSTERS },
 ];
 
@@ -199,6 +199,11 @@ for (let y = 0; y < MAP_SIZE_CAVE; y++) {
     }
     // 강한 몬스터 배치
     let monsters = [];
+    function getRandomCaveMonster() {
+      // CAVE_MONSTERS와 CAVE_BOSS_MONSTERS를 합쳐서 랜덤 추출
+      const pool = CAVE_MONSTERS.concat(CAVE_BOSS_MONSTERS);
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
     if (isBossEntrance) {
       monsters.push(new Monster(CAVE_BOSS_MONSTERS[bossEntrance[bossEntranceCount]], x, y));
       bossEntranceCount++;
@@ -209,11 +214,11 @@ for (let y = 0; y < MAP_SIZE_CAVE; y++) {
       monsters.push(new Monster(CAVE_BOSS_MONSTERS[bossDeep[bossDeepCount]], x, y));
       bossDeepCount++;
     } else if (extraEntrance.some(p => p.x === x && p.y === y)) {
-      monsters.push(new Monster(CAVE_BOSS_MONSTERS[Math.floor(Math.random()*CAVE_BOSS_MONSTERS.length)], x, y));
+      monsters.push(new Monster(getRandomCaveMonster(), x, y));
     } else if (extraMiddle.some(p => p.x === x && p.y === y)) {
-      monsters.push(new Monster(CAVE_BOSS_MONSTERS[Math.floor(Math.random()*CAVE_BOSS_MONSTERS.length)], x, y));
+      monsters.push(new Monster(getRandomCaveMonster(), x, y));
     } else if (extraDeep.some(p => p.x === x && p.y === y)) {
-      monsters.push(new Monster(CAVE_MONSTERS[Math.floor(Math.random()*CAVE_MONSTERS.length)], x, y));
+      monsters.push(new Monster(getRandomCaveMonster(), x, y));
     }
     // 구역 결정
     const zone = CAVE_ZONES.find(z => y >= z.yStart && y <= z.yEnd);
