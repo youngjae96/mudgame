@@ -13,7 +13,6 @@ const PlayerGameService = require('./services/PlayerGameService');
 const { getRoom } = require('./data/map');
 const { SHOP_ITEMS } = require('./data/items');
 const PlayerData = require('./models/PlayerData');
-const Guestbook = require('./models/Guestbook');
 
 let shopServiceInstance = null;
 
@@ -116,7 +115,7 @@ function handleInnCommand({ ws, playerName, players, getRoom, savePlayerData, se
     ws.send(JSON.stringify({ type: 'system', subtype: 'guide', message: '[여관] 마을에서만 이용할 수 있습니다.' }));
     return;
   }
-  if (player.hp === player.maxHp && player.mp === player.maxMp) {
+  if (player.hp === (player.getRealMaxHp ? player.getRealMaxHp() : player.maxHp) && player.mp === player.maxMp) {
     ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '[여관] 이미 HP/MP가 모두 가득 찼습니다.' }));
     return;
   }
@@ -126,7 +125,7 @@ function handleInnCommand({ ws, playerName, players, getRoom, savePlayerData, se
     return;
   }
   player.gold -= INN_PRICE;
-  player.hp = player.maxHp;
+  player.hp = player.getRealMaxHp ? player.getRealMaxHp() : player.maxHp;
   player.mp = player.maxMp;
   savePlayerData(playerName).catch(() => {});
   sendInventory(player);
@@ -224,7 +223,11 @@ async function handleAdminCommand({ ws, playerName, message, players, getRoom, s
       ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: `[운영자] 해당 이름의 아이템이 없습니다: ${itemName}` }));
       return;
     }
-    targetPlayer.inventory.push({ ...item });
+    const addSuccess = targetPlayer.addToInventory({ ...item }, targetPlayer.ws);
+    if (!addSuccess) {
+      ws.send(JSON.stringify({ type: 'system', message: `[운영자] ${target}님의 인벤토리가 가득 차 지급에 실패했습니다.` }));
+      return;
+    }
     sendInventory(targetPlayer);
     ws.send(JSON.stringify({ type: 'system', message: `[운영자] ${target}님에게 아이템 '${itemName}' 지급 완료!` }));
     if (targetPlayer.ws && targetPlayer.ws.readyState === 1) {
@@ -319,7 +322,7 @@ async function handleGuildCommand({ ws, playerName, message, players }) {
   const args = message.trim().split(' ');
   const subcmd = args[1];
   if (!subcmd) {
-    ws.send(JSON.stringify({ type: 'system', subtype: 'guide', message: '[길드] 사용법: /길드 <생성|가입|수락|탈퇴|추방|공지|정보|목록> ...' }));
+    ws.send(JSON.stringify({ type: 'system', subtype: 'guide', message: '[길드] 사용법: /길드 <생성|가입|수락|탈퇴|추방|공지|정보|목록|해체(길드장)> ...' }));
     return;
   }
   // /길드 생성 <길드이름>
@@ -579,8 +582,6 @@ async function handleHelpCommand({ ws }) {
     '<메시지> : 지역 채팅(명령어 없이 입력)',
     '/동 /서 /남 /북 : 방향 이동(오른쪽/왼쪽/아래/위, 또는 맵 터치)',
     '/누구 : 현재 접속중인 플레이어 목록 보기',
-    '/구매 <아이템명> : 아이템 구매',
-    '/판매 <아이템명> : 아이템 판매',
     '/장착 <아이템명> : 장비 장착',
     '/해제 무기, /해제 방어구 : 장비 해제',
     '/정보 : 내 능력치 확인',
@@ -590,9 +591,8 @@ async function handleHelpCommand({ ws }) {
     '/장비 : 내 장비 정보',
     '/지도 : 전체 맵 보기',
     '/텔포 <지역> : 월드 이동(예: 무인도, 마을)',
-    '/길드 <생성|가입|수락|탈퇴|추방|공지|정보|목록|해체|채팅|채팅로그> ... : 길드 관련 명령어',
+    '/길드 <생성|가입|수락|탈퇴|추방|공지|정보|목록|해체(길드장)> ... : 길드 관련 명령어',
     '/랭킹 : TOP 10 스탯 랭킹',
-    '/저장 : 내 상태 즉시 저장',
     '/방명록 : 방명록(글 목록/쓰기)',
     '/도움말 : 명령어 전체 안내',
   ].join('\n');
@@ -629,14 +629,20 @@ function handleShopSellCommand(args) {
 async function handleStatCommand({ ws, playerName, message, players }) {
   const args = message.trim().split(' ');
   const targetName = args[1] || playerName;
-  const target = players[targetName];
+  const target = PlayerManager.getPlayer(targetName);
   if (!target) {
     ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: `[정보] 해당 유저가 없습니다: ${targetName}` }));
     return;
   }
+  if (target.normalizeHp) target.normalizeHp();
+  const weapon = target.equipWeapon || {};
+  const armor = target.equipArmor || {};
+  const hpBonus = (weapon.hp || 0) + (armor.hp || 0);
+  let maxHp = (typeof target.getRealMaxHp === 'function' ? target.getRealMaxHp() : target.maxHp);
+  maxHp = Math.floor(maxHp);
   const statMsg =
     `[능력치: ${targetName}]\n` +
-    `HP  : ${target.hp} / ${target.maxHp}    MP  : ${target.mp} / ${target.maxMp}\n` +
+    `HP  : ${target.hp} / ${maxHp}    MP  : ${target.mp} / ${target.maxMp}\n` +
     `STR : ${target.str} (Exp: ${Number(target.strExp).toFixed(2)}/${Number(target.strExpMax).toFixed(2)})   DEX: ${target.dex} (Exp: ${Number(target.dexExp).toFixed(2)}/${Number(target.dexExpMax).toFixed(2)})   INT: ${target.int} (Exp: ${Number(target.intExp).toFixed(2)}/${Number(target.intExpMax).toFixed(2)})\n` +
     `공격력: ${target.getAtk ? target.getAtk() : target.atk}   방어력: ${target.getDef ? target.getDef() : target.def}`;
   ws.send(JSON.stringify({ type: 'system', subtype: 'info', message: statMsg }));
@@ -721,104 +727,36 @@ async function handleRankingCommand({ ws }) {
 }
 
 // /클랜힐: 클랜힐 ON/OFF 토글 (클랜힐 스크롤 보유 시만 가능)
-async function handleClanHealCommand({ ws, player }) {
+async function handleClanHealCommand({ ws, player, battleIntervals }) {
+  // 길드 미가입자는 사용 불가
+  if (!player.guildName) {
+    ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '길드에 가입해야 클랜힐을 사용할 수 있습니다.' }));
+    return;
+  }
   const hasScroll = player.inventory && player.inventory.some(i => i.name === '클랜힐 스크롤');
   if (!hasScroll) {
     ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '클랜힐 스크롤이 있어야 클랜힐을 사용할 수 있습니다.' }));
     return;
   }
-  player.clanHealOn = !player.clanHealOn;
-  ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: player.clanHealOn ? '클랜힐이 활성화되었습니다! (인트 경험치가 오릅니다)' : '클랜힐이 비활성화되었습니다.' }));
-}
-
-// /방명록 [공지|자유] [페이지]
-async function handleGuestbookCommand({ ws, message }) {
-  const args = message.trim().split(' ');
-  let type = 'guestbook';
-  let pageArgIdx = 1;
-  if (args[1] === '공지') {
-    type = 'notice';
-    pageArgIdx = 2;
-  } else if (args[1] === '자유') {
-    type = 'guestbook';
-    pageArgIdx = 2;
-  }
-  const page = Math.max(1, parseInt(args[pageArgIdx] || '1', 10));
-  const PAGE_SIZE = 10;
-  const total = await Guestbook.countDocuments({ type });
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  const entries = await Guestbook.find({ type })
-    .sort({ createdAt: -1 })
-    .skip((page - 1) * PAGE_SIZE)
-    .limit(PAGE_SIZE)
-    .lean();
-  const tabName = type === 'notice' ? '공지' : '자유';
-  const otherTab = type === 'notice' ? '자유' : '공지';
-  if (!entries.length) {
-    ws.send(JSON.stringify({ type: 'system', message: `[방명록 - ${tabName}] 등록된 메시지가 없습니다.\n/방명록 ${otherTab} : ${otherTab} 탭으로 이동\n/방명록 ${tabName} : ${tabName} 탭으로 이동\n/방명록쓰기 <메시지> : 방명록에 글 남기기 (150자 제한)\n/방명록 [페이지번호] : 방명록 목록 보기` }));
+  // 사냥(자동전투) 중에는 클랜힐을 켤 수 없음
+  if (battleIntervals && battleIntervals[player.name]) {
+    ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '사냥(자동전투) 중에는 클랜힐을 켤 수 없습니다.' }));
     return;
   }
-  let msg = `[방명록 - ${tabName}] (총 ${total}개, ${page}/${totalPages}페이지)\n`;
-  entries.forEach((e, i) => {
-    const date = new Date(e.createdAt).toLocaleString('ko-KR', { hour12: false });
-    msg += '────────────────────────────\n';
-    msg += `${(page-1)*PAGE_SIZE + i + 1}. [${e.name}] (${date})\n  ${e.message}\n`;
-  });
-  msg += '────────────────────────────\n';
-  msg += `/방명록 ${otherTab} : ${otherTab} 탭으로 이동\n/방명록 ${tabName} : ${tabName} 탭으로 이동\n/방명록 [페이지번호] : 방명록 목록 보기\n/방명록쓰기 <메시지> : 방명록에 글 남기기 (150자 제한)`;
-  ws.send(JSON.stringify({ type: 'system', message: msg }));
-}
-
-// /방명록쓰기 <메시지>
-const guestbookCooldown = {};
-async function handleGuestbookWriteCommand({ ws, playerName, message, req }) {
-  const ip = req && req.ip ? req.ip : '';
-  const text = message.replace('/방명록쓰기', '').trim();
-  if (!text) {
-    ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[방명록] 메시지를 입력하세요.' }));
-    return;
+  // 클랜힐 ON 시 현재 위치 저장
+  if (!player.clanHealOn) {
+    player.clanHealOn = true;
+    player.clanHealWorld = player.world;
+    player.clanHealX = player.position.x;
+    player.clanHealY = player.position.y;
+    ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '클랜힐이 활성화되었습니다! (인트 경험치가 오릅니다)' }));
+  } else {
+    player.clanHealOn = false;
+    delete player.clanHealWorld;
+    delete player.clanHealX;
+    delete player.clanHealY;
+    ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '클랜힐이 비활성화되었습니다.' }));
   }
-  if (text.length > 150) {
-    ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[방명록] 메시지는 150자 이내로 작성하세요.' }));
-    return;
-  }
-  const now = Date.now();
-  const key = playerName + '_' + ip;
-  if (guestbookCooldown[key] && now - guestbookCooldown[key] < 30000) {
-    ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[방명록] 도배 방지: 30초 후 다시 시도하세요.' }));
-    return;
-  }
-  guestbookCooldown[key] = now;
-  await Guestbook.create({ name: playerName, message: text, ip });
-  ws.send(JSON.stringify({ type: 'system', message: '[방명록] 메시지가 등록되었습니다.' }));
-}
-
-// /공지쓰기 <메시지> (운영자만)
-const noticeCooldown = {};
-async function handleNoticeWriteCommand({ ws, playerName, message, req }) {
-  if (playerName !== 'admin') {
-    ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[공지] 운영자만 공지 작성이 가능합니다.' }));
-    return;
-  }
-  const ip = req && req.ip ? req.ip : '';
-  const text = message.replace('/공지쓰기', '').trim();
-  if (!text) {
-    ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[공지] 메시지를 입력하세요.' }));
-    return;
-  }
-  if (text.length > 150) {
-    ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[공지] 메시지는 150자 이내로 작성하세요.' }));
-    return;
-  }
-  const now = Date.now();
-  const key = playerName + '_' + ip;
-  if (noticeCooldown[key] && now - noticeCooldown[key] < 30000) {
-    ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[공지] 도배 방지: 30초 후 다시 시도하세요.' }));
-    return;
-  }
-  noticeCooldown[key] = now;
-  await Guestbook.create({ name: playerName, message: text, ip, type: 'notice' });
-  ws.send(JSON.stringify({ type: 'system', message: '[공지] 공지 메시지가 등록되었습니다.' }));
 }
 
 // 명령어 핸들러 등록
@@ -842,9 +780,6 @@ const commandHandlers = {
   '/랭킹': handleRankingCommand,
   '/클랜힐': handleClanHealCommand,
   '/운영자': handleAdminCommand,
-  '/방명록': handleGuestbookCommand,
-  '/방명록쓰기': handleGuestbookWriteCommand,
-  '/공지쓰기': handleNoticeWriteCommand,
 };
 
 module.exports = {
@@ -866,7 +801,4 @@ module.exports = {
   handleReturnCommand,
   handleRankingCommand,
   handleClanHealCommand,
-  handleGuestbookCommand,
-  handleGuestbookWriteCommand,
-  handleNoticeWriteCommand,
 }; 

@@ -63,7 +63,7 @@ function processBattle(player, monster, room, VILLAGE_POS) {
       action: 'counter',
       value: monsterDmg,
       playerHp: Math.max(player.hp,0),
-      playerMaxHp: player.maxHp,
+      playerMaxHp: player.getRealMaxHp(),
       text: `${monster.name}의 반격!`,
     });
     // 자동 물약 사용 (Player 메서드 활용)

@@ -32,8 +32,32 @@ async function clanHealTick(PlayerManager, Guild) {
   // clanHealOn인 유저 목록
   const healers = Object.values(allPlayers).filter(p => p.clanHealOn);
   if (!healers.length) return;
-  // 각 힐러별로 길드원(자기 포함)에게 회복 적용
   for (const healer of healers) {
+    // 길드가 없으면 클랜힐 자동 중단
+    if (!healer.guildName) {
+      healer.clanHealOn = false;
+      delete healer.clanHealWorld;
+      delete healer.clanHealX;
+      delete healer.clanHealY;
+      if (healer.ws && healer.ws.readyState === 1) {
+        healer.ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '길드가 없어 클랜힐이 비활성화되었습니다.' }));
+      }
+      continue;
+    }
+    // 클랜힐 on한 자리에서만 유지
+    if (
+      healer.clanHealWorld !== undefined &&
+      (healer.world !== healer.clanHealWorld || healer.position.x !== healer.clanHealX || healer.position.y !== healer.clanHealY)
+    ) {
+      healer.clanHealOn = false;
+      delete healer.clanHealWorld;
+      delete healer.clanHealX;
+      delete healer.clanHealY;
+      if (healer.ws && healer.ws.readyState === 1) {
+        healer.ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '이동/위치 변경으로 클랜힐이 비활성화되었습니다.' }));
+      }
+      continue;
+    }
     let targets = [healer];
     // 길드가 있으면 길드원 전체(접속 중인 유저만)
     if (healer.guildName) {

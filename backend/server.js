@@ -37,15 +37,12 @@ const {
   handleShopSellCommand,
   handleStatCommand,
   handleWhisperCommand,
-  handleGuestbookCommand,
-  handleGuestbookWriteCommand,
 } = require('./commands');
 const logger = require('./middlewares/logger');
 const errorHandler = require('./middlewares/errorHandler');
 const playerRouter = require('./routes/player');
 const shopRouter = require('./routes/shop');
 const battleRouter = require('./routes/battle');
-const docsRouter = require('./routes/docs');
 const { PlayerManager, clanHealTick } = require('./playerManager');
 const RoomManager = require('./roomManager');
 const ShopService = require('./services/ShopService');
@@ -62,7 +59,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/player', playerRouter);
 app.use('/api/shop', shopRouter);
 app.use('/api/battle', battleRouter);
-app.use('/api/docs', docsRouter);
+require('./routes/docs')(app);
 app.use(errorHandler);
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
@@ -235,10 +232,8 @@ const commandHandlers = {
   '/랭킹': (args) => require('./commands').handleRankingCommand(args),
   '/클랜힐': (args) => {
     const player = PlayerManager.getPlayer(args.playerName);
-    return require('./commands').handleClanHealCommand({ ...args, player });
+    return require('./commands').handleClanHealCommand({ ...args, player, battleIntervals });
   },
-  '/방명록': (args) => handleGuestbookCommand(args),
-  '/방명록쓰기': (args) => handleGuestbookWriteCommand(args),
   '/공지쓰기': (args) => require('./commands').handleNoticeWriteCommand(args),
 };
 

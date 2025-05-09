@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import MiniMap from './MiniMap';
 import RoomInfo from './RoomInfo';
 import CharacterInfo from './CharacterInfo';
 import Inventory from './Inventory';
-import ChatBox from './ChatBox';
+import ChatBox, { ChatOnlyBox } from './ChatBox';
 import Button from './components/Button';
 import Input from './components/Input';
 import RoomItems from './RoomItems';
 import RoomMonsters from './RoomMonsters';
+import Modal from './components/Modal';
 
 const MobileRoot = styled.div`
   width: 100vw;
@@ -128,8 +129,9 @@ export default function GameMobileMain({
   messages, chatEndRef, handleSend, input, setInput,
   UI_LABELS, name, character, inventory, handlePickup, handleAttack, handleLogout
 }) {
-  // 탭 상태: room(방정보), info(내정보), inv(인벤)
-  const [tab, setTab] = useState('room'); // 기본값을 'room'으로 변경
+  // 탭 상태: room(방정보), info(내정보), inv(인벤), chat(채팅)
+  const [tab, setTab] = useState('room');
+  const [showPatchNote, setShowPatchNote] = useState(false);
 
   // 방 아이템/몬스터 렌더 함수
   const renderRoomItems = () => <RoomItems room={room} onPickup={handlePickup} />;
@@ -139,8 +141,22 @@ export default function GameMobileMain({
     <MobileRoot>
       <MobileHeader>
         <MobileTitle>그리머드RPG</MobileTitle>
-        <Button className="mobile-logout" onClick={handleLogout} size="sm">로그아웃</Button>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Button
+            variant="secondary"
+            size="sm"
+            style={{ verticalAlign: 'middle', padding: '6px 10px', fontSize: '1.18rem', color: '#ffe066' }}
+            aria-label="패치노트"
+            onClick={() => setShowPatchNote(true)}
+          >📢</Button>
+          <Button className="mobile-logout" onClick={handleLogout} size="sm">로그아웃</Button>
+        </span>
       </MobileHeader>
+      {showPatchNote && (
+        <Modal open={showPatchNote} onClose={() => setShowPatchNote(false)} title="패치노트">
+          <PatchNoteTabs />
+        </Modal>
+      )}
       <MobileMain>
         <MobileMapRoomPanel>
           <MiniMap room={room} mapSize={mapSize} mapInfo={mapInfo} onMove={handleMove} nearbyRooms={nearbyRooms} world={mapInfo?.world} />
@@ -149,11 +165,13 @@ export default function GameMobileMain({
           <TabButton $active={tab === 'room'} onClick={() => setTab('room')}>방정보</TabButton>
           <TabButton $active={tab === 'info'} onClick={() => setTab('info')}>내정보</TabButton>
           <TabButton $active={tab === 'inv'} onClick={() => setTab('inv')}>인벤</TabButton>
+          <TabButton $active={tab === 'chat'} onClick={() => setTab('chat')}>채팅</TabButton>
         </MobileTabs>
         <MobileContent>
           {tab === 'room' && <RoomInfo room={room} renderRoomItems={renderRoomItems} renderRoomMonsters={renderRoomMonsters} />}
           {tab === 'info' && <CharacterInfo name={name} room={room} character={character} />}
           {tab === 'inv' && <Inventory inventory={inventory} gold={character?.gold} />}
+          {tab === 'chat' && <ChatOnlyBox messages={messages} />}
         </MobileContent>
         <MobileChat>
           <MobileChatMessages>
@@ -172,6 +190,82 @@ export default function GameMobileMain({
           </MobileChatInput>
         </MobileChat>
       </MobileMain>
+      <style>{`
+        .patchnote-scroll {
+          scrollbar-width: thin;
+          scrollbar-color: #7ecfff #23272f;
+        }
+        .patchnote-scroll::-webkit-scrollbar {
+          width: 8px;
+          background: #23272f;
+          border-radius: 8px;
+        }
+        .patchnote-scroll::-webkit-scrollbar-thumb {
+          background: linear-gradient(120deg, #7ecfff 60%, #4fa3e3 100%);
+          border-radius: 8px;
+          min-height: 40px;
+        }
+        .patchnote-scroll::-webkit-scrollbar-thumb:hover {
+          background: #4fa3e3;
+        }
+      `}</style>
     </MobileRoot>
+  );
+}
+
+function PatchNoteTabs() {
+  const [notes, setNotes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selected, setSelected] = useState(0);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch('/api/patchnotes')
+      .then(res => res.json())
+      .then(data => {
+        setNotes(Array.isArray(data) ? data : []);
+        setLoading(false);
+      })
+      .catch(e => { setError('패치노트 불러오기 실패'); setLoading(false); });
+  }, []);
+
+  if (loading) return <div style={{ color: '#aaa', textAlign: 'center', margin: '32px 0' }}>패치노트 불러오는 중...</div>;
+  if (error) return <div style={{ color: '#ff7e7e', textAlign: 'center', margin: '32px 0' }}>{error}</div>;
+  if (!notes.length) return <div style={{ color: '#888', textAlign: 'center', margin: '32px 0' }}>등록된 패치노트가 없습니다.</div>;
+
+  return (
+    <div style={{ width: '100%', minWidth: 220, maxWidth: 360 }}>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 18, justifyContent: 'center', flexWrap: 'wrap' }}>
+        {notes.map((note, idx) => (
+          <button
+            key={note._id || idx}
+            onClick={() => setSelected(idx)}
+            style={{
+              background: selected === idx ? '#ffe066' : '#232837',
+              color: selected === idx ? '#232837' : '#ffe066',
+              border: 'none',
+              borderRadius: 8,
+              padding: '7px 12px',
+              fontWeight: 'bold',
+              fontSize: '1.01rem',
+              cursor: 'pointer',
+              boxShadow: selected === idx ? '0 2px 8px #ffe06644' : '0 1px 4px #0002',
+              transition: 'all 0.15s',
+              marginBottom: 2,
+              minWidth: 70,
+            }}
+          >
+            {note.title || (note.createdAt ? new Date(note.createdAt).toLocaleDateString() : '패치노트')}
+          </button>
+        ))}
+      </div>
+      <div className="patchnote-scroll" style={{ background: '#232837', borderRadius: 12, padding: '18px 12px', minHeight: 80, maxHeight: 220, overflowY: 'auto', color: '#ffe066', fontWeight: 500, fontSize: '1.01rem', boxShadow: '0 1px 8px #0002', lineHeight: 1.7 }}>
+        <div style={{ color: '#7ecfff', fontWeight: 'bold', fontSize: '1.08rem', marginBottom: 8 }}>
+          {notes[selected].title} <span style={{ color: '#b3c6e0', fontWeight: 400, fontSize: '0.98em', marginLeft: 8 }}>{notes[selected].createdAt ? new Date(notes[selected].createdAt).toLocaleString() : ''}</span>
+        </div>
+        <div style={{ whiteSpace: 'pre-line', color: '#ffe066', fontSize: '1.01rem' }}>{notes[selected].content}</div>
+      </div>
+    </div>
   );
 } 

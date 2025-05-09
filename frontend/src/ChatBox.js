@@ -281,4 +281,40 @@ function ChatBox({ messages, chatEndRef }) {
   );
 }
 
+export function ChatOnlyBox({ messages }) {
+  const [tab, setTab] = useState('all'); // all, local, whisper
+  const boxRef = useRef(null);
+  const filtered = Array.isArray(messages)
+    ? messages.filter(msg => {
+        if (msg.type !== 'chat') return false;
+        if (tab === 'all') return msg.chatType === 'global'; // 전체: global만
+        if (tab === 'local') return msg.chatType === 'local';
+        if (tab === 'whisper') return msg.chatType === 'whisper';
+        return true;
+      })
+    : [];
+  useEffect(() => {
+    if (boxRef.current) {
+      boxRef.current.scrollTop = boxRef.current.scrollHeight;
+    }
+  }, [filtered]);
+  return (
+    <div style={{ background: '#181c24', borderRadius: 8, padding: 12, marginBottom: 12, boxShadow: '0 2px 8px #0004' }}>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 8, justifyContent: 'center' }}>
+        <button onClick={() => setTab('all')} style={{ background: tab === 'all' ? '#7ecfff' : '#232837', color: tab === 'all' ? '#232837' : '#7ecfff', border: 'none', borderRadius: 6, padding: '4px 12px', fontWeight: 'bold', fontSize: '1.01rem', cursor: 'pointer', transition: 'all 0.15s' }}>전체</button>
+        <button onClick={() => setTab('local')} style={{ background: tab === 'local' ? '#7ecfff' : '#232837', color: tab === 'local' ? '#232837' : '#7ecfff', border: 'none', borderRadius: 6, padding: '4px 12px', fontWeight: 'bold', fontSize: '1.01rem', cursor: 'pointer', transition: 'all 0.15s' }}>지역</button>
+        <button onClick={() => setTab('whisper')} style={{ background: tab === 'whisper' ? '#7ecfff' : '#232837', color: tab === 'whisper' ? '#232837' : '#7ecfff', border: 'none', borderRadius: 6, padding: '4px 12px', fontWeight: 'bold', fontSize: '1.01rem', cursor: 'pointer', transition: 'all 0.15s' }}>귓속말</button>
+      </div>
+      <div ref={boxRef} className="patchnote-scroll" style={{ maxHeight: 130, minHeight: 60, overflowY: 'auto', fontSize: '1.01rem', background: 'none', padding: 0, margin: 0, ...(window.innerWidth <= 600 ? { maxHeight: 160 } : {}) }}>
+        {filtered.length === 0 && <div style={{ color: '#888', textAlign: 'center', marginTop: 16 }}>채팅 메시지가 없습니다.</div>}
+        {filtered.map((msg, i) => (
+          <div key={i} style={{ color: msg.chatType === 'whisper' ? '#2ecc40' : (msg.chatType === 'global' ? '#ffb347' : '#fff'), marginBottom: 4 }}>
+            <span style={{ fontWeight: 'bold' }}>[{msg.chatType === 'global' ? '전체' : msg.chatType === 'local' ? '지역' : '귓속말'}] {msg.name}:</span> {msg.message}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default ChatBox; 

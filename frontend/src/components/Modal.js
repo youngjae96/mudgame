@@ -22,6 +22,14 @@ const ModalContent = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  @media (max-width: 600px) {
+    min-width: 0;
+    max-width: 98vw;
+    min-height: 0;
+    max-height: 90vh;
+    padding: 4vw 2vw;
+    box-sizing: border-box;
+  }
 `;
 
 const ModalClose = styled.button`

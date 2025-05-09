@@ -127,6 +127,7 @@ function sendInventory(player) {
  * 캐릭터(플레이어) 정보 전송
  */
 function sendCharacterInfo(player) {
+  if (typeof player.normalizeHp === 'function') player.normalizeHp();
   // 장비 옵션 합산
   const weapon = player.equipWeapon || {};
   const armor = player.equipArmor || {};
@@ -138,7 +139,7 @@ function sendCharacterInfo(player) {
   const realStr = player.str + strBonus;
   const realDex = player.dex + dexBonus;
   const realInt = player.int + intBonus;
-  const realMaxHp = player.maxHp + hpBonus;
+  const realMaxHp = (typeof player.getRealMaxHp === 'function' ? player.getRealMaxHp() : player.maxHp);
   const realMaxMp = player.maxMp + mpBonus;
   const info = {
     hp: player.hp,

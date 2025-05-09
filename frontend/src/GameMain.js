@@ -1,10 +1,10 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import MiniMap from './MiniMap';
 import RoomInfo from './RoomInfo';
 import RoomItems from './RoomItems';
 import RoomMonsters from './RoomMonsters';
-import ChatBox from './ChatBox';
+import ChatBox, { ChatOnlyBox } from './ChatBox';
 import PlayerList from './PlayerList';
 import CharacterInfo from './CharacterInfo';
 import Button from './components/Button';
@@ -137,27 +137,27 @@ function GameMain({
   handleAttack
 }) {
   const [showHelp, setShowHelp] = useState(false);
+  const [showChatOnly, setShowChatOnly] = useState(false);
+  const [showPatchNote, setShowPatchNote] = useState(false);
 
   const commandList = [
     { cmd: '/전 <메시지>', desc: '전체 채팅(축약)' },
     { cmd: '<메시지>', desc: '지역 채팅(명령어 없이 입력)' },
     { cmd: '/동 /서 /남 /북', desc: '방향 이동(오른쪽/왼쪽/아래/위, 또는 맵 터치)' },
     { cmd: '/누구', desc: '현재 접속중인 플레이어 목록 보기' },
-    { cmd: '/구매 <아이템명>', desc: '아이템 구매' },
-    { cmd: '/판매 <아이템명>', desc: '아이템 판매' },
-    { cmd: '/장착 <아이템명>', desc: '장비 장착 (예: /장착 나무검, 옵션: +공 2)' },
-    { cmd: '/해제 <아이템명>', desc: '장비 해제' },
+    { cmd: '/장착 <아이템명>', desc: '장비 장착' },
+    { cmd: '/해제 무기, /해제 방어구', desc: '장비 해제' },
     { cmd: '/정보', desc: '내 능력치 확인' },
     { cmd: '/정보 <닉네임>', desc: '다른 유저 능력치 확인' },
     { cmd: '/귓 <닉네임> <메시지>', desc: '귓속말(비공개 메시지)' },
+    { cmd: '/귀환', desc: '1번 마을(마을 광장)으로 귀환' },
     { cmd: '/장비', desc: '내 장비 정보' },
     { cmd: '/지도', desc: '전체 맵 보기' },
     { cmd: '/텔포 <지역>', desc: '월드 이동(예: 무인도, 마을)' },
-    { cmd: '/귀환', desc: '1번 마을(마을 광장)으로 귀환' },
+    { cmd: '/길드 <생성|가입|수락|탈퇴|추방|공지|정보|목록|해체(길드장)> ...', desc: '길드 관련 명령어' },
     { cmd: '/랭킹', desc: 'TOP 10 스탯 랭킹' },
     { cmd: '/방명록', desc: '방명록(글 목록/쓰기)' },
     { cmd: '/도움말', desc: '명령어 전체 안내' },
-    { cmd: '/저장', desc: '내 상태 즉시 저장' },
   ];
 
   // 방 아이템 UI 분리
@@ -170,6 +170,13 @@ function GameMain({
     <>
       <MudTitle>
         그리머드RPG
+        <Button
+          variant="secondary"
+          size="sm"
+          style={{ marginLeft: 12, marginRight: 4, verticalAlign: 'middle', padding: '6px 10px', fontSize: '1.18rem', color: '#ffe066' }}
+          aria-label="패치노트"
+          onClick={() => setShowPatchNote(true)}
+        >📢</Button>
         <Button className="logout-btn" onClick={handleLogout}>로그아웃</Button>
       </MudTitle>
       {!connected ? (
@@ -185,6 +192,32 @@ function GameMain({
             )}
           </LeftPanel>
           <ChatSection>
+            {/* 채팅 버튼만 남기고 확성기(패치노트) 버튼은 제거 */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 6, gap: 6 }}>
+              <button
+                type="button"
+                onClick={() => setShowChatOnly(v => !v)}
+                style={{
+                  background: showChatOnly ? '#7ecfff' : '#232837',
+                  color: showChatOnly ? '#232837' : '#7ecfff',
+                  border: 'none',
+                  borderRadius: 6,
+                  padding: '4px 16px',
+                  fontWeight: 'bold',
+                  fontSize: '1.01rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s',
+                  marginBottom: 2,
+                  minWidth: 60,
+                }}
+              >채팅</button>
+            </div>
+            {showPatchNote && (
+              <Modal open={showPatchNote} onClose={() => setShowPatchNote(false)} title="패치노트">
+                <PatchNoteTabs />
+              </Modal>
+            )}
+            {showChatOnly && <ChatOnlyBox messages={messages} />}
             <ChatBox messages={messages} chatEndRef={chatEndRef} />
             <form className="input-form" onSubmit={handleSend} style={{ display: 'flex', alignItems: 'center' }}>
               <Input
@@ -252,7 +285,83 @@ function GameMain({
           </PlayerListPanel>
         </MudMain>
       )}
+      <style>{`
+        .patchnote-scroll {
+          scrollbar-width: thin;
+          scrollbar-color: #7ecfff #23272f;
+        }
+        .patchnote-scroll::-webkit-scrollbar {
+          width: 8px;
+          background: #23272f;
+          border-radius: 8px;
+        }
+        .patchnote-scroll::-webkit-scrollbar-thumb {
+          background: linear-gradient(120deg, #7ecfff 60%, #4fa3e3 100%);
+          border-radius: 8px;
+          min-height: 40px;
+        }
+        .patchnote-scroll::-webkit-scrollbar-thumb:hover {
+          background: #4fa3e3;
+        }
+      `}</style>
     </>
+  );
+}
+
+function PatchNoteTabs() {
+  const [notes, setNotes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selected, setSelected] = useState(0);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch('/api/patchnotes')
+      .then(res => res.json())
+      .then(data => {
+        setNotes(Array.isArray(data) ? data : []);
+        setLoading(false);
+      })
+      .catch(e => { setError('패치노트 불러오기 실패'); setLoading(false); });
+  }, []);
+
+  if (loading) return <div style={{ color: '#aaa', textAlign: 'center', margin: '32px 0' }}>패치노트 불러오는 중...</div>;
+  if (error) return <div style={{ color: '#ff7e7e', textAlign: 'center', margin: '32px 0' }}>{error}</div>;
+  if (!notes.length) return <div style={{ color: '#888', textAlign: 'center', margin: '32px 0' }}>등록된 패치노트가 없습니다.</div>;
+
+  return (
+    <div style={{ width: '100%', minWidth: 320, maxWidth: 480 }}>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 18, justifyContent: 'center', flexWrap: 'wrap' }}>
+        {notes.map((note, idx) => (
+          <button
+            key={note._id || idx}
+            onClick={() => setSelected(idx)}
+            style={{
+              background: selected === idx ? '#ffe066' : '#232837',
+              color: selected === idx ? '#232837' : '#ffe066',
+              border: 'none',
+              borderRadius: 8,
+              padding: '7px 18px',
+              fontWeight: 'bold',
+              fontSize: '1.04rem',
+              cursor: 'pointer',
+              boxShadow: selected === idx ? '0 2px 8px #ffe06644' : '0 1px 4px #0002',
+              transition: 'all 0.15s',
+              marginBottom: 2,
+              minWidth: 90,
+            }}
+          >
+            {note.title || (note.createdAt ? new Date(note.createdAt).toLocaleDateString() : '패치노트')}
+          </button>
+        ))}
+      </div>
+      <div className="patchnote-scroll" style={{ background: '#232837', borderRadius: 12, padding: '22px 18px', minHeight: 120, maxHeight: 300, overflowY: 'auto', color: '#ffe066', fontWeight: 500, fontSize: '1.08rem', boxShadow: '0 1px 8px #0002', lineHeight: 1.7 }}>
+        <div style={{ color: '#7ecfff', fontWeight: 'bold', fontSize: '1.13rem', marginBottom: 8 }}>
+          {notes[selected].title} <span style={{ color: '#b3c6e0', fontWeight: 400, fontSize: '0.98em', marginLeft: 8 }}>{notes[selected].createdAt ? new Date(notes[selected].createdAt).toLocaleString() : ''}</span>
+        </div>
+        <div style={{ whiteSpace: 'pre-line', color: '#ffe066', fontSize: '1.07rem' }}>{notes[selected].content}</div>
+      </div>
+    </div>
   );
 }
 

@@ -9,6 +9,11 @@ const MinimapWrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: 2px;
+  @media (max-width: 600px) {
+    overflow: auto;
+    max-width: 96vw;
+    max-height: 80vh;
+  }
 `;
 const MinimapRow = styled.div`
   display: flex;
@@ -17,6 +22,11 @@ const MinimapRow = styled.div`
 const MinimapCell = styled.div`
   width: ${({ $isCave }) => $isCave ? '16px' : '32px'};
   height: ${({ $isCave }) => $isCave ? '16px' : '32px'};
+  @media (max-width: 600px) {
+    width: ${({ $isCave }) => $isCave ? '10px' : '18px'};
+    height: ${({ $isCave }) => $isCave ? '10px' : '18px'};
+    font-size: ${({ $isCave }) => $isCave ? '0.6rem' : '0.9rem'};
+  }
   background: ${({ $cellType, $isCave, $caveZone }) => {
     if ($isCave) {
       if ($caveZone === 'entrance') return '#b3d8ff'; // 밝은 파랑(입구)
@@ -33,7 +43,6 @@ const MinimapCell = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: ${({ $isCave }) => $isCave ? '0.85rem' : '1.3rem'};
   color: ${({ $isCave, $caveZone }) => $isCave && $caveZone === 'deep' ? '#b8860b' : $isCave && $caveZone === 'middle' ? '#ffe066' : '#181c24'};
   cursor: default;
   border: 2px solid ${({ $isCave, $caveZone }) => {

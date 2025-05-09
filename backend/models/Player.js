@@ -15,7 +15,6 @@ class Player {
     this.position = { ...VILLAGE_POS };
     this.inventory = [];
     this.hp = 30;
-    this.maxHp = 30;
     this.mp = 10;
     this.maxMp = 10;
     this.str = 5;
@@ -43,7 +42,6 @@ class Player {
       this.strExp -= this.strExpMax;
       this.str++;
       this.strExpMax = calcNextStatExp(this.strExpMax);
-      this.maxHp += 2;
     }
   }
 
@@ -53,7 +51,6 @@ class Player {
       this.dexExp -= this.dexExpMax;
       this.dex++;
       this.dexExpMax = calcNextStatExp(this.dexExpMax);
-      this.maxHp += 1;
     }
   }
 
@@ -64,6 +61,7 @@ class Player {
       this.int++;
       this.intExpMax = calcNextStatExp(this.intExpMax);
       this.maxMp += 2;
+      this.hp = Math.min(this.hp, this.getRealMaxHp());
     }
   }
 
@@ -73,6 +71,7 @@ class Player {
     } else if (item.type === ITEM_TYPE.ARMOR) {
       this.equipArmor = item;
     }
+    this.hp = Math.min(this.hp, this.getRealMaxHp());
   }
 
   unequipItem(type) {
@@ -81,6 +80,7 @@ class Player {
     } else if (type === ITEM_TYPE.ARMOR) {
       this.equipArmor = null;
     }
+    this.hp = Math.min(this.hp, this.getRealMaxHp());
   }
 
   // 실제 전투/표시에는 getAtk()만 사용할 것
@@ -89,7 +89,7 @@ class Player {
     if (this.equipWeapon && zeroAtkWeapons.includes(this.equipWeapon.name)) {
       return 0;
     }
-    let base = 2 + this.str * 1.5 + this.dex * 0.5;
+    let base = 2 + this.str * 1.5 + this.dex * 0.5 + this.int * 0.3;
     if (this.equipWeapon) {
       base += this.equipWeapon.atk || 0;
       base += (this.equipWeapon.str || 0) * 1.5;
@@ -100,7 +100,7 @@ class Player {
 
   // 실제 전투/표시에는 getDef()만 사용할 것
   getDef() {
-    let base = 1 + this.dex * 1.2 + this.str * 0.3;
+    let base = 1 + this.dex * 1.2 + this.str * 0.3 + this.int * 0.2;
     if (this.equipArmor) {
       base += this.equipArmor.def || 0;
       base += (this.equipArmor.dex || 0) * 1.2;
@@ -109,16 +109,25 @@ class Player {
     return Math.floor(base);
   }
 
+  getRealMaxHp() {
+    const weapon = this.equipWeapon || {};
+    const armor = this.equipArmor || {};
+    const hpBonus = (weapon.hp || 0) + (armor.hp || 0);
+    let base = 30 + this.str * 2 + this.dex * 1 + this.int * 0.5 + hpBonus;
+    return Math.floor(base);
+  }
+
   autoUsePotion() {
-    if (this.hp > 0 && this.hp < this.maxHp) {
+    const maxHp = this.getRealMaxHp();
+    if (this.hp > 0 && this.hp < maxHp) {
       const potionIdx = this.inventory.findIndex(
         (item) => item.type === ITEM_TYPE.CONSUMABLE && item.perUse && item.total > 0
       );
       if (potionIdx !== -1) {
         const potion = this.inventory[potionIdx];
-        const needHeal = this.maxHp - this.hp;
+        const needHeal = maxHp - this.hp;
         const healAmount = Math.min(potion.perUse, potion.total, needHeal);
-        this.hp = Math.min(this.maxHp, this.hp + healAmount);
+        this.hp = Math.min(maxHp, this.hp + healAmount);
         potion.total -= healAmount;
         if (potion.total <= 0) {
           this.inventory.splice(potionIdx, 1);
@@ -137,16 +146,50 @@ class Player {
     );
   }
 
-  addToInventory(item) {
-    this.inventory.push(item);
-    if (this.inventory.length > 50) {
-      this.inventory = this.inventory.slice(-50);
+  addToInventory(item, ws) {
+    // 중첩 소모품(잡화/consumable)일 경우 count 50개 제한
+    if ((item.type === ITEM_TYPE.CONSUMABLE || item.type === '잡화' || (item.type && item.type.toLowerCase() === 'consumable')) && item.name) {
+      const existing = this.inventory.find(i => i.name === item.name && (i.type === ITEM_TYPE.CONSUMABLE || i.type === '잡화' || (i.type && i.type.toLowerCase() === 'consumable')));
+      if (existing) {
+        const curCount = existing.count || 1;
+        if (curCount >= 50) {
+          if (ws) {
+            ws.send(
+              JSON.stringify({
+                type: 'system',
+                subtype: 'error',
+                message: `${item.name}은(는) 최대 50개까지만 보유할 수 있습니다.`
+              })
+            );
+          }
+          return false;
+        }
+      }
     }
+    if (this.inventory.length >= 50) {
+      if (ws) {
+        ws.send(
+          JSON.stringify({
+            type: 'system',
+            subtype: 'error',
+            message: '인벤토리는 최대 50개까지만 보관할 수 있습니다.'
+          })
+        );
+      }
+      return false;
+    }
+    this.inventory.push(item);
+    return true;
   }
 
   // 인벤토리 내 모든 무기의 expBonus를 곱해서 반환 → 장착한 무기만 적용
   getTotalExpBonus() {
     return this.equipWeapon && this.equipWeapon.expBonus ? this.equipWeapon.expBonus : 1;
+  }
+
+  normalizeHp() {
+    const maxHp = this.getRealMaxHp();
+    if (this.hp > maxHp) this.hp = maxHp;
   }
 }
 

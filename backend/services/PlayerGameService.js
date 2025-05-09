@@ -181,10 +181,9 @@ const PlayerGameService = {
     const idx = room.items.findIndex((item) => item.id === itemId);
     if (idx !== -1) {
       const [item] = room.items.splice(idx, 1);
-      player.inventory.push(item);
-      // PlayerData 저장 전 인벤토리 50개 제한
-      if (player.inventory && player.inventory.length > 50) {
-        player.inventory = player.inventory.slice(-50);
+      const addSuccess = player.addToInventory(item, ws);
+      if (!addSuccess) {
+        return;
       }
       await savePlayerData(playerName);
       await sendRoomInfoToAllInRoom(PlayerManager.getAllPlayers(), player.world, player.position.x, player.position.y, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
@@ -340,7 +339,7 @@ const PlayerGameService = {
     const realStr = player.str + strBonus;
     const realDex = player.dex + dexBonus;
     const realInt = player.int + intBonus;
-    const realHp = player.maxHp + hpBonus;
+    const realHp = player.getRealMaxHp();
     const realMp = player.maxMp + mpBonus;
     const statMsg =
       `[능력치]\n` +

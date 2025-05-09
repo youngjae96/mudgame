@@ -51,9 +51,14 @@ const InventoryLi = styled.li`
 `;
 
 function Inventory({ inventory, gold }) {
+  // 슬롯(종류) 개수
+  const slotCount = inventory ? inventory.length : 0;
+
   return (
     <InventoryWrapper>
-      <InventoryTitle>내 인벤토리</InventoryTitle>
+      <InventoryTitle>
+        내 인벤토리 <span style={{ color: '#ffe066', fontWeight: 400 }}>({slotCount}/50)</span>
+      </InventoryTitle>
       <div style={{ color: '#ffe066', fontWeight: 'bold', marginBottom: 6 }}>골드: {gold} G</div>
       {(!inventory || inventory.length === 0) ? (
         <InventoryEmpty>인벤토리가 비어 있습니다.</InventoryEmpty>

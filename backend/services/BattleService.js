@@ -84,17 +84,25 @@ class BattleService {
             // 디버깅용 로그 추가
             // console.log('[드랍시도]', { itemName, found, inventoryLen: player.inventory.length });
             if (found) {
-              player.inventory.push({ ...found });
-              log.push({
-                type: 'system',
-                subtype: 'event',
-                message: `${monster.name}이(가) ${itemName}을(를) 드랍!`
-              });
-              log.push({
-                type: 'system',
-                subtype: 'error',
-                message: `${itemName}을(를) 획득했습니다!`
-              });
+              const addSuccess = player.addToInventory({ ...found }, player.ws);
+              if (addSuccess) {
+                log.push({
+                  type: 'system',
+                  subtype: 'event',
+                  message: `${monster.name}이(가) ${itemName}을(를) 드랍!`
+                });
+                log.push({
+                  type: 'system',
+                  subtype: 'error',
+                  message: `${itemName}을(를) 획득했습니다!`
+                });
+              } else {
+                log.push({
+                  type: 'system',
+                  subtype: 'error',
+                  message: `인벤토리가 가득 차서 ${itemName}을(를) 획득하지 못했습니다.`
+                });
+              }
             } else {
               // console.log('[드랍실패]', { itemName });
             }
@@ -112,7 +120,7 @@ class BattleService {
         action: 'counter',
         value: monsterDmg,
         playerHp: Math.max(player.hp,0),
-        playerMaxHp: player.maxHp,
+        playerMaxHp: player.getRealMaxHp(),
         text: `${monster.name}의 반격!`,
       });
       // 자동 물약 사용 (Player 메서드 활용)
