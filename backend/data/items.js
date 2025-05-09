@@ -70,10 +70,10 @@ const FOREST_MONSTERS = [
   { name: '엘프 전사', maxHp: 60, atk: 20, def: 9, gold: 14 }
 ];
 const CAVE_MONSTERS = [
-  { name: '암흑 미노타우로스', maxHp: 700, atk: 110, def: 60, gold: 155 },
-  { name: '동굴 리치', maxHp: 720, atk: 112, def: 62, gold: 160 },
-  { name: '지하 괴수', maxHp: 750, atk: 120, def: 68, gold: 170 },
-  { name: '암석 골렘', maxHp: 680, atk: 108, def: 58, gold: 165 },
+  { name: '암흑 미노타우로스', maxHp: 130, atk: 28, def: 16, gold: 22 },
+  { name: '동굴 리치', maxHp: 110, atk: 32, def: 14, gold: 20 },
+  { name: '지하 괴수', maxHp: 150, atk: 25, def: 20, gold: 25 },
+  { name: '암석 골렘', maxHp: 120, atk: 22, def: 25, gold: 19 },
 ];
 
 const SHOP_ITEMS = {

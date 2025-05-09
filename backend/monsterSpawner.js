@@ -11,9 +11,12 @@ function respawnMonster(world, x, y, getRoom, FIELD_MONSTERS, FOREST_MONSTERS, C
         let pool = FIELD_MONSTERS;
         if (room.type === ROOM_TYPE.FOREST) pool = FOREST_MONSTERS;
         if (room.type === ROOM_TYPE.CAVE) {
-          // 동굴(월드3)에서는 CAVE_MONSTERS + CAVE_BOSS_MONSTERS만 스폰
-          const { CAVE_BOSS_MONSTERS } = require('./data/items');
-          pool = CAVE_MONSTERS.concat(CAVE_BOSS_MONSTERS);
+          if (world === 3) {
+            const { CAVE_BOSS_MONSTERS } = require('./data/items');
+            pool = CAVE_BOSS_MONSTERS;
+          } else {
+            pool = CAVE_MONSTERS;
+          }
         }
         if (room.type !== ROOM_TYPE.VILLAGE) {
           const m = new Monster(pool[Math.floor(Math.random() * pool.length)], x, y);
