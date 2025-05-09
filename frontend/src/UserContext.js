@@ -17,13 +17,14 @@ export function UserProvider({ children }) {
     setLoading(true);
     try {
       const res = await apiLogin(username, password);
-      if (res.data.success && res.data.token) {
-        localStorage.setItem('jwtToken', res.data.token);
-        setToken(res.data.token);
+      if (res.data.success && res.data.accessToken && res.data.refreshToken) {
+        localStorage.setItem('jwtToken', res.data.accessToken);
+        localStorage.setItem('refreshToken', res.data.refreshToken);
+        setToken(res.data.accessToken);
         setIsLoggedIn(true);
         setUser({ name: username });
-        await fetchUserInfo(res.data.token);
-        await fetchInventory(res.data.token);
+        await fetchUserInfo(res.data.accessToken);
+        await fetchInventory(res.data.accessToken);
       }
     } catch (e) {
       setAuthError(e.response?.data?.error || '로그인 실패');
@@ -51,6 +52,7 @@ export function UserProvider({ children }) {
   // 로그아웃
   const logout = () => {
     localStorage.removeItem('jwtToken');
+    localStorage.removeItem('refreshToken');
     setToken('');
     setIsLoggedIn(false);
     setUser(null);

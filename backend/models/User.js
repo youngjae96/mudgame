@@ -7,5 +7,6 @@ const UserSchema = new mongoose.Schema({
   lastLoginIp: { type: String },
   lastLoginAt: { type: Date },
   banned: { type: Boolean, default: false },
+  refreshToken: { type: String },
 });
 module.exports = mongoose.model('User', UserSchema); 

@@ -86,11 +86,31 @@ router.post('/login', async (req, res) => {
   if (user.banned) return res.status(403).json({ error: '이 계정은 차단되어 로그인할 수 없습니다.' });
   const ok = await bcrypt.compare(password, user.password);
   if (!ok) return res.status(400).json({ error: '비밀번호가 일치하지 않습니다.' });
-  const token = jwt.sign({ userId: user._id, username: user.username }, SECRET, { expiresIn: '7d' });
+  // Access Token: 1시간, Refresh Token: 7일
+  const accessToken = jwt.sign({ userId: user._id, username: user.username }, SECRET, { expiresIn: '1h' });
+  const refreshToken = jwt.sign({ userId: user._id, username: user.username }, SECRET, { expiresIn: '7d' });
   user.lastLoginIp = ip;
   user.lastLoginAt = new Date();
+  user.refreshToken = refreshToken;
   await user.save();
-  res.json({ success: true, token });
+  res.json({ success: true, accessToken, refreshToken });
+});
+
+// Refresh Token으로 Access Token 재발급
+router.post('/refresh', async (req, res) => {
+  const { refreshToken } = req.body;
+  if (!refreshToken) return res.status(400).json({ error: 'Refresh Token이 필요합니다.' });
+  let decoded;
+  try {
+    decoded = jwt.verify(refreshToken, SECRET);
+  } catch (e) {
+    return res.status(401).json({ error: '유효하지 않은 Refresh Token입니다.' });
+  }
+  const user = await User.findOne({ _id: decoded.userId, refreshToken });
+  if (!user) return res.status(401).json({ error: '유효하지 않은 Refresh Token입니다.' });
+  // 새 Access Token 발급 (1시간)
+  const accessToken = jwt.sign({ userId: user._id, username: user.username }, SECRET, { expiresIn: '1h' });
+  res.json({ success: true, accessToken });
 });
 
 // JWT 인증 테스트용 엔드포인트
