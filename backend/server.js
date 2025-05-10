@@ -235,6 +235,7 @@ const commandHandlers = {
     return require('./commands').handleClanHealCommand({ ...args, player, battleIntervals });
   },
   '/공지쓰기': (args) => require('./commands').handleNoticeWriteCommand(args),
+  '/방명록': (args) => require('./commands').handleGuestbookCommand(args),
 };
 
 // 서비스 인스턴스 생성 및 의존성 주입

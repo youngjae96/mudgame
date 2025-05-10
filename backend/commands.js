@@ -13,6 +13,7 @@ const PlayerGameService = require('./services/PlayerGameService');
 const { getRoom } = require('./data/map');
 const { SHOP_ITEMS } = require('./data/items');
 const PlayerData = require('./models/PlayerData');
+const Guestbook = require('./models/Guestbook');
 
 let shopServiceInstance = null;
 
@@ -593,7 +594,7 @@ async function handleHelpCommand({ ws }) {
     '/텔포 <지역> : 월드 이동(예: 무인도, 마을)',
     '/길드 <생성|가입|수락|탈퇴|추방|공지|정보|목록|해체(길드장)> ... : 길드 관련 명령어',
     '/랭킹 : TOP 10 스탯 랭킹',
-    '/방명록 : 방명록(글 목록/쓰기)',
+    '/방명록 : 방명록 보기',
     '/도움말 : 명령어 전체 안내',
   ].join('\n');
   ws.send(JSON.stringify({ type: 'system', message: msg }));
@@ -643,7 +644,7 @@ async function handleStatCommand({ ws, playerName, message, players }) {
   const statMsg =
     `[능력치: ${targetName}]\n` +
     `HP  : ${target.hp} / ${maxHp}    MP  : ${target.mp} / ${target.maxMp}\n` +
-    `STR : ${target.str} (Exp: ${Number(target.strExp).toFixed(2)}/${Number(target.strExpMax).toFixed(2)})   DEX: ${target.dex} (Exp: ${Number(target.dexExp).toFixed(2)}/${Number(target.dexExpMax).toFixed(2)})   INT: ${target.int} (Exp: ${Number(target.intExp).toFixed(2)}/${Number(target.intExpMax).toFixed(2)})\n` +
+    `STR : ${target.str} (Exp: ${Number(target.strExp).toFixed(2)}/${Number(target.strExpMax).toFixed(2)})   DEX: ${target.dex} (Exp: ${Number(target.dexExp).toFixed(2)}/${Number(target.dexExpMax).toFixed(2)})\n` +
     `공격력: ${target.getAtk ? target.getAtk() : target.atk}   방어력: ${target.getDef ? target.getDef() : target.def}`;
   ws.send(JSON.stringify({ type: 'system', subtype: 'info', message: statMsg }));
 }
@@ -759,6 +760,62 @@ async function handleClanHealCommand({ ws, player, battleIntervals }) {
   }
 }
 
+// /방명록: 방명록 목록 조회/글쓰기
+const guestbookCooldown = {};
+async function handleGuestbookCommand({ ws, playerName, message, players }) {
+  const usage = '\n[방명록 사용법]\n/방명록 [페이지] : 방명록 목록(페이지네이션)\n/방명록 내용 : 글쓰기 (200자, 30초 쿨타임)';
+  const args = message.trim().split(' ');
+  let page = 1;
+  let isWrite = false;
+  let content = '';
+  if (args.length === 1) {
+    page = 1;
+  } else if (args.length === 2 && /^\d+$/.test(args[1])) {
+    page = parseInt(args[1], 10);
+  } else {
+    isWrite = true;
+    content = args.slice(1).join(' ').trim();
+  }
+
+  if (!isWrite) {
+    const PAGE_SIZE = 10;
+    const total = await Guestbook.countDocuments({ type: 'guestbook' });
+    const maxPage = Math.max(1, Math.ceil(total / PAGE_SIZE));
+    page = Math.max(1, Math.min(page, maxPage));
+    const list = await Guestbook.find({ type: 'guestbook' })
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * PAGE_SIZE)
+      .limit(PAGE_SIZE);
+    let msg = usage + '\n';
+    if (!list.length) {
+      msg += '[방명록] 등록된 글이 없습니다.';
+    } else {
+      msg += `[방명록] (페이지 ${page}/${maxPage})\n` + list.map(e => `${e.name}: ${e.message} (${e.createdAt.toLocaleString('ko-KR', { hour12: false })})`).join('\n');
+    }
+    ws.send(JSON.stringify({ type: 'system', message: msg }));
+    return;
+  } else {
+    if (!content) {
+      ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: usage + '\n[방명록] 내용을 입력하세요. (/방명록 내용)' }));
+      return;
+    }
+    if (content.length > 200) {
+      ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: usage + '\n[방명록] 200자 이내로 입력하세요.' }));
+      return;
+    }
+    const now = Date.now();
+    if (guestbookCooldown[playerName] && now - guestbookCooldown[playerName] < 30000) {
+      const left = ((30000 - (now - guestbookCooldown[playerName])) / 1000).toFixed(1);
+      ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: usage + `\n[방명록] ${left}초 후 다시 작성할 수 있습니다.` }));
+      return;
+    }
+    guestbookCooldown[playerName] = now;
+    await Guestbook.create({ name: playerName, message: content });
+    ws.send(JSON.stringify({ type: 'system', message: usage + '\n[방명록] 글이 등록되었습니다.' }));
+    return;
+  }
+}
+
 // 명령어 핸들러 등록
 const commandHandlers = {
   '/정보': handleStatCommand,
@@ -780,6 +837,7 @@ const commandHandlers = {
   '/랭킹': handleRankingCommand,
   '/클랜힐': handleClanHealCommand,
   '/운영자': handleAdminCommand,
+  '/방명록': handleGuestbookCommand,
 };
 
 module.exports = {
@@ -801,4 +859,5 @@ module.exports = {
   handleReturnCommand,
   handleRankingCommand,
   handleClanHealCommand,
+  handleGuestbookCommand,
 }; 

@@ -310,31 +310,48 @@ function GameMain({
 
 function PatchNoteTabs() {
   const [notes, setNotes] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [selected, setSelected] = useState(0);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    setLoading(true);
-    fetch('/api/patchnotes')
-      .then(res => res.json())
-      .then(data => {
-        setNotes(Array.isArray(data) ? data : []);
-        setLoading(false);
+    fetch('/readme.txt')
+      .then(res => res.text())
+      .then(text => {
+        // ---로 구분된 블록 분리
+        const blocks = text.split(/^-{3,}$/m).map(b => b.trim()).filter(Boolean);
+        const notesArr = blocks.map(block => {
+          const lines = block.split('\n');
+          return {
+            title: lines[0],
+            content: lines.slice(1).join('\n').trim()
+          };
+        });
+        setNotes(notesArr);
       })
-      .catch(e => { setError('패치노트 불러오기 실패'); setLoading(false); });
+      .catch(() => setError('패치노트 불러오기 실패'));
   }, []);
 
-  if (loading) return <div style={{ color: '#aaa', textAlign: 'center', margin: '32px 0' }}>패치노트 불러오는 중...</div>;
   if (error) return <div style={{ color: '#ff7e7e', textAlign: 'center', margin: '32px 0' }}>{error}</div>;
-  if (!notes.length) return <div style={{ color: '#888', textAlign: 'center', margin: '32px 0' }}>등록된 패치노트가 없습니다.</div>;
+  if (!notes.length) return <div style={{ color: '#aaa', textAlign: 'center', margin: '32px 0' }}>패치노트 불러오는 중...</div>;
 
   return (
-    <div style={{ width: '100%', minWidth: 320, maxWidth: 480 }}>
-      <div style={{ display: 'flex', gap: 8, marginBottom: 18, justifyContent: 'center', flexWrap: 'wrap' }}>
+    <div style={{ width: '100%', minWidth: 220, maxWidth: 480 }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: 8,
+          marginBottom: 18,
+          justifyContent: 'center',
+          flexWrap: 'nowrap',
+          overflowX: 'auto',
+          whiteSpace: 'nowrap',
+          scrollbarWidth: 'thin',
+          scrollbarColor: '#7ecfff #23272f',
+        }}
+      >
         {notes.map((note, idx) => (
           <button
-            key={note._id || idx}
+            key={idx}
             onClick={() => setSelected(idx)}
             style={{
               background: selected === idx ? '#ffe066' : '#232837',
@@ -348,17 +365,15 @@ function PatchNoteTabs() {
               boxShadow: selected === idx ? '0 2px 8px #ffe06644' : '0 1px 4px #0002',
               transition: 'all 0.15s',
               marginBottom: 2,
-              minWidth: 90,
+              minWidth: 120,
+              whiteSpace: 'nowrap',
             }}
           >
-            {note.title || (note.createdAt ? new Date(note.createdAt).toLocaleDateString() : '패치노트')}
+            {note.title}
           </button>
         ))}
       </div>
       <div className="patchnote-scroll" style={{ background: '#232837', borderRadius: 12, padding: '22px 18px', minHeight: 120, maxHeight: 300, overflowY: 'auto', color: '#ffe066', fontWeight: 500, fontSize: '1.08rem', boxShadow: '0 1px 8px #0002', lineHeight: 1.7 }}>
-        <div style={{ color: '#7ecfff', fontWeight: 'bold', fontSize: '1.13rem', marginBottom: 8 }}>
-          {notes[selected].title} <span style={{ color: '#b3c6e0', fontWeight: 400, fontSize: '0.98em', marginLeft: 8 }}>{notes[selected].createdAt ? new Date(notes[selected].createdAt).toLocaleString() : ''}</span>
-        </div>
         <div style={{ whiteSpace: 'pre-line', color: '#ffe066', fontSize: '1.07rem' }}>{notes[selected].content}</div>
       </div>
     </div>
