@@ -95,11 +95,18 @@ class ShopService {
       foundItem = SHOP_ITEMS[cat].find((item) => item.name === itemName);
       if (foundItem) break;
     }
-    // 천공의 갑옷/검은 ITEM_POOL에서 찾아서 판매 허용
-    if (!foundItem && (itemName === '천공의 갑옷' || itemName === '천공의 검')) {
-      const { ITEM_POOL } = require('../data/items');
-      if (Array.isArray(ITEM_POOL)) {
-        foundItem = ITEM_POOL.find(i => i.name === itemName);
+    // 무인도 드랍템(플레임/서리/용/암흑/천공 시리즈)도 ITEM_POOL에서 찾아 판매 허용
+    if (!foundItem) {
+      const ISLAND_DROP_ITEMS = [
+        '플레임소드', '플레임아머', '서리검', '서리갑옷',
+        '용의 검', '용의 갑옷', '암흑검', '암흑갑옷',
+        '천공의 갑옷', '천공의 검'
+      ];
+      if (ISLAND_DROP_ITEMS.includes(itemName)) {
+        const { ITEM_POOL } = require('../data/items');
+        if (Array.isArray(ITEM_POOL)) {
+          foundItem = ITEM_POOL.find(i => i.name === itemName);
+        }
       }
     }
     if (!foundItem || !foundItem.price) {

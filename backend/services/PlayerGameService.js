@@ -438,9 +438,13 @@ const PlayerGameService = {
     const args = message ? message.trim().split(' ').slice(1) : [];
     const page = Math.max(1, parseInt(args[0] || '1', 10));
     // 인벤토리 내 판매 가능한 아이템만 필터링
+    const ISLAND_DROP_ITEMS = [
+      '플레임소드', '플레임아머', '서리검', '서리갑옷',
+      '용의 검', '용의 갑옷', '암흑검', '암흑갑옷',
+      '천공의 갑옷', '천공의 검'
+    ];
     const sellable = player.inventory.filter(invItem => {
-      // 천공의 갑옷/검은 무조건 판매 가능
-      if (invItem.name === '천공의 갑옷' || invItem.name === '천공의 검') return true;
+      if (ISLAND_DROP_ITEMS.includes(invItem.name)) return true;
       return Object.values(SHOP_ITEMS).flat().some(shopItem => shopItem.name === invItem.name);
     });
     const itemsPerPage = 7;

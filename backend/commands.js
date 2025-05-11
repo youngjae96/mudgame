@@ -1,7 +1,7 @@
 // 명령어 핸들러 모듈
 // 필요한 의존성은 인자로 주입받도록 설계
 
-const { ITEM_TYPE } = require('./data/items');
+const { ITEM_TYPE, ITEM_POOL, SHOP_ITEMS } = require('./data/items');
 const { ISLAND_VILLAGE_POS, ISLAND2_VILLAGE_POS } = require('./data/map');
 const PlayerController = require('./controllers/PlayerController');
 const ShopService = require('./services/ShopService');
@@ -11,7 +11,6 @@ const { sendRoomInfoToAllInRoom, broadcast } = require('./utils/broadcast');
 const Guild = require('./models/Guild');
 const PlayerGameService = require('./services/PlayerGameService');
 const { getRoom } = require('./data/map');
-const { SHOP_ITEMS } = require('./data/items');
 const PlayerData = require('./models/PlayerData');
 const Guestbook = require('./models/Guestbook');
 
