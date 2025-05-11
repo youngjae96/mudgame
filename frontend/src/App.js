@@ -184,7 +184,9 @@ function AppInner() {
               mapInfo={mapInfo}
               handleMove={handleMove}
               nearbyRooms={nearbyRooms}
-              messages={messages}
+              chatLogMessages={chatLogMessages}
+              guildChatLogMessages={guildChatLogMessages}
+              allMessages={allMessages}
               chatEndRef={chatEndRef}
               handleSend={handleSend}
               input={input}

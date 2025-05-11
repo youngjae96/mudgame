@@ -126,11 +126,13 @@ const MobileContent = styled(MobilePanel)`
 
 export default function GameMobileMain({
   room, mapSize, mapInfo, handleMove, nearbyRooms,
-  messages, chatEndRef, handleSend, input, setInput,
+  chatLogMessages, guildChatLogMessages, chatEndRef, handleSend, input, setInput,
+  allMessages,
   UI_LABELS, name, character, inventory, handlePickup, handleAttack, handleLogout
 }) {
   // 탭 상태: room(방정보), info(내정보), inv(인벤), chat(채팅)
   const [tab, setTab] = useState('room');
+  const [chatTab, setChatTab] = useState('all');
   const [showPatchNote, setShowPatchNote] = useState(false);
 
   // 방 아이템/몬스터 렌더 함수
@@ -171,11 +173,15 @@ export default function GameMobileMain({
           {tab === 'room' && <RoomInfo room={room} renderRoomItems={renderRoomItems} renderRoomMonsters={renderRoomMonsters} />}
           {tab === 'info' && <CharacterInfo name={name} room={room} character={character} />}
           {tab === 'inv' && <Inventory inventory={inventory} gold={character?.gold} />}
-          {tab === 'chat' && <ChatOnlyBox messages={messages} />}
+          {tab === 'chat' && <ChatOnlyBox
+            messages={chatTab === 'guild' ? guildChatLogMessages : (chatTab === 'all' ? allMessages : chatLogMessages)}
+            tab={chatTab}
+            setTab={setChatTab}
+          />}
         </MobileContent>
         <MobileChat>
           <MobileChatMessages>
-            <ChatBox messages={messages} chatEndRef={chatEndRef} />
+            <ChatBox messages={allMessages} chatEndRef={chatEndRef} />
           </MobileChatMessages>
           <MobileChatInput onSubmit={handleSend} autoComplete="off">
             <Input
