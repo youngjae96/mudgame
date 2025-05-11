@@ -3,8 +3,8 @@ const http = require('http');
 const { WebSocketServer } = require('ws');
 const cors = require('cors');
 const Player = require('./models/Player');
-const { ITEM_POOL, FIELD_MONSTERS, FOREST_MONSTERS, CAVE_MONSTERS, SHOP_ITEMS, ISLAND_MONSTERS } = require('./data/items');
-const { MAP_SIZE, VILLAGE_POS, rooms, getRoom, roomsIsland, ISLAND_VILLAGE_POS, roomsCave, MAP_SIZE_CAVE } = require('./data/map');
+const { ITEM_POOL, FIELD_MONSTERS, FOREST_MONSTERS, CAVE_MONSTERS, SHOP_ITEMS, ISLAND_MONSTERS, ISLAND2_MONSTERS } = require('./data/items');
+const { MAP_SIZE, VILLAGE_POS, rooms, getRoom, roomsIsland, ISLAND_VILLAGE_POS, roomsCave, MAP_SIZE_CAVE, roomsIsland2, ISLAND2_VILLAGE_POS } = require('./data/map');
 const Monster = require('./models/Monster');
 const {
   broadcast,
@@ -50,6 +50,7 @@ const PlayerService = require('./services/PlayerService');
 const { setupCommands } = require('./commands');
 const PlayerGameService = require('./services/PlayerGameService');
 const Guild = require('./models/Guild');
+const ChatLog = require('./models/ChatLog');
 
 const app = express();
 app.use(cors());
@@ -162,6 +163,13 @@ function respawnMonsterWithDeps(world, x, y) {
       CAVE_MONSTERS, CAVE_MONSTERS, CAVE_MONSTERS, Monster,
       getPlayersInRoom, sendRoomInfo, MAP_SIZE_CAVE, { x: 0, y: 9 }, PlayerManager.getAllPlayers()
     );
+  } else if (world === 4) {
+    respawnMonster(
+      world, x, y,
+      getRoom,
+      ISLAND2_MONSTERS, ISLAND2_MONSTERS, ISLAND2_MONSTERS, Monster,
+      getPlayersInRoom, sendRoomInfo, MAP_SIZE, ISLAND2_VILLAGE_POS, PlayerManager.getAllPlayers()
+    );
   } else {
     respawnMonster(
       world, x, y,
@@ -236,6 +244,7 @@ const commandHandlers = {
   },
   '/공지쓰기': (args) => require('./commands').handleNoticeWriteCommand(args),
   '/방명록': (args) => require('./commands').handleGuestbookCommand(args),
+  '/길': (args) => require('./commands').handleGuildChatCommand(args),
 };
 
 // 서비스 인스턴스 생성 및 의존성 주입
@@ -352,6 +361,17 @@ wss.on('connection', (ws) => {
           // 공지 전송
           if (global.currentNotice) {
             ws.send(JSON.stringify({ type: 'notice', notice: global.currentNotice }));
+          }
+          // 최근 100개 전체채팅 전송
+          const recentChats = await ChatLog.find({ chatType: 'global' }).sort({ time: -1 }).limit(100).lean();
+          ws.send(JSON.stringify({ type: 'chatLog', log: recentChats.reverse() }));
+          // 길드채팅 로그 전송 (길드 있을 때만)
+          if (player.guildName) {
+            const guild = await Guild.findOne({ name: player.guildName });
+            if (guild && Array.isArray(guild.chatLog)) {
+              const guildChats = guild.chatLog.slice(-100);
+              ws.send(JSON.stringify({ type: 'guildChatLog', log: guildChats }));
+            }
           }
         })();
       } else if (data.type === 'chat') {

@@ -127,6 +127,11 @@ const WhisperMsg = styled.div`
   color: #2ecc40;
   font-weight: bold;
 `;
+const GuildChatMsg = styled.div`
+  margin-bottom: 4px;
+  color: #ff66cc;
+  font-weight: bold;
+`;
 
 function getBattleIcon(subtype) {
   switch (subtype) {
@@ -219,6 +224,9 @@ function DefaultChatMessage({ msg }) {
   }
   return <ChatMsg>{msg.type === 'chat' ? <b>{msg.name}: </b> : null}{content.toString().split('\n').map((line, idx) => (<React.Fragment key={idx}>{line}<br /></React.Fragment>))}</ChatMsg>;
 }
+function GuildChatMessage({ msg }) {
+  return <GuildChatMsg><span>[길드] <b>{msg.name}</b>: {msg.message}</span></GuildChatMsg>;
+}
 
 function getMessageComponent(msg, i) {
   switch (msg.type) {
@@ -229,6 +237,7 @@ function getMessageComponent(msg, i) {
     case MESSAGE_TYPES.CHAT:
       if (msg.chatType === 'global') return <GlobalChatMessage key={i} msg={msg} />;
       if (msg.chatType === 'local') return <LocalChatMessage key={i} msg={msg} />;
+      if (msg.chatType === 'guild') return <GuildChatMessage key={i} msg={msg} />;
       if (msg.chatType === 'whisper') return <WhisperMsg key={i}><span><b>{msg.name}</b>: {msg.message}</span></WhisperMsg>;
       return <DefaultChatMessage key={i} msg={msg} />;
     case MESSAGE_TYPES.BATTLE:
@@ -281,17 +290,18 @@ function ChatBox({ messages, chatEndRef }) {
   );
 }
 
-export function ChatOnlyBox({ messages }) {
-  const [tab, setTab] = useState('all'); // all, local, whisper
+export function ChatOnlyBox({ messages, tab, setTab }) {
   const boxRef = useRef(null);
+  // 길드탭일 때는 필터 없이 전체, 나머지는 기존대로
   const filtered = Array.isArray(messages)
-    ? messages.filter(msg => {
-        if (msg.type !== 'chat') return false;
-        if (tab === 'all') return msg.chatType === 'global'; // 전체: global만
-        if (tab === 'local') return msg.chatType === 'local';
-        if (tab === 'whisper') return msg.chatType === 'whisper';
-        return true;
-      })
+    ? (tab === 'guild'
+        ? messages
+        : messages.filter(msg => msg.type === 'chat' && (
+            (tab === 'all' && msg.chatType === 'global') ||
+            (tab === 'local' && msg.chatType === 'local') ||
+            (tab === 'whisper' && msg.chatType === 'whisper')
+          ))
+      )
     : [];
   useEffect(() => {
     if (boxRef.current) {
@@ -303,13 +313,14 @@ export function ChatOnlyBox({ messages }) {
       <div style={{ display: 'flex', gap: 8, marginBottom: 8, justifyContent: 'center' }}>
         <button onClick={() => setTab('all')} style={{ background: tab === 'all' ? '#7ecfff' : '#232837', color: tab === 'all' ? '#232837' : '#7ecfff', border: 'none', borderRadius: 6, padding: '4px 12px', fontWeight: 'bold', fontSize: '1.01rem', cursor: 'pointer', transition: 'all 0.15s' }}>전체</button>
         <button onClick={() => setTab('local')} style={{ background: tab === 'local' ? '#7ecfff' : '#232837', color: tab === 'local' ? '#232837' : '#7ecfff', border: 'none', borderRadius: 6, padding: '4px 12px', fontWeight: 'bold', fontSize: '1.01rem', cursor: 'pointer', transition: 'all 0.15s' }}>지역</button>
+        <button onClick={() => setTab('guild')} style={{ background: tab === 'guild' ? '#7ecfff' : '#232837', color: tab === 'guild' ? '#232837' : '#7ecfff', border: 'none', borderRadius: 6, padding: '4px 12px', fontWeight: 'bold', fontSize: '1.01rem', cursor: 'pointer', transition: 'all 0.15s' }}>길드</button>
         <button onClick={() => setTab('whisper')} style={{ background: tab === 'whisper' ? '#7ecfff' : '#232837', color: tab === 'whisper' ? '#232837' : '#7ecfff', border: 'none', borderRadius: 6, padding: '4px 12px', fontWeight: 'bold', fontSize: '1.01rem', cursor: 'pointer', transition: 'all 0.15s' }}>귓속말</button>
       </div>
       <div ref={boxRef} className="patchnote-scroll" style={{ maxHeight: 130, minHeight: 60, overflowY: 'auto', fontSize: '1.01rem', background: 'none', padding: 0, margin: 0, ...(window.innerWidth <= 600 ? { maxHeight: 160 } : {}) }}>
         {filtered.length === 0 && <div style={{ color: '#888', textAlign: 'center', marginTop: 16 }}>채팅 메시지가 없습니다.</div>}
         {filtered.map((msg, i) => (
-          <div key={i} style={{ color: msg.chatType === 'whisper' ? '#2ecc40' : (msg.chatType === 'global' ? '#ffb347' : '#fff'), marginBottom: 4 }}>
-            <span style={{ fontWeight: 'bold' }}>[{msg.chatType === 'global' ? '전체' : msg.chatType === 'local' ? '지역' : '귓속말'}] {msg.name}:</span> {msg.message}
+          <div key={i} style={{ color: msg.chatType === 'whisper' ? '#2ecc40' : (msg.chatType === 'global' ? '#ffb347' : (msg.chatType === 'guild' ? '#ff66cc' : '#fff')), marginBottom: 4 }}>
+            <span style={{ fontWeight: 'bold' }}>[{msg.chatType === 'global' ? '전체' : msg.chatType === 'local' ? '지역' : msg.chatType === 'guild' ? '길드' : '귓속말'}] {msg.name}:</span> {msg.message}
           </div>
         ))}
       </div>

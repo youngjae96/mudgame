@@ -101,7 +101,9 @@ const PlayerListPanel = styled.div`
  * @param {object} props.mapInfo - 맵 정보
  * @param {function} props.handleMove - 이동 핸들러
  * @param {Array} props.nearbyRooms - 주변 방 정보
- * @param {Array} props.messages - 채팅 메시지 목록
+ * @param {Array} props.allMessages - 전체 채팅 메시지 목록
+ * @param {Array} props.chatLogMessages - 채팅 로그 메시지 목록
+ * @param {Array} props.guildChatLogMessages - 길드 채팅 로그 메시지 목록
  * @param {object} props.chatEndRef - 채팅 스크롤 ref
  * @param {function} props.handleSend - 채팅 전송 핸들러
  * @param {string} props.input - 채팅 입력값
@@ -123,7 +125,9 @@ function GameMain({
   mapInfo,
   handleMove,
   nearbyRooms,
-  messages,
+  allMessages,
+  chatLogMessages,
+  guildChatLogMessages,
   chatEndRef,
   handleSend,
   input,
@@ -139,6 +143,7 @@ function GameMain({
   const [showHelp, setShowHelp] = useState(false);
   const [showChatOnly, setShowChatOnly] = useState(false);
   const [showPatchNote, setShowPatchNote] = useState(false);
+  const [chatTab, setChatTab] = useState('all'); // all, local, guild, whisper
 
   const commandList = [
     { cmd: '/전 <메시지>', desc: '전체 채팅(축약)' },
@@ -154,6 +159,7 @@ function GameMain({
     { cmd: '/장비', desc: '내 장비 정보' },
     { cmd: '/지도', desc: '전체 맵 보기' },
     { cmd: '/텔포 <지역>', desc: '월드 이동(예: 무인도, 마을)' },
+    { cmd: '/길 <메시지>', desc: '길드 채팅' },
     { cmd: '/길드 <생성|가입|수락|탈퇴|추방|공지|정보|목록|해체(길드장)> ...', desc: '길드 관련 명령어' },
     { cmd: '/랭킹', desc: 'TOP 10 스탯 랭킹' },
     { cmd: '/방명록', desc: '방명록(글 목록/쓰기)' },
@@ -217,8 +223,8 @@ function GameMain({
                 <PatchNoteTabs />
               </Modal>
             )}
-            {showChatOnly && <ChatOnlyBox messages={messages} />}
-            <ChatBox messages={messages} chatEndRef={chatEndRef} />
+            {showChatOnly && <ChatOnlyBox messages={chatTab === 'guild' ? guildChatLogMessages : chatLogMessages} tab={chatTab} setTab={setChatTab} />}
+            <ChatBox messages={allMessages} chatEndRef={chatEndRef} />
             <form className="input-form" onSubmit={handleSend} style={{ display: 'flex', alignItems: 'center' }}>
               <Input
                 className="chat-input"

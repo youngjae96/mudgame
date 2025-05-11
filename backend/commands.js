@@ -2,7 +2,7 @@
 // 필요한 의존성은 인자로 주입받도록 설계
 
 const { ITEM_TYPE } = require('./data/items');
-const { ISLAND_VILLAGE_POS } = require('./data/map');
+const { ISLAND_VILLAGE_POS, ISLAND2_VILLAGE_POS } = require('./data/map');
 const PlayerController = require('./controllers/PlayerController');
 const ShopService = require('./services/ShopService');
 const { PlayerManager } = require('./playerManager');
@@ -35,10 +35,32 @@ function handleTeleportCommand({ ws, playerName, message, players, getRoom, getP
   if (!player) return;
   const args = message.trim().split(' ');
   if (args.length < 2) {
-    ws.send(JSON.stringify({ type: 'system', subtype: 'guide', message: '[텔레포트] 사용법: /텔포 <지역이름> (예: /텔포 무인도, /텔포 마을)' }));
+    ws.send(JSON.stringify({ type: 'system', subtype: 'guide', message: '[텔레포트] 사용법: /텔포 <지역이름> (예: /텔포 무인도, /텔포 무인도2, /텔포 마을)' }));
     return;
   }
   const dest = args[1];
+  if (dest === '무인도2') {
+    if (player.world === 1 && player.position.x === 4 && player.position.y === 4) {
+      // 클랜힐 자동 비활성화
+      if (player.clanHealOn) {
+        player.clanHealOn = false;
+        ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '텔레포트로 클랜힐이 비활성화되었습니다.' }));
+      }
+      RoomManager.removePlayerFromRoom(playerName, player.world, player.position.x, player.position.y);
+      player.world = 4;
+      player.position = { x: ISLAND2_VILLAGE_POS.x, y: ISLAND2_VILLAGE_POS.y };
+      RoomManager.addPlayerToRoom(playerName, player.world, player.position.x, player.position.y);
+      PlayerManager.addPlayer(playerName, player);
+      ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '[텔레포트] 무인도2 오두막으로 이동합니다!' }));
+      sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, ISLAND2_VILLAGE_POS);
+      sendInventory(player);
+      sendCharacterInfo(player);
+      sendRoomInfoToAllInRoom(PlayerManager.getAllPlayers(), player.world, player.position.x, player.position.y, getRoom, getPlayersInRoom, MAP_SIZE, ISLAND2_VILLAGE_POS);
+    } else {
+      ws.send(JSON.stringify({ type: 'system', subtype: 'guide', message: '[텔레포트] 마을 광장에서만 무인도2로 이동할 수 있습니다.' }));
+    }
+    return;
+  }
   if (dest === '무인도') {
     if (player.world === 1 && player.position.x === 4 && player.position.y === 4) {
       // 클랜힐 자동 비활성화
@@ -61,7 +83,24 @@ function handleTeleportCommand({ ws, playerName, message, players, getRoom, getP
     }
     return;
   } else if (dest === '마을') {
-    if (player.world === 2 && player.position.x === ISLAND_VILLAGE_POS.x && player.position.y === ISLAND_VILLAGE_POS.y) {
+    // 무인도2 오두막에서 마을 복귀
+    if (player.world === 4 && player.position.x === ISLAND2_VILLAGE_POS.x && player.position.y === ISLAND2_VILLAGE_POS.y) {
+      // 클랜힐 자동 비활성화
+      if (player.clanHealOn) {
+        player.clanHealOn = false;
+        ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '텔레포트로 클랜힐이 비활성화되었습니다.' }));
+      }
+      RoomManager.removePlayerFromRoom(playerName, player.world, player.position.x, player.position.y);
+      player.world = 1;
+      player.position = { x: 4, y: 4 };
+      RoomManager.addPlayerToRoom(playerName, player.world, player.position.x, player.position.y);
+      PlayerManager.addPlayer(playerName, player);
+      ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '[텔레포트] 마을 광장으로 이동합니다!' }));
+      sendRoomInfo(player, getRoom, getPlayersInRoom, MAP_SIZE, { x: 4, y: 4 });
+      sendInventory(player);
+      sendCharacterInfo(player);
+      sendRoomInfoToAllInRoom(PlayerManager.getAllPlayers(), player.world, player.position.x, player.position.y, getRoom, getPlayersInRoom, MAP_SIZE, { x: 4, y: 4 });
+    } else if (player.world === 2 && player.position.x === ISLAND_VILLAGE_POS.x && player.position.y === ISLAND_VILLAGE_POS.y) {
       // 클랜힐 자동 비활성화
       if (player.clanHealOn) {
         player.clanHealOn = false;
@@ -78,7 +117,7 @@ function handleTeleportCommand({ ws, playerName, message, players, getRoom, getP
       sendCharacterInfo(player);
       sendRoomInfoToAllInRoom(PlayerManager.getAllPlayers(), player.world, player.position.x, player.position.y, getRoom, getPlayersInRoom, MAP_SIZE, { x: 4, y: 4 });
     } else {
-      ws.send(JSON.stringify({ type: 'system', subtype: 'guide', message: '[텔레포트] 무인도 오두막에서만 마을로 이동할 수 있습니다.' }));
+      ws.send(JSON.stringify({ type: 'system', subtype: 'guide', message: '[텔레포트] 무인도/무인도2 오두막에서만 마을로 이동할 수 있습니다.' }));
     }
     return;
   } else if (dest === '동굴') {
@@ -120,7 +159,7 @@ function handleInnCommand({ ws, playerName, players, getRoom, savePlayerData, se
     ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '[여관] 이미 HP/MP가 모두 가득 찼습니다.' }));
     return;
   }
-  const INN_PRICE = 50;
+  const INN_PRICE = 10;
   if (player.gold < INN_PRICE) {
     ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: `[여관] 골드가 부족합니다. (필요: ${INN_PRICE}G)` }));
     return;
@@ -210,13 +249,13 @@ async function handleAdminCommand({ ws, playerName, message, players, getRoom, s
       ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: `[운영자] 해당 닉네임의 플레이어가 없습니다: ${target}` }));
       return;
     }
-    // 아이템 풀에서 이름으로 검색
-    const { ITEM_POOL, SHOP_ITEMS } = require('./data/items');
-    let item = ITEM_POOL.find(i => i.name === itemName);
+    // 아이템 풀에서 이름으로 검색 (공백, 대소문자 무시)
+    const normalize = s => s.replace(/\s/g, '').toLowerCase();
+    let item = ITEM_POOL.find(i => normalize(i.name) === normalize(itemName));
     if (!item) {
       // SHOP_ITEMS의 모든 카테고리에서 검색
       for (const cat of Object.keys(SHOP_ITEMS)) {
-        item = SHOP_ITEMS[cat].find(i => i.name === itemName);
+        item = SHOP_ITEMS[cat].find(i => normalize(i.name) === normalize(itemName));
         if (item) break;
       }
     }
@@ -532,10 +571,10 @@ async function handleGuildCommand({ ws, playerName, message, players }) {
     ws.send(JSON.stringify({ type: 'system', message: '[길드] 길드가 해체되었습니다.' }));
     return;
   }
-  // /길드채팅 <메시지>: 길드 채팅 (최대 15개 저장)
+  // /길드채팅 <메시지>: 길드 채팅 (최대 100개 저장)
   if (subcmd === '채팅') {
-    const chatMsg = args.join(' ').trim();
-    if (!chatMsg) {
+    const msg = args.join(' ').trim();
+    if (!msg) {
       ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[길드채팅] 보낼 메시지를 입력하세요.' }));
       return;
     }
@@ -544,9 +583,15 @@ async function handleGuildCommand({ ws, playerName, message, players }) {
       ws.send(JSON.stringify({ type: 'system', message: '[길드채팅] 소속된 길드가 없습니다.' }));
       return;
     }
-    guild.chatLog.push({ name: playerName, message: chatMsg, time: new Date() });
-    if (guild.chatLog.length > 15) guild.chatLog = guild.chatLog.slice(-15);
+    guild.chatLog.push({ name: playerName, message: msg, time: new Date() });
+    if (guild.chatLog.length > 100) guild.chatLog = guild.chatLog.slice(-100);
     await guild.save();
+    // 길드원 전체에게 브로드캐스트
+    Object.values(PlayerManager.getAllPlayers()).forEach(p => {
+      if (p.guildName === guild.name && p.ws && p.ws.readyState === 1) {
+        p.ws.send(JSON.stringify({ type: 'chat', chatType: 'guild', name: playerName, message: msg }));
+      }
+    });
     ws.send(JSON.stringify({ type: 'system', message: '[길드채팅] 메시지가 전송되었습니다.' }));
     return;
   }
@@ -591,7 +636,8 @@ async function handleHelpCommand({ ws }) {
     '/귀환 : 1번 마을(마을 광장)으로 귀환',
     '/장비 : 내 장비 정보',
     '/지도 : 전체 맵 보기',
-    '/텔포 <지역> : 월드 이동(예: 무인도, 마을)',
+    '/텔포 <지역> : 월드 이동(예: 무인도, 무인도2, 마을)',
+    '/길 <메시지> : 길드 채팅',
     '/길드 <생성|가입|수락|탈퇴|추방|공지|정보|목록|해체(길드장)> ... : 길드 관련 명령어',
     '/랭킹 : TOP 10 스탯 랭킹',
     '/방명록 : 방명록 보기',
@@ -642,9 +688,12 @@ async function handleStatCommand({ ws, playerName, message, players }) {
   let maxHp = (typeof target.getRealMaxHp === 'function' ? target.getRealMaxHp() : target.maxHp);
   maxHp = Math.floor(maxHp);
   const statMsg =
-    `[능력치: ${targetName}]\n` +
-    `HP  : ${target.hp} / ${maxHp}    MP  : ${target.mp} / ${target.maxMp}\n` +
-    `STR : ${target.str} (Exp: ${Number(target.strExp).toFixed(2)}/${Number(target.strExpMax).toFixed(2)})   DEX: ${target.dex} (Exp: ${Number(target.dexExp).toFixed(2)}/${Number(target.dexExpMax).toFixed(2)})\n` +
+    `[능력치: ${targetName}]
+` +
+    `HP  : ${target.hp} / ${maxHp}    MP  : ${target.mp} / ${target.maxMp}
+` +
+    `STR : ${target.str} (Exp: ${Number(target.strExp).toFixed(2)}/${Number(target.strExpMax).toFixed(2)})   DEX: ${target.dex} (Exp: ${Number(target.dexExp).toFixed(2)}/${Number(target.dexExpMax).toFixed(2)})   INT: ${target.int} (Exp: ${Number(target.intExp).toFixed(2)}/${Number(target.intExpMax).toFixed(2)})
+` +
     `공격력: ${target.getAtk ? target.getAtk() : target.atk}   방어력: ${target.getDef ? target.getDef() : target.def}`;
   ws.send(JSON.stringify({ type: 'system', subtype: 'info', message: statMsg }));
 }
@@ -816,6 +865,34 @@ async function handleGuestbookCommand({ ws, playerName, message, players }) {
   }
 }
 
+// /길 <메시지>: 길드 채팅 (최대 100개 저장)
+async function handleGuildChatCommand({ ws, playerName, message, players }) {
+  const msg = message.trim().replace(/^\/길\s*/, '');
+  if (!msg) {
+    ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[길드채팅] 보낼 메시지를 입력하세요.' }));
+    return;
+  }
+  const player = PlayerManager.getPlayer(playerName);
+  if (!player || !player.guildName) {
+    ws.send(JSON.stringify({ type: 'system', message: '[길드채팅] 길드에 가입해야 길드채팅을 사용할 수 있습니다.' }));
+    return;
+  }
+  const guild = await Guild.findOne({ name: player.guildName });
+  if (!guild) {
+    ws.send(JSON.stringify({ type: 'system', message: '[길드채팅] 길드 정보를 찾을 수 없습니다.' }));
+    return;
+  }
+  guild.chatLog.push({ name: playerName, message: msg, time: new Date() });
+  if (guild.chatLog.length > 100) guild.chatLog = guild.chatLog.slice(-100);
+  await guild.save();
+  // 길드원 전체에게 브로드캐스트
+  Object.values(PlayerManager.getAllPlayers()).forEach(p => {
+    if (p.guildName === guild.name && p.ws && p.ws.readyState === 1) {
+      p.ws.send(JSON.stringify({ type: 'chat', chatType: 'guild', name: playerName, message: msg }));
+    }
+  });
+}
+
 // 명령어 핸들러 등록
 const commandHandlers = {
   '/정보': handleStatCommand,
@@ -838,6 +915,7 @@ const commandHandlers = {
   '/클랜힐': handleClanHealCommand,
   '/운영자': handleAdminCommand,
   '/방명록': handleGuestbookCommand,
+  '/길': handleGuildChatCommand,
 };
 
 module.exports = {
@@ -860,4 +938,5 @@ module.exports = {
   handleRankingCommand,
   handleClanHealCommand,
   handleGuestbookCommand,
+  handleGuildChatCommand,
 }; 

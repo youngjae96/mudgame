@@ -83,7 +83,10 @@ function AppInner() {
     handleAttack,
     nearbyRooms,
     ws,
-    notice
+    notice,
+    allMessages,
+    chatLogMessages,
+    guildChatLogMessages
   } = useWebSocket(handleDisconnect);
 
   React.useEffect(() => { setInventory(wsInventory); }, [wsInventory]);
@@ -94,7 +97,7 @@ function AppInner() {
   }, [wsCharacter]);
   React.useEffect(() => { setMapInfo(wsMapInfo); }, [wsMapInfo]);
   React.useEffect(() => { setRoom(wsRoom); }, [wsRoom]);
-  React.useEffect(() => { clearMessages(); wsMessages.forEach(addMessage); }, [wsMessages, addMessage, clearMessages]);
+  React.useEffect(() => { clearMessages(); (wsMessages || []).forEach(addMessage); }, [wsMessages, addMessage, clearMessages]);
 
   useEffect(() => {
     window.setShowMap = setShowMap;
@@ -156,7 +159,9 @@ function AppInner() {
               mapInfo={mapInfo}
               handleMove={handleMove}
               nearbyRooms={nearbyRooms}
-              messages={messages}
+              allMessages={allMessages}
+              chatLogMessages={chatLogMessages}
+              guildChatLogMessages={guildChatLogMessages}
               chatEndRef={chatEndRef}
               handleSend={handleSend}
               input={input}

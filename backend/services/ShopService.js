@@ -95,7 +95,8 @@ class ShopService {
       foundItem = SHOP_ITEMS[cat].find((item) => item.name === itemName);
       if (foundItem) break;
     }
-    if (!foundItem) {
+    // 천공의 갑옷/검은 ITEM_POOL에서 찾아서 판매 허용
+    if (!foundItem && (itemName === '천공의 갑옷' || itemName === '천공의 검')) {
       const { ITEM_POOL } = require('../data/items');
       if (Array.isArray(ITEM_POOL)) {
         foundItem = ITEM_POOL.find(i => i.name === itemName);

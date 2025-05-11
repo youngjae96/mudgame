@@ -1,6 +1,7 @@
 // PlayerGameService: 게임 내 실시간 플레이어 관련 로직(이동, 채팅, 명령어, 아이템, 전투 등)
 
 const { PlayerManager } = require('../playerManager');
+const ChatLog = require('../models/ChatLog');
 
 const PlayerGameService = {
   async handleMove({ ws, playerName, dx, dy, RoomManager, getRoom, getPlayersInRoom, sendRoomInfoToAllInRoom, savePlayerData, sendInventory, sendCharacterInfo, MAP_SIZE, VILLAGE_POS, battleIntervals }) {
@@ -88,6 +89,8 @@ const PlayerGameService = {
         return;
       }
       player.lastGlobalChat = now;
+      // DB에 저장
+      ChatLog.create({ name: playerName, message: chatMsg, type: 'chat', chatType: 'global', time: new Date() }).catch(() => {});
       broadcast(wss, { type: 'chat', chatType: 'global', name: playerName, message: chatMsg });
       return;
     }
@@ -436,6 +439,8 @@ const PlayerGameService = {
     const page = Math.max(1, parseInt(args[0] || '1', 10));
     // 인벤토리 내 판매 가능한 아이템만 필터링
     const sellable = player.inventory.filter(invItem => {
+      // 천공의 갑옷/검은 무조건 판매 가능
+      if (invItem.name === '천공의 갑옷' || invItem.name === '천공의 검') return true;
       return Object.values(SHOP_ITEMS).flat().some(shopItem => shopItem.name === invItem.name);
     });
     const itemsPerPage = 7;

@@ -26,7 +26,7 @@ function useWebSocket(onDisconnect) {
   const [connected, setConnected] = useState(false);
   const [name, setName] = useState('');
   const [input, setInput] = useState('');
-  const [messages, setMessages] = useState([]);
+  const [allMessages, setAllMessages] = useState([]);
   const [players, setPlayers] = useState([]);
   const [room, setRoom] = useState(null);
   const [mapSize, setMapSize] = useState(5);
@@ -40,16 +40,38 @@ function useWebSocket(onDisconnect) {
   const reconnectAttempts = useRef(0);
   const reconnectTimeout = useRef(null);
   const [wsError, setWsError] = useState(null);
+  const [chatLogMessages, setChatLogMessages] = useState([]);
+  const [guildChatLogMessages, setGuildChatLogMessages] = useState([]);
 
   useEffect(() => {
     if (connected && ws.current) {
       ws.current.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        if (data.type === 'chat' || data.type === 'system') {
-          setMessages((msgs) => {
-            const next = [...msgs, data];
-            return next.length > 100 ? next.slice(next.length - 100) : next;
-          });
+        if (data.type === 'chatLog') {
+          setChatLogMessages(data.log);
+        } else if (data.type === 'guildChatLog') {
+          setGuildChatLogMessages(
+            (data.log || []).map(msg => ({
+              ...msg,
+              type: 'chat',
+              chatType: 'guild'
+            }))
+          );
+        } else if (data.type === 'chat') {
+          setAllMessages(msgs => [...msgs, data]);
+          setChatLogMessages(msgs => [...msgs, data].slice(-100));
+          if (data.chatType === 'guild') {
+            setGuildChatLogMessages(msgs => [
+              ...msgs,
+              {
+                ...data,
+                type: 'chat',
+                chatType: 'guild'
+              }
+            ].slice(-100));
+          }
+        } else if (data.type === 'system') {
+          setAllMessages(msgs => [...msgs, data]);
         } else if (data.type === 'players') {
           setPlayers(data.list);
         } else if (data.type === 'room') {
@@ -62,10 +84,7 @@ function useWebSocket(onDisconnect) {
         } else if (data.type === 'character') {
           setCharacter(data.info);
         } else if (data.type === 'stat') {
-          setMessages((msgs) => {
-            const next = [...msgs, { type: 'stat', text: data.text }];
-            return next.length > 100 ? next.slice(next.length - 100) : next;
-          });
+          setAllMessages(msgs => [...msgs, { type: 'stat', text: data.text }]);
           if (typeof data.text === 'string') {
             const stat = {};
             const hpMatch = data.text.match(/HP\s*:\s*([\d.]+)\s*\/\s*([\d.]+(?:\s*\(\+?[\d.]+\))?)/);
@@ -85,7 +104,7 @@ function useWebSocket(onDisconnect) {
             if (Object.keys(stat).length > 0) setCharacter((prev) => ({ ...prev, ...stat }));
           }
         } else if (data.type === 'battle') {
-          setMessages((msgs) => {
+          setAllMessages(msgs => {
             if (Array.isArray(data.log)) {
               const logs = data.log.map((log) => ({ ...log }));
               const next = [...msgs.flat(), ...logs];
@@ -150,7 +169,7 @@ function useWebSocket(onDisconnect) {
     };
     ws.current.onclose = () => {
       setConnected(false);
-      setMessages((msgs) => [...msgs, { type: 'system', message: SYSTEM_MESSAGES.DISCONNECTED }]);
+      setAllMessages((msgs) => [...msgs, { type: 'system', message: SYSTEM_MESSAGES.DISCONNECTED }]);
       setWsError('WebSocket 연결 종료');
       if (onDisconnect) onDisconnect();
       if (reconnectTimeout.current) clearTimeout(reconnectTimeout.current);
@@ -158,11 +177,31 @@ function useWebSocket(onDisconnect) {
     };
     ws.current.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      if (data.type === 'chat' || data.type === 'system') {
-        setMessages((msgs) => {
-          const next = [...msgs, data];
-          return next.length > 100 ? next.slice(next.length - 100) : next;
-        });
+      if (data.type === 'chatLog') {
+        setChatLogMessages(data.log);
+      } else if (data.type === 'guildChatLog') {
+        setGuildChatLogMessages(
+          (data.log || []).map(msg => ({
+            ...msg,
+            type: 'chat',
+            chatType: 'guild'
+          }))
+        );
+      } else if (data.type === 'chat') {
+        setAllMessages(msgs => [...msgs, data]);
+        setChatLogMessages(msgs => [...msgs, data].slice(-100));
+        if (data.chatType === 'guild') {
+          setGuildChatLogMessages(msgs => [
+            ...msgs,
+            {
+              ...data,
+              type: 'chat',
+              chatType: 'guild'
+            }
+          ].slice(-100));
+        }
+      } else if (data.type === 'system') {
+        setAllMessages(msgs => [...msgs, data]);
       } else if (data.type === 'players') {
         setPlayers(data.list);
       } else if (data.type === 'room') {
@@ -175,10 +214,7 @@ function useWebSocket(onDisconnect) {
       } else if (data.type === 'character') {
         setCharacter(data.info);
       } else if (data.type === 'stat') {
-        setMessages((msgs) => {
-          const next = [...msgs, { type: 'stat', text: data.text }];
-          return next.length > 100 ? next.slice(next.length - 100) : next;
-        });
+        setAllMessages(msgs => [...msgs, { type: 'stat', text: data.text }]);
         if (typeof data.text === 'string') {
           const stat = {};
           const hpMatch = data.text.match(/HP\s*:\s*([\d.]+)\s*\/\s*([\d.]+(?:\s*\(\+?[\d.]+\))?)/);
@@ -198,7 +234,7 @@ function useWebSocket(onDisconnect) {
           if (Object.keys(stat).length > 0) setCharacter((prev) => ({ ...prev, ...stat }));
         }
       } else if (data.type === 'battle') {
-        setMessages((msgs) => {
+        setAllMessages(msgs => {
           if (Array.isArray(data.log)) {
             const logs = data.log.map((log) => ({ ...log }));
             const next = [...msgs.flat(), ...logs];
@@ -299,7 +335,7 @@ function useWebSocket(onDisconnect) {
     setName,
     input,
     setInput,
-    messages,
+    allMessages,
     players,
     room,
     mapSize,
@@ -314,7 +350,9 @@ function useWebSocket(onDisconnect) {
     handleAttack,
     nearbyRooms,
     notice,
-    wsError
+    wsError,
+    chatLogMessages,
+    guildChatLogMessages
   };
 }
 

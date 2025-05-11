@@ -1,6 +1,6 @@
 const Room = require('../utils/Room');
 const Monster = require('../models/Monster');
-const { FIELD_MONSTERS, FOREST_MONSTERS, CAVE_MONSTERS, ISLAND_MONSTERS, CAVE_BOSS_MONSTERS } = require('./items');
+const { FIELD_MONSTERS, FOREST_MONSTERS, CAVE_MONSTERS, ISLAND_MONSTERS, CAVE_BOSS_MONSTERS, ISLAND2_MONSTERS } = require('./items');
 
 const MAP_SIZE = 9;
 const VILLAGE_POS = { x: 4, y: 4 };
@@ -123,6 +123,59 @@ for (let y = 0; y < MAP_SIZE; y++) {
   }
 }
 
+// 무인도2 월드(월드4)
+const roomsIsland2 = [];
+const ISLAND2_VILLAGE_POS = { x: 4, y: 7 };
+for (let y = 0; y < MAP_SIZE; y++) {
+  for (let x = 0; x < MAP_SIZE; x++) {
+    let type, name, description;
+    let monsters = [];
+    if (x === 0 || x === 8 || y === 0 || y === 8) {
+      type = ROOM_TYPE.SEA;
+      name = '바다';
+      description = '끝없이 펼쳐진 푸른 바다입니다.';
+    } else if (x === 1 || x === 7 || y === 1 || y === 7) {
+      // 무인도2 오두막 고정 배치
+      if (x === ISLAND2_VILLAGE_POS.x && y === ISLAND2_VILLAGE_POS.y) {
+        type = ROOM_TYPE.VILLAGE;
+        name = '무인도2 오두막';
+        description = '섬의 유일한 오두막입니다.';
+      } else {
+        type = ROOM_TYPE.BEACH;
+        name = '무인도2 해변';
+        description = '파도가 밀려오는 고요한 해변입니다.';
+        // 해변 몬스터 배치
+        if (Math.random() < 0.7) monsters.push(new Monster(ISLAND2_MONSTERS[0], x, y));
+        if (Math.random() < 0.3) monsters.push(new Monster(ISLAND2_MONSTERS[1], x, y));
+      }
+    } else if (x >= 3 && x <= 5 && y >= 3 && y <= 5) {
+      type = ROOM_TYPE.JUNGLE;
+      name = '무인도2 정글';
+      description = '울창한 정글, 야생의 기운이 느껴집니다.';
+      // 정글 몬스터 배치
+      if (Math.random() < 0.7) monsters.push(new Monster(ISLAND2_MONSTERS[2], x, y));
+      if (Math.random() < 0.3) monsters.push(new Monster(ISLAND2_MONSTERS[3], x, y));
+    } else if (x >= 6 && y >= 4 && y <= 6) {
+      type = ROOM_TYPE.VOLCANO;
+      name = '무인도2 화산지대';
+      description = '뜨거운 용암이 흐르는 위험한 화산지대입니다.';
+      // 화산 몬스터 배치
+      if (Math.random() < 0.7) monsters.push(new Monster(ISLAND2_MONSTERS[1], x, y));
+      if (Math.random() < 0.3) monsters.push(new Monster(ISLAND2_MONSTERS[2], x, y));
+    } else {
+      type = ROOM_TYPE.ISLANDFIELD;
+      name = '무인도2 평지';
+      description = '풀과 바람이 어우러진 무인도의 평지입니다.';
+      // 평지 몬스터 배치
+      if (Math.random() < 0.7) monsters.push(new Monster(ISLAND2_MONSTERS[0], x, y));
+      if (Math.random() < 0.3) monsters.push(new Monster(ISLAND2_MONSTERS[3], x, y));
+    }
+    const room = new Room(x, y, type, name, description, 4);
+    for (const m of monsters) room.monsters.push(m);
+    roomsIsland2.push(room);
+  }
+}
+
 const MAP_SIZE_CAVE = 30;
 const CAVE_ZONES = [
   { name: '동굴 입구', type: ROOM_TYPE.CAVE, yStart: 0, yEnd: 9, monsters: CAVE_MONSTERS },
@@ -240,10 +293,10 @@ if (caveEntrance) {
 }
 
 // worlds 객체를 모든 맵 생성 이후에 선언
-const worlds = { 1: rooms, 2: roomsIsland, 3: roomsCave };
+const worlds = { 1: rooms, 2: roomsIsland, 3: roomsCave, 4: roomsIsland2 };
 function getRoom(world, x, y) {
   const arr = worlds[world] || rooms;
   return arr.find(r => r.x === x && r.y === y);
 }
 
-module.exports = { MAP_SIZE, VILLAGE_POS, rooms, getRoom, worlds, ISLAND_VILLAGE_POS, ROOM_TYPE }; 
+module.exports = { MAP_SIZE, VILLAGE_POS, rooms, getRoom, worlds, ISLAND_VILLAGE_POS, ROOM_TYPE, roomsIsland2, ISLAND2_VILLAGE_POS }; 

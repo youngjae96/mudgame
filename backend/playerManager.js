@@ -72,8 +72,11 @@ async function clanHealTick(PlayerManager, Guild) {
     const healAmount = 1 + Math.floor((healer.int || 0) / 5);
     const healedNames = [];
     for (const target of targets) {
-      if (target.hp < target.maxHp) {
-        target.hp = Math.min(target.maxHp, target.hp + healAmount);
+      const realMaxHp = typeof target.getRealMaxHp === 'function' ? target.getRealMaxHp() : target.maxHp;
+      const before = target.hp;
+      if (target.hp < realMaxHp) {
+        target.hp = Math.min(realMaxHp, target.hp + healAmount);
+        const after = target.hp;
         healedNames.push(target.name);
         // HP가 변한 유저에게 캐릭터 정보 실시간 전송
         if (target.ws && target.ws.readyState === 1) {

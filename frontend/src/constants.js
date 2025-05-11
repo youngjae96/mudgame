@@ -35,6 +35,7 @@ export const MESSAGE_TYPES = {
   SYSTEM: 'system',
   BATTLE: 'battle',
   STAT: 'stat',
+  GUILD: 'guild',
 };
 
 export const MESSAGE_SUBTYPES = {
