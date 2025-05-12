@@ -1,0 +1,74 @@
+[
+  {
+    "name": "해변의 크랩킹",
+    "maxHp": 220,
+    "atk": 45,
+    "def": 28,
+    "gold": 50,
+    "dropItems": ["플레임소드"],
+    "dropRates": [0.1]
+  },
+  {
+    "name": "거대 조개괴수",
+    "maxHp": 260,
+    "atk": 40,
+    "def": 34,
+    "gold": 55,
+    "dropItems": ["플레임아머"],
+    "dropRates": [0.03]
+  },
+  {
+    "name": "정글 히드라",
+    "maxHp": 420,
+    "atk": 70,
+    "def": 40,
+    "gold": 80,
+    "dropItems": ["서리검"],
+    "dropRates": [0.02]
+  },
+  {
+    "name": "맹독 고릴라",
+    "maxHp": 320,
+    "atk": 60,
+    "def": 36,
+    "gold": 65,
+    "dropItems": ["서리갑옷"],
+    "dropRates": [0.03]
+  },
+  {
+    "name": "화산 드래곤",
+    "maxHp": 600,
+    "atk": 100,
+    "def": 55,
+    "gold": 150,
+    "dropItems": ["용의 검"],
+    "dropRates": [0.02]
+  },
+  {
+    "name": "용암 거인",
+    "maxHp": 520,
+    "atk": 90,
+    "def": 70,
+    "gold": 130,
+    "dropItems": ["용의 갑옷"],
+    "dropRates": [0.03]
+  },
+  {
+    "name": "무인도 멧돼지",
+    "maxHp": 180,
+    "atk": 38,
+    "def": 22,
+    "gold": 40,
+    "dropItems": ["암흑검"],
+    "dropRates": [0.02]
+  },
+  {
+    "name": "야생 코뿔소",
+    "maxHp": 260,
+    "atk": 48,
+    "def": 30,
+    "gold": 48,
+    "dropItems": ["암흑갑옷"],
+    "dropRates": [0.03]
+  }
+] 

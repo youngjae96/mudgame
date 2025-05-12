@@ -36,8 +36,30 @@ class Player {
     this.lastLocalChat = 0;
   }
 
-  gainStrExp(amount = 1) {
-    this.strExp += amount;
+  // 모든 경험치 보너스를 곱해서 반환 (type: 'str'|'dex'|'int', extra: 임시 보너스)
+  getExpBonus(type = '', extra = 1) {
+    let bonus = 1;
+    // 무기 보너스
+    if (this.equipWeapon && this.equipWeapon.expBonus) bonus *= this.equipWeapon.expBonus;
+    // 임시(전투 등) 보너스
+    if (extra && typeof extra === 'number') bonus *= extra;
+    // 글로벌 이벤트 보너스
+    if (global && global.EVENT_EXP_BONUS) bonus *= global.EVENT_EXP_BONUS;
+    // 필요시 type별 분기, 기타 보너스 추가 가능
+    return bonus;
+  }
+
+  // 통합 경험치 증가 함수
+  gainStatExp(type, amount = 1, extraBonus = 1) {
+    const realAmount = amount * this.getExpBonus(type, extraBonus);
+    if (type === 'str') return this.gainStrExp(realAmount);
+    if (type === 'dex') return this.gainDexExp(realAmount);
+    if (type === 'int') return this.gainIntExp(realAmount);
+  }
+
+  gainStrExp(amount = 1, extraBonus = 1) {
+    const realAmount = amount * this.getExpBonus('str', extraBonus);
+    this.strExp += realAmount;
     while (this.strExp >= this.strExpMax) {
       this.strExp -= this.strExpMax;
       this.str++;
@@ -45,8 +67,9 @@ class Player {
     }
   }
 
-  gainDexExp(amount = 1) {
-    this.dexExp += amount;
+  gainDexExp(amount = 1, extraBonus = 1) {
+    const realAmount = amount * this.getExpBonus('dex', extraBonus);
+    this.dexExp += realAmount;
     while (this.dexExp >= this.dexExpMax) {
       this.dexExp -= this.dexExpMax;
       this.dex++;
@@ -54,8 +77,9 @@ class Player {
     }
   }
 
-  gainIntExp(amount = 1) {
-    this.intExp += amount;
+  gainIntExp(amount = 1, extraBonus = 1) {
+    const realAmount = amount * this.getExpBonus('int', extraBonus);
+    this.intExp += realAmount;
     while (this.intExp >= this.intExpMax) {
       this.intExp -= this.intExpMax;
       this.int++;

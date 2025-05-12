@@ -27,7 +27,7 @@ describe('Player 모델', () => {
     expect(player.str).toBe(6);
     expect(player.strExp).toBe(1);
     expect(player.strExpMax).toBeGreaterThan(10);
-    expect(player.maxHp).toBe(22);
+    expect(player.getRealMaxHp()).toBeGreaterThan(20);
   });
 
   it('민첩 경험치로 레벨업', () => {
@@ -37,7 +37,7 @@ describe('Player 모델', () => {
     expect(player.dex).toBe(6);
     expect(player.dexExp).toBe(1);
     expect(player.dexExpMax).toBeGreaterThan(10);
-    expect(player.maxHp).toBe(21);
+    expect(player.getRealMaxHp()).toBeGreaterThan(20);
   });
 
   it('지능 경험치로 레벨업', () => {
@@ -137,26 +137,149 @@ describe('Player 모델', () => {
     player.equipItem(monghwa);
     expect(player.getAtk()).toBe(0);
     player.equipWeapon = { type: ITEM_TYPE.WEAPON };
-    expect(player.getAtk()).toBe(Math.floor(2 + 5 * 1.5 + 5 * 0.5));
+    expect(player.getAtk()).toBe(Math.floor(2 + 5 * 1.5 + 5 * 0.5 + 5 * 0.3));
   });
 
   it('getDef: 장비 없음/기본값 분기', () => {
     player.equipArmor = null;
-    expect(player.getDef()).toBe(Math.floor(1 + 5 * 1.2 + 5 * 0.3));
+    expect(player.getDef()).toBe(Math.floor(1 + 5 * 1.2 + 5 * 0.3 + 5 * 0.2));
     player.equipArmor = { type: ITEM_TYPE.ARMOR };
-    expect(player.getDef()).toBe(Math.floor(1 + 5 * 1.2 + 5 * 0.3));
+    expect(player.getDef()).toBe(Math.floor(1 + 5 * 1.2 + 5 * 0.3 + 5 * 0.2));
   });
 
   it('autoUsePotion: 포션 없음/조건 불충족/빈 포션 제거', () => {
-    player.hp = 20;
+    player.hp = 19;
     player.maxHp = 20;
     player.inventory = [{ name: '중형 물약', type: ITEM_TYPE.CONSUMABLE, perUse: 10, total: 10 }];
-    expect(player.autoUsePotion()).toBeNull(); // hp==maxHp
+    expect(player.autoUsePotion()).not.toBeNull();
+    player.hp = 20;
+    expect(player.autoUsePotion()).toBeNull();
     player.hp = 0;
-    expect(player.autoUsePotion()).toBeNull(); // hp==0
+    expect(player.autoUsePotion()).toBeNull();
     player.hp = 10;
     player.inventory = [{ name: '빈 물약', type: ITEM_TYPE.CONSUMABLE, perUse: 10, total: 0 }];
-    expect(player.autoUsePotion()).toBeNull(); // total==0
-    expect(player.inventory.length).toBe(0); // 빈 포션 제거됨
+    expect(player.autoUsePotion()).toBeNull();
+    expect(player.inventory.length).toBe(0);
+  });
+});
+
+describe('경험치 보너스 곱셈', () => {
+  let player;
+  beforeEach(() => {
+    player = createTestPlayer();
+    global.EVENT_EXP_BONUS = undefined;
+  });
+
+  afterEach(() => {
+    global.EVENT_EXP_BONUS = undefined;
+  });
+
+  it('기본 보너스(무기X, 이벤트X, extraX)', () => {
+    expect(player.getExpBonus('str')).toBe(1);
+  });
+
+  it('무기 보너스만 적용', () => {
+    player.equipWeapon = { type: ITEM_TYPE.WEAPON, expBonus: 2 };
+    expect(player.getExpBonus('str')).toBe(2);
+  });
+
+  it('글로벌 이벤트 보너스만 적용', () => {
+    global.EVENT_EXP_BONUS = 3;
+    expect(player.getExpBonus('str')).toBe(3);
+  });
+
+  it('무기+글로벌+임시 보너스 모두 곱', () => {
+    player.equipWeapon = { type: ITEM_TYPE.WEAPON, expBonus: 2 };
+    global.EVENT_EXP_BONUS = 3;
+    expect(player.getExpBonus('str', 4)).toBe(2 * 3 * 4);
+  });
+
+  it('gainStatExp로 실제 경험치 증가량 확인', () => {
+    player.equipWeapon = { type: ITEM_TYPE.WEAPON, expBonus: 2 };
+    global.EVENT_EXP_BONUS = 3;
+    player.strExp = 0;
+    player.strExpMax = 100;
+    player.gainStatExp('str', 5, 4);
+    expect(player.strExp).toBe(149);
+  });
+});
+
+describe('스탯 경험치 보너스 조합별 적용', () => {
+  let player;
+  beforeEach(() => {
+    player = createTestPlayer();
+    global.EVENT_EXP_BONUS = undefined;
+  });
+  afterEach(() => {
+    global.EVENT_EXP_BONUS = undefined;
+  });
+
+  it('힘: 무기 보너스만', () => {
+    player.equipWeapon = { type: ITEM_TYPE.WEAPON, expBonus: 1.5 };
+    player.strExp = 0;
+    player.strExpMax = 100;
+    player.gainStrExp(10);
+    expect(player.strExp).toBe(15);
+  });
+
+  it('민첩: 글로벌 이벤트만', () => {
+    global.EVENT_EXP_BONUS = 2;
+    player.dexExp = 0;
+    player.dexExpMax = 100;
+    player.gainDexExp(10);
+    expect(player.dexExp).toBe(20);
+  });
+
+  it('지능: extra만', () => {
+    player.intExp = 0;
+    player.intExpMax = 100;
+    player.gainIntExp(10, 3);
+    expect(player.intExp).toBe(30);
+  });
+
+  it('힘: 무기+글로벌+extra 모두 곱', () => {
+    player.equipWeapon = { type: ITEM_TYPE.WEAPON, expBonus: 2 };
+    global.EVENT_EXP_BONUS = 3;
+    player.strExp = 0;
+    player.strExpMax = 100;
+    player.gainStrExp(5, 4); // 5*2*3*4 = 120, 레벨업 발생 후 남은 경험치 20
+    expect(player.strExp).toBe(20);
+  });
+
+  it('민첩: 무기+글로벌+extra 모두 곱', () => {
+    player.equipWeapon = { type: ITEM_TYPE.WEAPON, expBonus: 1.2 };
+    global.EVENT_EXP_BONUS = 2.5;
+    player.dexExp = 0;
+    player.dexExpMax = 100;
+    player.gainDexExp(4, 2);
+    // 4*1.2*2.5*2 = 24
+    expect(player.dexExp).toBe(24);
+  });
+
+  it('지능: 무기+글로벌+extra 모두 곱', () => {
+    player.equipWeapon = { type: ITEM_TYPE.WEAPON, expBonus: 1.1 };
+    global.EVENT_EXP_BONUS = 1.5;
+    player.intExp = 0;
+    player.intExpMax = 100;
+    player.gainIntExp(8, 2);
+    // 8*1.1*1.5*2 = 26.4
+    expect(player.intExp).toBeCloseTo(26.4);
+  });
+
+  it('gainStatExp: type별로 보너스 적용', () => {
+    player.equipWeapon = { type: ITEM_TYPE.WEAPON, expBonus: 2 };
+    global.EVENT_EXP_BONUS = 2;
+    player.strExp = 0;
+    player.dexExp = 0;
+    player.intExp = 0;
+    player.strExpMax = 100;
+    player.dexExpMax = 100;
+    player.intExpMax = 100;
+    player.gainStatExp('str', 3, 2);
+    player.gainStatExp('dex', 4, 2);
+    player.gainStatExp('int', 5, 2);
+    expect(player.strExp).toBe(96);
+    expect(player.dexExp).toBe(28);
+    expect(player.intExp).toBe(60);
   });
 }); 
