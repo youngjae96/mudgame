@@ -115,7 +115,7 @@ const PlayerGameService = {
     }
     if (chatType === 'command') {
       if (process.env.DEBUG === 'true') console.log('DEBUG handleChat command:', command, args);
-      await this.handleCommand({ ws, playerName, command, args, RoomManager: null, getRoom, getPlayersInRoom, sendRoomInfoToAllInRoom, savePlayerData, sendInventory, sendCharacterInfo, broadcast, SHOP_ITEMS, MAP_SIZE, VILLAGE_POS, commandHandlers, sendRoomInfo: sendRoomInfoToAllInRoom });
+      await this.handleCommand({ ws, playerName, command, args, RoomManager: null, getRoom, getPlayersInRoom, sendRoomInfoToAllInRoom, savePlayerData, sendInventory, sendCharacterInfo, broadcast, SHOP_ITEMS, MAP_SIZE, VILLAGE_POS, commandHandlers, sendRoomInfo: sendRoomInfoToAllInRoom, battleIntervals });
       return;
     }
     if (chatType === 'move') {
@@ -123,7 +123,7 @@ const PlayerGameService = {
       return;
     }
   },
-  async handleCommand({ ws, playerName, command, args, RoomManager, getRoom, getPlayersInRoom, sendRoomInfoToAllInRoom, savePlayerData, sendInventory, sendCharacterInfo, broadcast, SHOP_ITEMS, MAP_SIZE, VILLAGE_POS, commandHandlers, sendRoomInfo }) {
+  async handleCommand({ ws, playerName, command, args, RoomManager, getRoom, getPlayersInRoom, sendRoomInfoToAllInRoom, savePlayerData, sendInventory, sendCharacterInfo, broadcast, SHOP_ITEMS, MAP_SIZE, VILLAGE_POS, commandHandlers, sendRoomInfo, battleIntervals }) {
     if (process.env.DEBUG === 'true') console.log('DEBUG commandHandlers:', commandHandlers);
     if (process.env.DEBUG === 'true') console.log('DEBUG command:', command);
     if (process.env.DEBUG === 'true') console.log('DEBUG commandHandlers[command]:', commandHandlers && commandHandlers[command]);
@@ -132,46 +132,81 @@ const PlayerGameService = {
       return;
     }
     if (commandHandlers[command]) {
-      if (command === '/여관') {
-        return await commandHandlers[command]({
+      // 객체 기반 명령어 지원
+      if (typeof commandHandlers[command].execute === 'function') {
+        // /클랜힐 명령어는 player, battleIntervals 인자 필요
+        if (command === '/클랜힐') {
+          const player = PlayerManager.getPlayer(playerName);
+          return await commandHandlers[command].execute({
+            ws,
+            player,
+            battleIntervals
+          });
+        }
+        // /정보 명령어는 players 인자 명시적으로 전달
+        if (command === '/정보') {
+          return await commandHandlers[command].execute({
+            ws,
+            playerName,
+            message: [command, ...args].join(' '),
+            players: PlayerManager.getAllPlayers()
+          });
+        }
+        // /랭킹 명령어는 PlayerManager 인자 명시적으로 전달
+        if (command === '/랭킹') {
+          return await commandHandlers[command].execute({
+            ws,
+            PlayerManager
+          });
+        }
+        return await commandHandlers[command].execute({
           ws,
           playerName,
+          message: [command, ...args].join(' '),
           players: PlayerManager.getAllPlayers(),
           getRoom,
-          savePlayerData,
-          sendInventory,
-          sendCharacterInfo
-        });
-      }
-      if (command === '/귀환') {
-        return await commandHandlers[command]({
-          ws,
-          playerName,
-          PlayerManager,
-          getRoom,
           getPlayersInRoom,
-          sendRoomInfo,
+          SHOP_ITEMS,
+          savePlayerData,
           sendInventory,
           sendCharacterInfo,
           MAP_SIZE,
-          VILLAGE_POS
+          VILLAGE_POS,
+          sendRoomInfo
+        });
+      } else if (typeof commandHandlers[command] === 'function') {
+        // /귀환 명령어는 PlayerManager 인자 필요
+        if (command === '/귀환') {
+          return await commandHandlers[command]({
+            ws,
+            playerName,
+            PlayerManager,
+            getRoom,
+            getPlayersInRoom,
+            sendRoomInfo,
+            sendInventory,
+            sendCharacterInfo,
+            MAP_SIZE,
+            VILLAGE_POS
+          });
+        }
+        // 기존 함수 기반 명령어
+        return await commandHandlers[command]({
+          ws,
+          playerName,
+          message: [command, ...args].join(' '),
+          players: PlayerManager.getAllPlayers(),
+          getRoom,
+          getPlayersInRoom,
+          SHOP_ITEMS,
+          savePlayerData,
+          sendInventory,
+          sendCharacterInfo,
+          MAP_SIZE,
+          VILLAGE_POS,
+          sendRoomInfo
         });
       }
-      return await commandHandlers[command]({
-        ws,
-        playerName,
-        message: [command, ...args].join(' '),
-        players: PlayerManager.getAllPlayers(),
-        getRoom,
-        getPlayersInRoom,
-        SHOP_ITEMS,
-        savePlayerData,
-        sendInventory,
-        sendCharacterInfo,
-        MAP_SIZE,
-        VILLAGE_POS,
-        sendRoomInfo
-      });
     } else {
       ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '알 수 없는 명령어입니다.' }));
     }

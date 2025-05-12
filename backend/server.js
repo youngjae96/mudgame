@@ -22,22 +22,7 @@ const jwt = require('jsonwebtoken');
 const SECRET = 'your_jwt_secret';
 const PlayerData = require('./models/PlayerData');
 const User = require('./models/User');
-const {
-  handleBuyCommand,
-  handleSellCommand,
-  handleEquipCommand,
-  handleUnequipCommand,
-  handleTeleportCommand,
-  handleInnCommand,
-  handleAdminCommand,
-  handleGuildCommand,
-  handleWhoCommand,
-  handleHelpCommand,
-  handleShopCommand,
-  handleShopSellCommand,
-  handleStatCommand,
-  handleWhisperCommand,
-} = require('./commands');
+const { commandHandlers } = require('./commands');
 const logger = require('./middlewares/logger');
 const errorHandler = require('./middlewares/errorHandler');
 const playerRouter = require('./routes/player');
@@ -219,33 +204,6 @@ async function savePlayerData(playerName) {
     }
   }
 }
-
-// 명령어-핸들러 매핑 객체
-const commandHandlers = {
-  '/구매': handleBuyCommand,
-  '/판매': handleSellCommand,
-  '/상점': handleShopCommand,
-  '/상점판매': handleShopSellCommand,
-  '/장착': handleEquipCommand,
-  '/해제': handleUnequipCommand,
-  '/텔포': handleTeleportCommand,
-  '/여관': handleInnCommand,
-  '/운영자': (args) => handleAdminCommand({ ...args, savePlayerData }),
-  '/길드': (args) => handleGuildCommand(args),
-  '/누구': (args) => handleWhoCommand(args),
-  '/도움말': (args) => handleHelpCommand(args),
-  '/정보': (args) => handleStatCommand(args),
-  '/귓': (args) => handleWhisperCommand(args),
-  '/귀환': (args) => require('./commands').handleReturnCommand({ ...args, PlayerManager }),
-  '/랭킹': (args) => require('./commands').handleRankingCommand(args),
-  '/클랜힐': (args) => {
-    const player = PlayerManager.getPlayer(args.playerName);
-    return require('./commands').handleClanHealCommand({ ...args, player, battleIntervals });
-  },
-  '/공지쓰기': (args) => require('./commands').handleNoticeWriteCommand(args),
-  '/방명록': (args) => require('./commands').handleGuestbookCommand(args),
-  '/길': (args) => require('./commands').handleGuildChatCommand(args),
-};
 
 // 서비스 인스턴스 생성 및 의존성 주입
 const shopService = new ShopService({

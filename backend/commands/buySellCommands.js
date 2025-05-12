@@ -1,20 +1,24 @@
-// 구매/판매 명령어 핸들러 분리
+// 구매/판매 명령어 핸들러 클래스화
 let shopServiceInstance = null;
 
 function setShopServiceInstance(shopService) {
   shopServiceInstance = shopService;
 }
 
-function handleBuyCommand(args) {
-  return shopServiceInstance.buyItem(args);
+class BuyCommand {
+  execute(args) {
+    return shopServiceInstance.buyItem(args);
+  }
 }
 
-function handleSellCommand(args) {
-  return shopServiceInstance.sellItem(args);
+class SellCommand {
+  execute(args) {
+    return shopServiceInstance.sellItem(args);
+  }
 }
 
 module.exports = {
   setShopServiceInstance,
-  handleBuyCommand,
-  handleSellCommand,
+  BuyCommand,
+  SellCommand,
 }; 

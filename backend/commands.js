@@ -16,13 +16,17 @@ const { handleAdminCommand } = require('./commands/adminCommands');
 const { handleGuildCommand } = require('./commands/guildCommands');
 const guestbookCommands = require('./commands/guestbookCommands');
 const handleGuestbookCommand = guestbookCommands.handleGuestbookCommand;
-const { handleShopCommand, handleShopSellCommand } = require('./commands/shopCommands');
+const { handleShopCommand, handleShopSellCommand, ShopCommand, ShopSellCommand } = require('./commands/shopCommands');
 const { handleStatCommand, handleWhisperCommand } = require('./commands/statCommands');
-const { handleWhoCommand, handleHelpCommand, handleGuildChatCommand } = require('./commands/etcCommands');
-const { handleReturnCommand, handleRankingCommand, handleClanHealCommand } = require('./commands/returnCommands');
-const { handleInnCommand } = require('./commands/innCommands');
-const { handleTeleportCommand } = require('./commands/teleportCommands');
-const { handleBuyCommand, handleSellCommand, setShopServiceInstance } = require('./commands/buySellCommands');
+const { WhoCommand, HelpCommand, GuildChatCommand } = require('./commands/etcCommands');
+const { ReturnCommand, RankingCommand, ClanHealCommand } = require('./commands/returnCommands');
+const { InnCommand } = require('./commands/innCommands');
+const { TeleportCommand } = require('./commands/teleportCommands');
+const { BuyCommand, SellCommand, setShopServiceInstance } = require('./commands/buySellCommands');
+const { StatCommand, WhisperCommand } = require('./commands/statCommands');
+const { GuestbookCommand } = require('./commands/guestbookCommands');
+const { GuildCommand } = require('./commands/guildCommands');
+const { AdminCommand } = require('./commands/adminCommands');
 
 let shopServiceInstance = null;
 
@@ -33,47 +37,48 @@ function setupCommands({ shopService, playerService }) {
 
 // 명령어 핸들러 등록
 const commandHandlers = {
-  '/정보': handleStatCommand,
-  '/귓': handleWhisperCommand,
-  '/구매': handleBuyCommand,
-  '/판매': handleSellCommand,
+  '/정보': new StatCommand(),
+  '/귓': new WhisperCommand(),
+  '/구매': new BuyCommand(),
+  '/판매': new SellCommand(),
   '/장착': PlayerController.handleEquipCommand,
   '/해제': PlayerController.handleUnequipCommand,
-  '/정보': handleStatCommand,
   '/장비': PlayerController.handleEquipCommand,
   '/지도': PlayerController.handleMapCommand,
-  '/텔포': handleTeleportCommand,
-  '/길드': handleGuildCommand,
+  '/텔포': new TeleportCommand(),
+  '/길드': new GuildCommand(),
   '/저장': PlayerController.handleSaveCommand,
-  '/도움말': handleHelpCommand,
-  '/구매': handleShopCommand,
-  '/판매': handleShopSellCommand,
-  '/귀환': handleReturnCommand,
-  '/랭킹': handleRankingCommand,
-  '/클랜힐': handleClanHealCommand,
-  '/운영자': handleAdminCommand,
-  '/길': handleGuildChatCommand,
+  '/도움말': new HelpCommand(),
+  '/귀환': new ReturnCommand(),
+  '/랭킹': new RankingCommand(),
+  '/클랜힐': new ClanHealCommand(),
+  '/운영자': new AdminCommand(),
+  '/길': new GuildChatCommand(),
+  '/여관': new InnCommand(),
+  '/누구': new WhoCommand(),
+  '/상점': new ShopCommand(),
+  '/상점판매': new ShopSellCommand(),
+  '/방명록': new GuestbookCommand(),
 };
 
 module.exports = {
   setupCommands,
-  handleBuyCommand,
-  handleSellCommand,
+  commandHandlers,
+  handleBuyCommand: new BuyCommand(),
+  handleSellCommand: new SellCommand(),
   handleEquipCommand: PlayerController.handleEquipCommand,
   handleUnequipCommand: PlayerController.handleUnequipCommand,
-  handleTeleportCommand,
-  handleInnCommand,
   handleAdminCommand,
   handleGuildCommand,
-  handleWhoCommand,
-  handleHelpCommand,
+  handleWhoCommand: new WhoCommand(),
+  handleHelpCommand: new HelpCommand(),
   handleShopCommand,
   handleShopSellCommand,
   handleStatCommand,
   handleWhisperCommand,
-  handleReturnCommand,
-  handleRankingCommand,
-  handleClanHealCommand,
+  handleReturnCommand: new ReturnCommand(),
+  handleRankingCommand: new RankingCommand(),
+  handleClanHealCommand: new ClanHealCommand(),
   handleGuestbookCommand,
-  handleGuildChatCommand,
+  handleGuildChatCommand: new GuildChatCommand(),
 }; 
