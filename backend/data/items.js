@@ -118,7 +118,7 @@ const SHOP_ITEMS = {
 
 const ISLAND_MONSTERS = [
   // 해변(중간~강, 기존의 2~2.5배)
-  { name: '해변의 크랩킹', maxHp: 220, atk: 45, def: 28, gold: 50, dropItems: [ITEM_NAME_FLAME_SWORD], dropRates: [1.0] },
+  { name: '해변의 크랩킹', maxHp: 220, atk: 45, def: 28, gold: 50, dropItems: [ITEM_NAME_FLAME_SWORD], dropRates: [0.1] },
   { name: '거대 조개괴수', maxHp: 260, atk: 40, def: 34, gold: 55, dropItems: [ITEM_NAME_FLAME_ARMOR], dropRates: [0.03] },
   // 정글(강~매우강, 기존의 2.5~3배)
   { name: '정글 히드라', maxHp: 420, atk: 70, def: 40, gold: 80, dropItems: [ITEM_NAME_FROST_SWORD], dropRates: [0.02] },
