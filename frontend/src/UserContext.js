@@ -10,6 +10,7 @@ export function UserProvider({ children }) {
   const [inventory, setInventory] = useState([]);
   const [authError, setAuthError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [registerPasswordConfirm, setRegisterPasswordConfirm] = useState('');
 
   // 로그인
   const login = async (username, password) => {
@@ -92,7 +93,8 @@ export function UserProvider({ children }) {
   return (
     <UserContext.Provider value={{
       isLoggedIn, token, user, inventory, authError, loading,
-      login, register, logout, fetchUserInfo, fetchInventory, setAuthError
+      login, register, logout, fetchUserInfo, fetchInventory, setAuthError,
+      registerPasswordConfirm, setRegisterPasswordConfirm
     }}>
       {children}
     </UserContext.Provider>

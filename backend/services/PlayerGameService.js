@@ -2,6 +2,7 @@
 
 const { PlayerManager } = require('../playerManager');
 const ChatLog = require('../models/ChatLog');
+const { filterBadWords } = require('../utils/filterBadWords');
 
 const PlayerGameService = {
   async handleMove({ ws, playerName, dx, dy, RoomManager, getRoom, getPlayersInRoom, sendRoomInfoToAllInRoom, savePlayerData, sendInventory, sendCharacterInfo, MAP_SIZE, VILLAGE_POS, battleIntervals }) {
@@ -78,9 +79,14 @@ const PlayerGameService = {
       ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: chatMsg }));
       return;
     }
+    // 욕설 자동 치환 적용 (한국어만)
+    let filteredMsg = chatMsg;
+    if (typeof chatMsg === 'string') {
+      filteredMsg = filterBadWords(chatMsg);
+    }
     if (chatType === 'global') {
       const now = Date.now();
-      if (typeof chatMsg === 'string' && chatMsg.length > 80) {
+      if (typeof filteredMsg === 'string' && filteredMsg.length > 80) {
         ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '전체채팅은 80자까지 입력할 수 있습니다.' }));
         return;
       }
@@ -90,13 +96,22 @@ const PlayerGameService = {
       }
       player.lastGlobalChat = now;
       // DB에 저장
-      ChatLog.create({ name: playerName, message: chatMsg, type: 'chat', chatType: 'global', time: new Date() }).catch(() => {});
-      broadcast(wss, { type: 'chat', chatType: 'global', name: playerName, message: chatMsg });
+      await ChatLog.create({ name: playerName, message: filteredMsg, type: 'chat', chatType: 'global', time: new Date() });
+      // 100개 초과 시 오래된 것 삭제
+      const count = await ChatLog.countDocuments({ chatType: 'global' });
+      if (count > 100) {
+        const toDelete = await ChatLog.find({ chatType: 'global' }).sort({ time: 1 }).limit(count - 100).select('_id');
+        const ids = toDelete.map(doc => doc._id);
+        if (ids.length > 0) {
+          await ChatLog.deleteMany({ _id: { $in: ids } });
+        }
+      }
+      broadcast(wss, { type: 'chat', chatType: 'global', name: playerName, message: filteredMsg });
       return;
     }
     if (chatType === 'local') {
       const now = Date.now();
-      if (typeof chatMsg === 'string' && chatMsg.length > 60) {
+      if (typeof filteredMsg === 'string' && filteredMsg.length > 60) {
         ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '지역채팅은 60자까지 입력할 수 있습니다.' }));
         return;
       }
@@ -108,7 +123,7 @@ const PlayerGameService = {
       const { x, y } = player.position;
       Object.values(PlayerManager.getAllPlayers()).forEach((p) => {
         if (p.position && p.position.x === x && p.position.y === y) {
-          p.ws.send(JSON.stringify({ type: 'chat', chatType: 'local', name: playerName, message: chatMsg }));
+          p.ws.send(JSON.stringify({ type: 'chat', chatType: 'local', name: playerName, message: filteredMsg }));
         }
       });
       return;
@@ -140,7 +155,8 @@ const PlayerGameService = {
           return await commandHandlers[command].execute({
             ws,
             player,
-            battleIntervals
+            battleIntervals,
+            PlayerManager
           });
         }
         // /정보 명령어는 players 인자 명시적으로 전달
@@ -149,7 +165,8 @@ const PlayerGameService = {
             ws,
             playerName,
             message: [command, ...args].join(' '),
-            players: PlayerManager.getAllPlayers()
+            players: PlayerManager.getAllPlayers(),
+            PlayerManager
           });
         }
         // /랭킹 명령어는 PlayerManager 인자 명시적으로 전달
@@ -159,6 +176,7 @@ const PlayerGameService = {
             PlayerManager
           });
         }
+        // 모든 객체 기반 명령어에 PlayerManager 등 공통 의존성 포함
         return await commandHandlers[command].execute({
           ws,
           playerName,
@@ -172,24 +190,10 @@ const PlayerGameService = {
           sendCharacterInfo,
           MAP_SIZE,
           VILLAGE_POS,
-          sendRoomInfo
+          sendRoomInfo,
+          PlayerManager
         });
       } else if (typeof commandHandlers[command] === 'function') {
-        // /귀환 명령어는 PlayerManager 인자 필요
-        if (command === '/귀환') {
-          return await commandHandlers[command]({
-            ws,
-            playerName,
-            PlayerManager,
-            getRoom,
-            getPlayersInRoom,
-            sendRoomInfo,
-            sendInventory,
-            sendCharacterInfo,
-            MAP_SIZE,
-            VILLAGE_POS
-          });
-        }
         // 기존 함수 기반 명령어
         return await commandHandlers[command]({
           ws,
@@ -204,7 +208,8 @@ const PlayerGameService = {
           sendCharacterInfo,
           MAP_SIZE,
           VILLAGE_POS,
-          sendRoomInfo
+          sendRoomInfo,
+          PlayerManager
         });
       }
     } else {
@@ -433,6 +438,7 @@ const PlayerGameService = {
       });
       msg += '\n구매: /구매 아이템명 (예: /구매 나무검)';
       msg += '\n판매: /상점판매';
+      msg += '\n※ 물약류(소모품/잡화)는 /구매 아이템명 갯수 (예: /구매 소형 물약 10), /판매 아이템명 갯수 (예: /판매 소형 물약 10) 으로 여러 개 구매/판매할 수 있습니다.';
       ws.send(JSON.stringify({ type: 'system', subtype: 'info', message: msg }));
       return;
     }
@@ -458,6 +464,7 @@ const PlayerGameService = {
     msg += `\n페이지: /상점 ${cat} [페이지번호]`;
     msg += '\n구매: /구매 아이템명 (예: /구매 나무검)';
     msg += '\n판매: /상점판매';
+    msg += '\n※ 물약류(소모품/잡화)는 /구매 아이템명 갯수 (예: /구매 소형 물약 10), /판매 아이템명 갯수 (예: /판매 소형 물약 10) 으로 여러 개 구매/판매할 수 있습니다.';
     ws.send(JSON.stringify({ type: 'system', subtype: 'info', message: msg }));
   },
   // /상점판매 [페이지]

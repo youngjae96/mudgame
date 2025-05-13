@@ -51,6 +51,7 @@ function AppInner() {
   const [loginPassword, setLoginPassword] = useState('');
   const [registerUsername, setRegisterUsername] = useState('');
   const [registerPassword, setRegisterPassword] = useState('');
+  const [registerPasswordConfirm, setRegisterPasswordConfirm] = useState('');
 
   const {
     inventory, setInventory,
@@ -130,6 +131,8 @@ function AppInner() {
         setRegisterUsername={setRegisterUsername}
         registerPassword={registerPassword}
         setRegisterPassword={setRegisterPassword}
+        registerPasswordConfirm={registerPasswordConfirm}
+        setRegisterPasswordConfirm={setRegisterPasswordConfirm}
         handleLogin={() => login(loginUsername, loginPassword)}
         handleRegister={() => register(registerUsername, registerPassword)}
         authError={authError}

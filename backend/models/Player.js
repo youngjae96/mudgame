@@ -153,6 +153,7 @@ class Player {
         const healAmount = Math.min(potion.perUse, potion.total, needHeal);
         this.hp = Math.min(maxHp, this.hp + healAmount);
         potion.total -= healAmount;
+        this.syncPotionCount();
         if (potion.total <= 0) {
           this.inventory.splice(potionIdx, 1);
         }
@@ -162,6 +163,21 @@ class Player {
     }
     this.removeEmptyPotions();
     return null;
+  }
+
+  syncPotionCount() {
+    const { ITEM_POOL } = require('../data/items');
+    this.inventory.forEach(item => {
+      if (
+        (item.type === ITEM_TYPE.CONSUMABLE || item.type === '잡화' || (item.type && item.type.toLowerCase() === 'consumable')) &&
+        item.total !== undefined && item.name
+      ) {
+        const ref = Array.isArray(ITEM_POOL) ? ITEM_POOL.find(i => i.name === item.name) : null;
+        if (ref && ref.total) {
+          item.count = Math.max(0, Math.ceil(item.total / ref.total));
+        }
+      }
+    });
   }
 
   removeEmptyPotions() {

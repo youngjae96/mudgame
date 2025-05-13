@@ -174,7 +174,7 @@ export default function GameMobileMain({
           {tab === 'info' && <CharacterInfo name={name} room={room} character={character} />}
           {tab === 'inv' && <Inventory inventory={inventory} gold={character?.gold} />}
           {tab === 'chat' && <ChatOnlyBox
-            messages={chatTab === 'guild' ? guildChatLogMessages : (chatTab === 'all' ? allMessages : chatLogMessages)}
+            messages={chatTab === 'guild' ? guildChatLogMessages : chatLogMessages}
             tab={chatTab}
             setTab={setChatTab}
           />}
@@ -250,14 +250,18 @@ function PatchNoteTabs() {
       <div
         style={{
           display: 'flex',
-          gap: 8,
-          marginBottom: 18,
-          justifyContent: 'center',
           flexWrap: 'nowrap',
           overflowX: 'auto',
           whiteSpace: 'nowrap',
+          gap: 4,
+          marginBottom: 18,
+          justifyContent: 'flex-start',
           scrollbarWidth: 'thin',
           scrollbarColor: '#7ecfff #23272f',
+          padding: '0 8px',
+          boxSizing: 'border-box',
+          width: '100%',
+          maxWidth: 480,
         }}
       >
         {notes.map((note, idx) => (
@@ -269,15 +273,16 @@ function PatchNoteTabs() {
               color: selected === idx ? '#232837' : '#ffe066',
               border: 'none',
               borderRadius: 8,
-              padding: '7px 18px',
+              padding: '7px 12px',
               fontWeight: 'bold',
-              fontSize: '1.04rem',
+              fontSize: '1.01rem',
               cursor: 'pointer',
               boxShadow: selected === idx ? '0 2px 8px #ffe06644' : '0 1px 4px #0002',
               transition: 'all 0.15s',
               marginBottom: 2,
-              minWidth: 120,
+              minWidth: 70,
               whiteSpace: 'nowrap',
+              flex: '0 0 auto',
             }}
           >
             {note.title}

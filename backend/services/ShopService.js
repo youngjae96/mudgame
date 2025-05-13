@@ -22,7 +22,16 @@ class ShopService {
       ws.send(JSON.stringify({ type: 'system', subtype: 'guide', message: '상점은 마을에서만 이용할 수 있습니다.' }));
       return;
     }
-    const itemName = message.trim().replace('/구매 ', '').trim();
+    // '/구매 아이템명 [갯수]' 파싱
+    const args = message.trim().replace('/구매 ', '').trim().split(' ');
+    let count = 1;
+    let itemName = args[0];
+    if (args.length > 1 && !isNaN(Number(args[args.length - 1]))) {
+      count = Math.max(1, parseInt(args[args.length - 1], 10));
+      itemName = args.slice(0, -1).join(' ');
+    } else {
+      itemName = args.join(' ');
+    }
     let foundItem = null;
     for (const cat of Object.keys(SHOP_ITEMS)) {
       foundItem = SHOP_ITEMS[cat].find((item) => item.name === itemName);
@@ -32,8 +41,11 @@ class ShopService {
       ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '상점에 없는 아이템입니다.' }));
       return;
     }
-    if (player.gold < foundItem.price) {
-      ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '골드가 부족합니다.' }));
+    if (count < 1) count = 1;
+    if (count > 50) count = 50;
+    const totalPrice = foundItem.price * count;
+    if (player.gold < totalPrice) {
+      ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: `골드가 부족합니다. (필요: ${totalPrice}G)` }));
       return;
     }
     if (player.inventory.length >= 50) {
@@ -47,29 +59,34 @@ class ShopService {
         item.name === itemName &&
         (item.type && (item.type.toLowerCase() === 'consumable' || item.type === '잡화'))
       );
+      let curCount = existingItem ? (existingItem.count || 1) : 0;
+      if (curCount + count > 50) {
+        ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: `${itemName}은(는) 최대 50개까지만 보유할 수 있습니다.` }));
+        return;
+      }
       if (existingItem) {
-        const curCount = existingItem.count || 1;
-        if (curCount + 1 > 50) {
-          ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: `${itemName}은(는) 최대 50개까지만 보유할 수 있습니다.` }));
-          return;
-        }
         addSuccess = true;
-        existingItem.total += foundItem.total;
-        existingItem.count = curCount + 1;
+        existingItem.total += foundItem.total * count;
+        existingItem.count = curCount + count;
       } else {
-        addSuccess = player.addToInventory({ ...foundItem, count: 1 }, ws);
+        addSuccess = player.addToInventory({ ...foundItem, count: count, total: foundItem.total * count }, ws);
       }
     } else {
+      // 무기/방어구 등은 여러 개 동시 구매 불가(1개만 허용)
+      if (count > 1) {
+        ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '이 아이템은 한 번에 1개만 구매할 수 있습니다.' }));
+        return;
+      }
       addSuccess = player.addToInventory({ ...foundItem }, ws);
     }
     if (!addSuccess) {
       return;
     }
-    player.gold -= foundItem.price;
+    player.gold -= totalPrice;
     await this.savePlayerData(playerName).catch(() => {});
     this.sendInventory(player);
     this.sendCharacterInfo(player);
-    ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `${foundItem.name}을(를) 구매했습니다!` }));
+    ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `${foundItem.name}을(를) ${count}개 구매했습니다!` }));
   }
 
   /**
@@ -84,7 +101,16 @@ class ShopService {
       ws.send(JSON.stringify({ type: 'system', subtype: 'guide', message: '상점은 마을에서만 이용할 수 있습니다.' }));
       return;
     }
-    const itemName = message.trim().replace('/판매 ', '').trim();
+    // '/판매 아이템명 [갯수]' 파싱
+    const args = message.trim().replace('/판매 ', '').trim().split(' ');
+    let count = 1;
+    let itemName = args[0];
+    if (args.length > 1 && !isNaN(Number(args[args.length - 1]))) {
+      count = Math.max(1, parseInt(args[args.length - 1], 10));
+      itemName = args.slice(0, -1).join(' ');
+    } else {
+      itemName = args.join(' ');
+    }
     const idx = player.inventory.findIndex((item) => item.name === itemName);
     if (idx === -1) {
       ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '인벤토리에 해당 아이템이 없습니다.' }));
@@ -113,22 +139,37 @@ class ShopService {
       ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '상점에서 판매할 수 없는 아이템입니다.' }));
       return;
     }
-    const sellPrice = Math.floor(foundItem.price * 0.5);
-    player.gold += sellPrice;
+    if (count < 1) count = 1;
     // 소모품(중첩 물약) 판매 로직
     if ((player.inventory[idx].type && (player.inventory[idx].type.toLowerCase() === 'consumable' || player.inventory[idx].type === '잡화')) && player.inventory[idx].count) {
-      player.inventory[idx].count -= 1;
-      player.inventory[idx].total -= foundItem.total || player.inventory[idx].perUse || 0;
+      if (count > player.inventory[idx].count) count = player.inventory[idx].count;
+      const sellPrice = Math.floor(foundItem.price * 0.5) * count;
+      player.gold += sellPrice;
+      player.inventory[idx].count -= count;
+      player.inventory[idx].total -= (foundItem.total || player.inventory[idx].perUse || 0) * count;
       if (player.inventory[idx].count <= 0 || player.inventory[idx].total <= 0) {
         player.inventory.splice(idx, 1);
       }
+      await this.savePlayerData(playerName).catch(() => {});
+      this.sendInventory(player);
+      this.sendCharacterInfo(player);
+      ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `${itemName}을(를) ${count}개 판매했습니다! (+${sellPrice}G)` }));
+      return;
     } else {
+      // 무기/방어구 등은 여러 개 동시 판매 불가(1개만 허용)
+      if (count > 1) {
+        ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '이 아이템은 한 번에 1개만 판매할 수 있습니다.' }));
+        return;
+      }
+      const sellPrice = Math.floor(foundItem.price * 0.5);
+      player.gold += sellPrice;
       player.inventory.splice(idx, 1);
+      await this.savePlayerData(playerName).catch(() => {});
+      this.sendInventory(player);
+      this.sendCharacterInfo(player);
+      ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `${itemName}을(를) 판매했습니다! (+${sellPrice}G)` }));
+      return;
     }
-    await this.savePlayerData(playerName).catch(() => {});
-    this.sendInventory(player);
-    this.sendCharacterInfo(player);
-    ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `${itemName}을(를) 판매했습니다! (+${sellPrice}G)` }));
   }
 }
 

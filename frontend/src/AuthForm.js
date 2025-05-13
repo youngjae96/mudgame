@@ -79,6 +79,8 @@ function AuthForm({
   setRegisterUsername,
   registerPassword,
   setRegisterPassword,
+  registerPasswordConfirm,
+  setRegisterPasswordConfirm,
   handleLogin,
   handleRegister,
   authError,
@@ -109,7 +111,8 @@ function AuthForm({
             <>
               <input className="auth-input" placeholder="닉네임" value={registerUsername} onChange={e => setRegisterUsername(e.target.value)} disabled={loading} />
               <input className="auth-input" type="password" placeholder="비밀번호" value={registerPassword} onChange={e => setRegisterPassword(e.target.value)} disabled={loading} />
-              <Button className="auth-btn" onClick={handleRegister} disabled={!registerUsername || !registerPassword || loading} style={{width: '100%', marginTop: 8}}>
+              <input className="auth-input" type="password" placeholder="비밀번호 확인" value={registerPasswordConfirm} onChange={e => setRegisterPasswordConfirm(e.target.value)} disabled={loading} />
+              <Button className="auth-btn" onClick={handleRegister} disabled={!registerUsername || !registerPassword || !registerPasswordConfirm || registerPassword !== registerPasswordConfirm || loading} style={{width: '100%', marginTop: 8}}>
                 {loading ? '회원가입 중...' : '회원가입'}
               </Button>
             </>
