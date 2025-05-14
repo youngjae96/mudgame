@@ -18,6 +18,7 @@ import GameMobileMain from './GameMobileMain';
 import { UserProvider, useUserContext } from './UserContext';
 import { GameStateProvider, useGameStateContext } from './GameStateContext';
 import ResponsiveLayout from './layout/ResponsiveLayout';
+import Alert from './components/Alert';
 
 const Container = styled.div`
   max-width: 1100px;
@@ -118,6 +119,18 @@ function AppInner() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  const [showAlert, setShowAlert] = useState(false);
+  const [expEventActive, setExpEventActive] = useState(false);
+
+  // 서버에서 내려주는 character 패킷의 expEventActive로 동기화
+  useEffect(() => {
+    if (wsCharacter && typeof wsCharacter.expEventActive === 'boolean') {
+      setExpEventActive(wsCharacter.expEventActive);
+    }
+  }, [wsCharacter]);
+
+  const bannerHeight = isMobile ? 56 : 54;
+
   if (!isLoggedIn) {
     return (
       <AuthForm
@@ -146,65 +159,74 @@ function AppInner() {
 
   return (
     <>
-      {notice && (
-        <div style={{ background: '#222', color: '#ffe066', fontWeight: 'bold', padding: '10px', textAlign: 'center', borderRadius: '8px', marginBottom: '10px', fontSize: '1.1em', letterSpacing: '1px' }}>{notice}</div>
-      )}
-      {showMap && <MapModal mapSize={mapSize} mapInfo={mapInfo} onClose={() => setShowMap(false)} />}
-      <ResponsiveLayout
-        isMobile={isMobile}
-        desktop={
-          <Container>
-            <GameMain
-              connected={connected}
-              handleLogout={logout}
-              room={room}
-              mapSize={mapSize}
-              mapInfo={mapInfo}
-              handleMove={handleMove}
-              nearbyRooms={nearbyRooms}
-              allMessages={allMessages}
-              chatLogMessages={chatLogMessages}
-              guildChatLogMessages={guildChatLogMessages}
-              chatEndRef={chatEndRef}
-              handleSend={handleSend}
-              input={input}
-              setInput={setInput}
-              UI_LABELS={UI_LABELS}
-              players={players}
-              name={name}
-              character={character}
-              inventory={inventory}
-              handlePickup={handlePickup}
-              handleAttack={handleAttack}
-            />
-          </Container>
-        }
-        mobile={
-          <MobileRoot>
-            <GameMobileMain
-              room={room}
-              mapSize={mapSize}
-              mapInfo={mapInfo}
-              handleMove={handleMove}
-              nearbyRooms={nearbyRooms}
-              chatLogMessages={chatLogMessages}
-              guildChatLogMessages={guildChatLogMessages}
-              allMessages={allMessages}
-              chatEndRef={chatEndRef}
-              handleSend={handleSend}
-              input={input}
-              setInput={setInput}
-              UI_LABELS={UI_LABELS}
-              name={name}
-              character={character}
-              inventory={inventory}
-              handlePickup={handlePickup}
-              handleAttack={handleAttack}
-              handleLogout={logout}
-            />
-          </MobileRoot>
-        }
-      />
+      <div>
+        {showAlert && notice && (
+          <Alert
+            message={notice}
+            type="warning"
+            onClose={() => setShowAlert(false)}
+            autoHideDuration={3500}
+          />
+        )}
+        {showMap && <MapModal mapSize={mapSize} mapInfo={mapInfo} onClose={() => setShowMap(false)} />}
+        <ResponsiveLayout
+          isMobile={isMobile}
+          desktop={
+            <Container>
+              <GameMain
+                connected={connected}
+                handleLogout={logout}
+                room={room}
+                mapSize={mapSize}
+                mapInfo={mapInfo}
+                handleMove={handleMove}
+                nearbyRooms={nearbyRooms}
+                allMessages={allMessages}
+                chatLogMessages={chatLogMessages}
+                guildChatLogMessages={guildChatLogMessages}
+                chatEndRef={chatEndRef}
+                handleSend={handleSend}
+                input={input}
+                setInput={setInput}
+                UI_LABELS={UI_LABELS}
+                players={players}
+                name={name}
+                character={character}
+                inventory={inventory}
+                handlePickup={handlePickup}
+                handleAttack={handleAttack}
+                expEventActive={expEventActive}
+              />
+            </Container>
+          }
+          mobile={
+            <MobileRoot>
+              <GameMobileMain
+                room={room}
+                mapSize={mapSize}
+                mapInfo={mapInfo}
+                handleMove={handleMove}
+                nearbyRooms={nearbyRooms}
+                chatLogMessages={chatLogMessages}
+                guildChatLogMessages={guildChatLogMessages}
+                allMessages={allMessages}
+                chatEndRef={chatEndRef}
+                handleSend={handleSend}
+                input={input}
+                setInput={setInput}
+                UI_LABELS={UI_LABELS}
+                name={name}
+                character={character}
+                inventory={inventory}
+                handlePickup={handlePickup}
+                handleAttack={handleAttack}
+                handleLogout={logout}
+                expEventActive={expEventActive}
+              />
+            </MobileRoot>
+          }
+        />
+      </div>
     </>
   );
 }

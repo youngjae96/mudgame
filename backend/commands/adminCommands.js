@@ -11,7 +11,7 @@ class AdminCommand {
     }
     const args = message.trim().split(' ');
     if (args.length < 2) {
-      ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[운영자] 사용법: /운영자 <공지|골드지급|아이템지급|텔포|서버저장|차단> ...' }));
+      ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[운영자] 사용법: /운영자 <공지|골드지급|아이템지급|텔포|서버저장|차단|경험치|경험치해제> ...' }));
       return;
     }
     const subcmd = args[1];
@@ -169,6 +169,28 @@ class AdminCommand {
       } catch (err) {
         ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: `[운영자] IP 차단 실패: ${err.message}` }));
       }
+      return;
+    }
+    if (subcmd === '경험치') {
+      global.expDoubleEvent = true;
+      if (typeof global.wss !== 'undefined') {
+        broadcast(global.wss, { type: 'notice', notice: '경험치 1.2배 이벤트가 시작되었습니다! (테스트/운영용)' });
+        const { PlayerManager } = require('../playerManager');
+        const { sendCharacterInfo } = require('../utils/broadcast');
+        Object.values(PlayerManager.getAllPlayers()).forEach(p => sendCharacterInfo(p));
+      }
+      ws.send(JSON.stringify({ type: 'system', message: '[운영자] 경험치 1.2배 이벤트가 시작되었습니다.' }));
+      return;
+    }
+    if (subcmd === '경험치해제') {
+      global.expDoubleEvent = false;
+      if (typeof global.wss !== 'undefined') {
+        broadcast(global.wss, { type: 'notice', notice: '경험치 1.2배 이벤트가 종료되었습니다.' });
+        const { PlayerManager } = require('../playerManager');
+        const { sendCharacterInfo } = require('../utils/broadcast');
+        Object.values(PlayerManager.getAllPlayers()).forEach(p => sendCharacterInfo(p));
+      }
+      ws.send(JSON.stringify({ type: 'system', message: '[운영자] 경험치 1.2배 이벤트가 종료되었습니다.' }));
       return;
     }
     ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[운영자] 지원하지 않는 서브명령어입니다.' }));

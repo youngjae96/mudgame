@@ -61,7 +61,7 @@ function RoomInfo({ room, renderRoomItems, renderRoomMonsters }) {
   if (!room) return null;
   return (
     <RoomInfoWrapper>
-      <RoomName>{room.name}</RoomName>
+      <RoomName>{room.name} ({room.x}, {room.y})</RoomName>
       <RoomDesc>{room.description}</RoomDesc>
       <RoomPlayers>
         <b>이 방의 플레이어:</b> {room.players.join(', ')}

@@ -40,9 +40,15 @@ class BattleService {
     if (typeof player.getTotalExpBonus === 'function') {
       expBonus *= player.getTotalExpBonus();
     }
+    // 경험치 1.2배 이벤트 적용
+    if (global.expDoubleEvent) {
+      expBonus *= 1.2;
+    }
+    // 로그 출력: 경험치 보너스 및 실제 지급량
+    console.log(`[Battle] ${player.name} vs ${monster.name} | expBonus: ${expBonus} | strExp: ${1.5 * expBonus} | dexExp: ${0.75 * expBonus} | 이벤트:${!!global.expDoubleEvent}`);
 
-    if (player.gainStrExp) player.gainStrExp(1 * expBonus);
-    if (player.gainDexExp) player.gainDexExp(0.5 * expBonus);
+    if (player.gainStrExp) player.gainStrExp(1.5 * expBonus);
+    if (player.gainDexExp) player.gainDexExp(0.75 * expBonus);
 
     let monsterDead = false;
     let playerDead = false;

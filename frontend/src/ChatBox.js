@@ -132,6 +132,28 @@ const GuildChatMsg = styled.div`
   color: #ff66cc;
   font-weight: bold;
 `;
+const ExpEventBanner = styled.div`
+  width: 100%;
+  background: linear-gradient(90deg, #ff9800 60%, #ffd54f 100%);
+  color: #fff;
+  font-weight: bold;
+  text-align: center;
+  padding: 7px 0 6px 0;
+  font-size: 1.08rem;
+  letter-spacing: 1px;
+  border-radius: 8px 8px 0 0;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 8px #0002;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  @media (max-width: 600px) {
+    font-size: 1.13rem;
+    padding: 8px 0 7px 0;
+    margin-bottom: 6px;
+  }
+`;
 
 function getBattleIcon(subtype) {
   switch (subtype) {
@@ -252,9 +274,10 @@ function getMessageComponent(msg, i) {
  * @param {object} props - 컴포넌트 props
  * @param {Array} props.messages - 채팅 메시지 목록
  * @param {React.RefObject} props.chatEndRef - 채팅 끝 참조 객체
+ * @param {boolean} props.expEventActive - 경험치 이벤트 활성 여부
  * @returns {JSX.Element}
  */
-function ChatBox({ messages, chatEndRef }) {
+function ChatBox({ messages, chatEndRef, expEventActive }) {
   const wrapperRef = useRef(null);
   const [autoScroll, setAutoScroll] = useState(true);
 
@@ -284,6 +307,28 @@ function ChatBox({ messages, chatEndRef }) {
   const flatMessages = Array.isArray(messages) ? messages.flat(Infinity) : [];
   return (
     <ChatBoxWrapper ref={wrapperRef} onScroll={handleScroll}>
+      {expEventActive && (
+        <div
+          style={{
+            position: 'sticky',
+            top: 0,
+            background: 'linear-gradient(90deg, #ffe066 70%, #ffb347 100%)',
+            color: '#232837',
+            fontWeight: 'bold',
+            fontSize: '0.98rem',
+            padding: '4px 0',
+            textAlign: 'center',
+            zIndex: 10,
+            borderRadius: '8px 8px 0 0',
+            letterSpacing: 0.2,
+            whiteSpace: 'normal',
+          }}
+        >
+          <span role="img" aria-label="fire">🔥</span>
+          경험치 +20% 주말이벤트 중!
+          <span role="img" aria-label="fire">🔥</span>
+        </div>
+      )}
       {flatMessages.map((msg, i) => getMessageComponent(msg, i))}
       <div ref={chatEndRef} />
     </ChatBoxWrapper>

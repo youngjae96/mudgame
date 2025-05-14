@@ -157,7 +157,10 @@ function sendCharacterInfo(player) {
     dexExpMax: player.dexExpMax,
     intExp: player.intExp,
     intExpMax: player.intExpMax,
-    gold: player.gold
+    gold: player.gold,
+    equipWeapon: player.equipWeapon || null,
+    equipArmor: player.equipArmor || null,
+    expEventActive: !!global.expDoubleEvent
   };
   player.ws.send(JSON.stringify({ type: 'character', info }));
 }

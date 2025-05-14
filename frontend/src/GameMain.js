@@ -115,6 +115,7 @@ const PlayerListPanel = styled.div`
  * @param {Array} props.inventory - 인벤토리 목록
  * @param {function} props.handlePickup - 아이템 줍기 핸들러
  * @param {function} props.handleAttack - 몬스터 공격 핸들러
+ * @param {boolean} props.expEventActive - 경험치 이벤트 활성화 여부
  * @returns {JSX.Element}
  */
 function GameMain({
@@ -138,7 +139,8 @@ function GameMain({
   character,
   inventory,
   handlePickup,
-  handleAttack
+  handleAttack,
+  expEventActive
 }) {
   const [showHelp, setShowHelp] = useState(false);
   const [showChatOnly, setShowChatOnly] = useState(false);
@@ -224,7 +226,7 @@ function GameMain({
               </Modal>
             )}
             {showChatOnly && <ChatOnlyBox messages={chatTab === 'guild' ? guildChatLogMessages : chatLogMessages} tab={chatTab} setTab={setChatTab} />}
-            <ChatBox messages={allMessages} chatEndRef={chatEndRef} />
+            <ChatBox messages={allMessages} chatEndRef={chatEndRef} expEventActive={expEventActive} />
             <form className="input-form" onSubmit={handleSend} style={{ display: 'flex', alignItems: 'center' }}>
               <Input
                 className="chat-input"

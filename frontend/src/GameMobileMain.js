@@ -10,6 +10,7 @@ import Input from './components/Input';
 import RoomItems from './RoomItems';
 import RoomMonsters from './RoomMonsters';
 import Modal from './components/Modal';
+import ExpEventBanner from './components/ExpEventBanner';
 
 const MobileRoot = styled.div`
   width: 100vw;
@@ -128,7 +129,8 @@ export default function GameMobileMain({
   room, mapSize, mapInfo, handleMove, nearbyRooms,
   chatLogMessages, guildChatLogMessages, chatEndRef, handleSend, input, setInput,
   allMessages,
-  UI_LABELS, name, character, inventory, handlePickup, handleAttack, handleLogout
+  UI_LABELS, name, character, inventory, handlePickup, handleAttack, handleLogout,
+  expEventActive
 }) {
   // 탭 상태: room(방정보), info(내정보), inv(인벤), chat(채팅)
   const [tab, setTab] = useState('room');
@@ -181,7 +183,7 @@ export default function GameMobileMain({
         </MobileContent>
         <MobileChat>
           <MobileChatMessages>
-            <ChatBox messages={allMessages} chatEndRef={chatEndRef} />
+            <ChatBox messages={allMessages} chatEndRef={chatEndRef} expEventActive={expEventActive} />
           </MobileChatMessages>
           <MobileChatInput onSubmit={handleSend} autoComplete="off">
             <Input

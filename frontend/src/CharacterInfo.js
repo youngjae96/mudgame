@@ -64,24 +64,74 @@ const StatRow = styled.div`
     font-weight: bold;
   }
 `;
+const GaugeBar = styled.div`
+  width: 100%;
+  height: 18px;
+  background: #23272f;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  position: relative;
+  overflow: hidden;
+`;
+const GaugeFill = styled.div`
+  height: 100%;
+  border-radius: 8px;
+  transition: width 0.3s;
+`;
+const GaugeLabel = styled.div`
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+  text-align: center;
+  color: #fff;
+  font-size: 0.93rem;
+  font-weight: bold;
+  line-height: 18px;
+  text-shadow: 0 1px 2px #000a;
+`;
 
 function CharacterInfo({ name, room, character }) {
   if (!character) return null;
+  // 다양한 key에서 장비 정보 추출
+  const equipment = character.equipment || character.equip || character.equipped || {};
+  const weapon = character.equipWeapon || equipment.weapon || equipment.무기 || character.weapon || character.무기 || null;
+  const armor = character.equipArmor || equipment.armor || equipment.방어구 || character.armor || character.방어구 || null;
+  const accessory = equipment.accessory || equipment.장신구 || character.accessory || character.장신구 || null;
+  const etc = equipment.etc || equipment.기타 || character.etc || character.기타 || null;
   return (
     <CharacterInfoWrapper>
-      <CharacterTitle>내 캐릭터</CharacterTitle>
-      <CharacterRow>닉네임: <b>{name}</b></CharacterRow>
-      <CharacterRow>위치: ({room?.x}, {room?.y})</CharacterRow>
-      <CharacterRow>현재 방: {room?.name}</CharacterRow>
-      <CharacterRow>구역: {room?.type}</CharacterRow>
+      <CharacterTitle>캐릭터 정보</CharacterTitle>
       <CharacterStats>
-        <StatRow><span>HP</span><span>{character.hp} / {character.maxHp}</span></StatRow>
-        <StatRow><span>MP</span><span>{character.mp} / {character.maxMp}</span></StatRow>
+        {/* HP 게이지 */}
+        <div style={{ marginBottom: 2 }}>
+          <GaugeBar>
+            <GaugeFill style={{ width: `${(character.hp / character.maxHp) * 100}%`, background: 'linear-gradient(90deg, #ff4e4e 60%, #ffb3b3 100%)' }} />
+            <GaugeLabel>HP {character.hp} / {character.maxHp}</GaugeLabel>
+          </GaugeBar>
+        </div>
+        {/* MP 게이지 */}
+        <div style={{ marginBottom: 8 }}>
+          <GaugeBar>
+            <GaugeFill style={{ width: `${(character.mp / character.maxMp) * 100}%`, background: 'linear-gradient(90deg, #2196f3 60%, #7ecfff 100%)' }} />
+            <GaugeLabel>MP {character.mp} / {character.maxMp}</GaugeLabel>
+          </GaugeBar>
+        </div>
+        {/* 스탯 정보 */}
         <StatRow><span>힘</span><span>{character.str}</span></StatRow>
         <StatRow><span>민첩</span><span>{character.dex}</span></StatRow>
         <StatRow><span>지능</span><span>{character.int}</span></StatRow>
         <StatRow><span>공격력</span><span>{character.atk}</span></StatRow>
         <StatRow><span>방어력</span><span>{character.def}</span></StatRow>
+        {/* 장비 정보 */}
+        <StatRow><span>무기</span><span>{weapon ? (weapon.name || weapon) : '없음'}</span></StatRow>
+        <StatRow><span>방어구</span><span>{armor ? (armor.name || armor) : '없음'}</span></StatRow>
+        {accessory && (
+          <StatRow><span>장신구</span><span>{accessory.name || accessory}</span></StatRow>
+        )}
+        {etc && (
+          <StatRow><span>기타</span><span>{etc.name || etc}</span></StatRow>
+        )}
       </CharacterStats>
     </CharacterInfoWrapper>
   );

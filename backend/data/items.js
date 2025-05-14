@@ -23,6 +23,11 @@ const ITEM_NAME_LARGE_POTION = '대형 물약';
 const ITEM_NAME_KKUM = '꿈결의 검';
 const ITEM_NAME_HWAN = '환상의 검';
 const ITEM_NAME_YOUNG = '영원의 검';
+const ITEM_NAME_IDLE10 = '신비의 검';
+const ITEM_NAME_IDLE13 = '환영의 검';
+const ITEM_NAME_IDLE15 = '몽중의 검';
+const ITEM_NAME_IDLE18 = '영겁의 검';
+const ITEM_NAME_IDLE20 = '초월의 검';
 
 const ITEM_TYPE = {
   WEAPON: '무기',
@@ -67,23 +72,21 @@ const ISLAND2_MONSTERS = [
 ];
 
 const CAVE_BOSS_MONSTERS = [
-  // 약한 몬스터 (그대로)
-  { name: '지하 마왕', maxHp: 800, atk: 130, def: 75, gold: 200, dropItems: [ITEM_NAME_HWAN, ITEM_NAME_YOUNG], dropRates: [0.004, 0.0015] },
-  { name: '암흑 드래곤', maxHp: 780, atk: 128, def: 72, gold: 195, dropItems: [ITEM_NAME_HWAN, ITEM_NAME_YOUNG], dropRates: [0.004, 0.0015] },
-  { name: '동굴 히드라', maxHp: 760, atk: 125, def: 70, gold: 190, dropItems: [ITEM_NAME_HWAN, ITEM_NAME_YOUNG], dropRates: [0.004, 0.0015] },
-  { name: '심연의 골렘', maxHp: 740, atk: 122, def: 68, gold: 185, dropItems: [ITEM_NAME_HWAN, ITEM_NAME_YOUNG], dropRates: [0.004, 0.0015] },
-  { name: '지하 괴수왕', maxHp: 720, atk: 120, def: 66, gold: 180, dropItems: [ITEM_NAME_HWAN, ITEM_NAME_YOUNG], dropRates: [0.004, 0.0015] },
-  { name: '암석 거대거미', maxHp: 700, atk: 118, def: 64, gold: 175, dropItems: [ITEM_NAME_HWAN, ITEM_NAME_YOUNG], dropRates: [0.004, 0.0015] },
-  { name: '동굴 망령', maxHp: 780, atk: 126, def: 70, gold: 192, dropItems: [ITEM_NAME_HWAN, ITEM_NAME_YOUNG], dropRates: [0.004, 0.0015] },
-  // 강한 몬스터 (상향)
-  { name: '지하 불사자', maxHp: 1140, atk: 149, def: 82, gold: 216, dropItems: [ITEM_NAME_HWAN, ITEM_NAME_YOUNG], dropRates: [0.004, 0.0015] },
-  { name: '암흑 리치로드', maxHp: 1110, atk: 145, def: 78, gold: 209, dropItems: [ITEM_NAME_HWAN, ITEM_NAME_YOUNG], dropRates: [0.004, 0.0015] },
-  { name: '동굴 거대뱀', maxHp: 1080, atk: 143, def: 74, gold: 196, dropItems: [ITEM_NAME_HWAN, ITEM_NAME_YOUNG], dropRates: [0.004, 0.0015] },
-  { name: '심연의 박쥐왕', maxHp: 1050, atk: 138, def: 72, gold: 190, dropItems: [ITEM_NAME_HWAN, ITEM_NAME_YOUNG], dropRates: [0.004, 0.0015] },
-  { name: '지하 돌연변이', maxHp: 1140, atk: 152, def: 86, gold: 222, dropItems: [ITEM_NAME_HWAN, ITEM_NAME_YOUNG], dropRates: [0.004, 0.0015] },
-  { name: '암흑 슬라임킹', maxHp: 1170, atk: 155, def: 89, gold: 228, dropItems: [ITEM_NAME_HWAN, ITEM_NAME_YOUNG], dropRates: [0.004, 0.0015] },
-  { name: '동굴 불꽃정령', maxHp: 1080, atk: 144, def: 79, gold: 205, dropItems: [ITEM_NAME_HWAN, ITEM_NAME_YOUNG], dropRates: [0.004, 0.0015] },
-  { name: '심연의 맹독전갈', maxHp: 1110, atk: 148, def: 83, gold: 214, dropItems: [ITEM_NAME_HWAN, ITEM_NAME_YOUNG], dropRates: [0.004, 0.0015] },
+  { name: '지하 마왕', maxHp: 800, atk: 130, def: 75, gold: 200, dropItems: [ITEM_NAME_HWAN, ITEM_NAME_YOUNG, ITEM_NAME_IDLE10, ITEM_NAME_IDLE13, ITEM_NAME_IDLE15, ITEM_NAME_IDLE18, ITEM_NAME_IDLE20], dropRates: [0.004, 0.0015, 0.0015, 0.0012, 0.001, 0.001, 0.001] },
+  { name: '암흑 드래곤', maxHp: 780, atk: 128, def: 72, gold: 195, dropItems: [ITEM_NAME_HWAN, ITEM_NAME_YOUNG, ITEM_NAME_IDLE10, ITEM_NAME_IDLE13, ITEM_NAME_IDLE15, ITEM_NAME_IDLE18, ITEM_NAME_IDLE20], dropRates: [0.004, 0.0015, 0.001, 0.0015, 0.0012, 0.001, 0.001] },
+  { name: '동굴 히드라', maxHp: 760, atk: 125, def: 70, gold: 190, dropItems: [ITEM_NAME_HWAN, ITEM_NAME_YOUNG, ITEM_NAME_IDLE10, ITEM_NAME_IDLE13, ITEM_NAME_IDLE15, ITEM_NAME_IDLE18, ITEM_NAME_IDLE20], dropRates: [0.004, 0.0015, 0.001, 0.001, 0.0015, 0.0012, 0.001] },
+  { name: '심연의 골렘', maxHp: 740, atk: 122, def: 68, gold: 185, dropItems: [ITEM_NAME_HWAN, ITEM_NAME_YOUNG, ITEM_NAME_IDLE10, ITEM_NAME_IDLE13, ITEM_NAME_IDLE15, ITEM_NAME_IDLE18, ITEM_NAME_IDLE20], dropRates: [0.004, 0.0015, 0.001, 0.001, 0.001, 0.0015, 0.0012] },
+  { name: '지하 괴수왕', maxHp: 720, atk: 120, def: 66, gold: 180, dropItems: [ITEM_NAME_HWAN, ITEM_NAME_YOUNG, ITEM_NAME_IDLE10, ITEM_NAME_IDLE13, ITEM_NAME_IDLE15, ITEM_NAME_IDLE18, ITEM_NAME_IDLE20], dropRates: [0.004, 0.0015, 0.0012, 0.001, 0.001, 0.001, 0.0015] },
+  { name: '암석 거대거미', maxHp: 700, atk: 118, def: 64, gold: 175, dropItems: [ITEM_NAME_HWAN, ITEM_NAME_YOUNG, ITEM_NAME_IDLE10, ITEM_NAME_IDLE13, ITEM_NAME_IDLE15, ITEM_NAME_IDLE18, ITEM_NAME_IDLE20], dropRates: [0.004, 0.0015, 0.001, 0.0012, 0.001, 0.0015, 0.001] },
+  { name: '동굴 망령', maxHp: 780, atk: 126, def: 70, gold: 192, dropItems: [ITEM_NAME_HWAN, ITEM_NAME_YOUNG, ITEM_NAME_IDLE10, ITEM_NAME_IDLE13, ITEM_NAME_IDLE15, ITEM_NAME_IDLE18, ITEM_NAME_IDLE20], dropRates: [0.004, 0.0015, 0.001, 0.001, 0.0012, 0.001, 0.0015] },
+  { name: '지하 불사자', maxHp: 1140, atk: 149, def: 82, gold: 216, dropItems: [ITEM_NAME_HWAN, ITEM_NAME_YOUNG, ITEM_NAME_IDLE10, ITEM_NAME_IDLE13, ITEM_NAME_IDLE15, ITEM_NAME_IDLE18, ITEM_NAME_IDLE20], dropRates: [0.004, 0.0015, 0.003, 0.0015, 0.0015, 0.002, 0.0015] },
+  { name: '암흑 리치로드', maxHp: 1110, atk: 145, def: 78, gold: 209, dropItems: [ITEM_NAME_HWAN, ITEM_NAME_YOUNG, ITEM_NAME_IDLE10, ITEM_NAME_IDLE13, ITEM_NAME_IDLE15, ITEM_NAME_IDLE18, ITEM_NAME_IDLE20], dropRates: [0.004, 0.0015, 0.0015, 0.003, 0.0015, 0.0015, 0.002] },
+  { name: '동굴 거대뱀', maxHp: 1080, atk: 143, def: 74, gold: 196, dropItems: [ITEM_NAME_HWAN, ITEM_NAME_YOUNG, ITEM_NAME_IDLE10, ITEM_NAME_IDLE13, ITEM_NAME_IDLE15, ITEM_NAME_IDLE18, ITEM_NAME_IDLE20], dropRates: [0.004, 0.0015, 0.002, 0.0015, 0.003, 0.0015, 0.0015] },
+  { name: '심연의 박쥐왕', maxHp: 1050, atk: 138, def: 72, gold: 190, dropItems: [ITEM_NAME_HWAN, ITEM_NAME_YOUNG, ITEM_NAME_IDLE10, ITEM_NAME_IDLE13, ITEM_NAME_IDLE15, ITEM_NAME_IDLE18, ITEM_NAME_IDLE20], dropRates: [0.004, 0.0015, 0.0015, 0.002, 0.0015, 0.003, 0.0015] },
+  { name: '지하 돌연변이', maxHp: 1140, atk: 152, def: 86, gold: 222, dropItems: [ITEM_NAME_HWAN, ITEM_NAME_YOUNG, ITEM_NAME_IDLE10, ITEM_NAME_IDLE13, ITEM_NAME_IDLE15, ITEM_NAME_IDLE18, ITEM_NAME_IDLE20], dropRates: [0.004, 0.0015, 0.0015, 0.0015, 0.002, 0.0015, 0.003] },
+  { name: '암흑 슬라임킹', maxHp: 1170, atk: 155, def: 89, gold: 228, dropItems: [ITEM_NAME_HWAN, ITEM_NAME_YOUNG, ITEM_NAME_IDLE10, ITEM_NAME_IDLE13, ITEM_NAME_IDLE15, ITEM_NAME_IDLE18, ITEM_NAME_IDLE20], dropRates: [0.004, 0.0015, 0.003, 0.0015, 0.0015, 0.002, 0.0015] },
+  { name: '동굴 불꽃정령', maxHp: 1080, atk: 144, def: 79, gold: 205, dropItems: [ITEM_NAME_HWAN, ITEM_NAME_YOUNG, ITEM_NAME_IDLE10, ITEM_NAME_IDLE13, ITEM_NAME_IDLE15, ITEM_NAME_IDLE18, ITEM_NAME_IDLE20], dropRates: [0.004, 0.0015, 0.0015, 0.003, 0.0015, 0.0015, 0.002] },
+  { name: '심연의 맹독전갈', maxHp: 1110, atk: 148, def: 83, gold: 214, dropItems: [ITEM_NAME_HWAN, ITEM_NAME_YOUNG, ITEM_NAME_IDLE10, ITEM_NAME_IDLE13, ITEM_NAME_IDLE15, ITEM_NAME_IDLE18, ITEM_NAME_IDLE20], dropRates: [0.004, 0.0015, 0.0015, 0.0015, 0.003, 0.002, 0.0015] },
 ];
 
 // 자동 상점 아이템 분류

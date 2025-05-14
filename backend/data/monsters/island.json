@@ -4,7 +4,7 @@
     "maxHp": 220,
     "atk": 45,
     "def": 28,
-    "gold": 50,
+    "gold": 58,
     "dropItems": ["플레임소드"],
     "dropRates": [0.1]
   },
@@ -13,7 +13,7 @@
     "maxHp": 260,
     "atk": 40,
     "def": 34,
-    "gold": 55,
+    "gold": 63,
     "dropItems": ["플레임아머"],
     "dropRates": [0.03]
   },
@@ -22,7 +22,7 @@
     "maxHp": 420,
     "atk": 70,
     "def": 40,
-    "gold": 80,
+    "gold": 92,
     "dropItems": ["서리검"],
     "dropRates": [0.02]
   },
@@ -31,7 +31,7 @@
     "maxHp": 320,
     "atk": 60,
     "def": 36,
-    "gold": 65,
+    "gold": 75,
     "dropItems": ["서리갑옷"],
     "dropRates": [0.03]
   },
@@ -40,7 +40,7 @@
     "maxHp": 600,
     "atk": 100,
     "def": 55,
-    "gold": 150,
+    "gold": 170,
     "dropItems": ["용의 검"],
     "dropRates": [0.02]
   },
@@ -49,7 +49,7 @@
     "maxHp": 520,
     "atk": 90,
     "def": 70,
-    "gold": 130,
+    "gold": 148,
     "dropItems": ["용의 갑옷"],
     "dropRates": [0.03]
   },
@@ -58,7 +58,7 @@
     "maxHp": 180,
     "atk": 38,
     "def": 22,
-    "gold": 40,
+    "gold": 46,
     "dropItems": ["암흑검"],
     "dropRates": [0.02]
   },
@@ -67,7 +67,7 @@
     "maxHp": 260,
     "atk": 48,
     "def": 30,
-    "gold": 48,
+    "gold": 55,
     "dropItems": ["암흑갑옷"],
     "dropRates": [0.03]
   }
