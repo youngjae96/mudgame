@@ -11,7 +11,7 @@ const EXP_BONUS_MIN = 1.00;
  * 다음 스탯 경험치 요구량 계산
  */
 function calcNextStatExp(prev) {
-  return Math.floor(prev * 1.2 + 5);
+  return Math.floor(prev * 1.16 + 5);
 }
 
 /**

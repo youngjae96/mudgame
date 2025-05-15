@@ -562,6 +562,47 @@ setInterval(() => {
   clanHealTick(PlayerManager, Guild);
 }, 4000);
 
+// === 경험치 이벤트 자동 스케줄러 (테스트: 목요일 18:55~18:58) ===
+function getKoreaTime() {
+  // 한국 시간(UTC+9) Date 객체 반환
+  const now = new Date();
+  return new Date(now.getTime() + 9 * 60 * 60 * 1000);
+}
+
+setInterval(() => {
+  const now = getKoreaTime();
+  const day = now.getUTCDay(); // 0:일, 1:월, ..., 4:목, 5:금, 6:토
+  const hour = now.getUTCHours();
+  const min = now.getUTCMinutes();
+
+  // 토요일 09:00 ~ 일요일 21:00
+  const eventStart = (day === 6 && (hour > 9 || (hour === 9 && min >= 0))) || (day === 0 && (hour < 21 || (hour === 21 && min === 0)));
+  const eventActive = (day === 6 && (hour > 9 || (hour === 9 && min >= 0))) || (day === 0 && (hour < 21 || (hour === 21 && min === 0)));
+  // 실제로는 토요일 09:00부터 일요일 21:00까지
+  // day === 6(토) 09:00~24:00, day === 0(일) 00:00~21:00
+  const isEventTime = (day === 6 && (hour > 9 || (hour === 9 && min >= 0))) || (day === 0 && (hour < 21 || (hour === 21 && min === 0)));
+
+  if (isEventTime) {
+    if (!global.expDoubleEvent) {
+      global.expDoubleEvent = true;
+      if (typeof global.wss !== 'undefined') {
+        broadcast(global.wss, { type: 'notice', notice: '[자동] 경험치 1.2배 이벤트가 시작되었습니다! (토 09:00 ~ 일 21:00)' });
+        Object.values(PlayerManager.getAllPlayers()).forEach(p => sendCharacterInfo(p));
+      }
+      console.log('[경험치이벤트] 자동 시작 (토 09:00 ~ 일 21:00)');
+    }
+  } else {
+    if (global.expDoubleEvent) {
+      global.expDoubleEvent = false;
+      if (typeof global.wss !== 'undefined') {
+        broadcast(global.wss, { type: 'notice', notice: '[자동] 경험치 1.2배 이벤트가 종료되었습니다.' });
+        Object.values(PlayerManager.getAllPlayers()).forEach(p => sendCharacterInfo(p));
+      }
+      console.log('[경험치이벤트] 자동 종료 (토 09:00 ~ 일 21:00)');
+    }
+  }
+}, 5000); // 5초마다 체크
+
 if (require.main === module) {
   global.wss = wss;
   server.listen(PORT, () => {
