@@ -33,9 +33,9 @@
   { "name": "철갑옷", "type": "방어구", "def": 6, "dex": 1, "price": 180, "shopBuy": true, "shopSell": true, "drop": false, "desc": "무거운 철로 만든 갑옷" },
   { "name": "은갑옷", "type": "방어구", "def": 10, "dex": 2, "str": 1, "price": 450, "shopBuy": true, "shopSell": true, "drop": false, "desc": "은으로 만든 고급 갑옷" },
   { "name": "금갑옷", "type": "방어구", "def": 18, "dex": 3, "str": 2, "price": 1100, "shopBuy": true, "shopSell": true, "drop": false, "desc": "황금으로 만든 최고의 갑옷" },
-  { "name": "신비의 검", "type": "무기", "atk": 0, "expBonus": 1.10, "desc": "신비로운 힘이 깃든 방치형 무기. 힘/민첩 경험치 10% 증가", "drop": true, "shopBuy": false, "shopSell": true },
-  { "name": "환영의 검", "type": "무기", "atk": 0, "expBonus": 1.13, "desc": "환영처럼 스며드는 힘. 힘/민첩 경험치 13% 증가", "drop": true, "shopBuy": false, "shopSell": true },
-  { "name": "몽중의 검", "type": "무기", "atk": 0, "expBonus": 1.15, "desc": "꿈속에서 깨어난 전설의 방치형 무기. 힘/민첩 경험치 15% 증가", "drop": true, "shopBuy": false, "shopSell": true },
-  { "name": "영겁의 검", "type": "무기", "atk": 0, "expBonus": 1.18, "desc": "영원한 시간의 흐름을 담은 방치형 무기. 힘/민첩 경험치 18% 증가", "drop": true, "shopBuy": false, "shopSell": true },
-  { "name": "초월의 검", "type": "무기", "atk": 0, "expBonus": 1.20, "desc": "모든 한계를 초월한 방치형 무기. 힘/민첩 경험치 20% 증가", "drop": true, "shopBuy": false, "shopSell": true }
+  { "name": "신비의 검", "type": "무기", "atk": 0, "expBonus": 1.10, "desc": "신비로운 힘이 깃든 방치형 무기. 힘/민첩 경험치 10% 증가", "drop": true, "shopBuy": false, "shopSell": true, "price": 80000 },
+  { "name": "환영의 검", "type": "무기", "atk": 0, "expBonus": 1.13, "desc": "환영처럼 스며드는 힘. 힘/민첩 경험치 13% 증가", "drop": true, "shopBuy": false, "shopSell": true, "price": 85000 },
+  { "name": "몽중의 검", "type": "무기", "atk": 0, "expBonus": 1.15, "desc": "꿈속에서 깨어난 전설의 방치형 무기. 힘/민첩 경험치 15% 증가", "drop": true, "shopBuy": false, "shopSell": true, "price": 90000 },
+  { "name": "영겁의 검", "type": "무기", "atk": 0, "expBonus": 1.18, "desc": "영원한 시간의 흐름을 담은 방치형 무기. 힘/민첩 경험치 18% 증가", "drop": true, "shopBuy": false, "shopSell": true, "price": 95000 },
+  { "name": "초월의 검", "type": "무기", "atk": 0, "expBonus": 1.20, "desc": "모든 한계를 초월한 방치형 무기. 힘/민첩 경험치 20% 증가", "drop": true, "shopBuy": false, "shopSell": true, "price": 100000 }
 ] 

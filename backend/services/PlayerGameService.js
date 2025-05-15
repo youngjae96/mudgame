@@ -487,7 +487,7 @@ const PlayerGameService = {
     ];
     const sellable = player.inventory.filter(invItem => {
       if (ISLAND_DROP_ITEMS.includes(invItem.name)) return true;
-      return Object.values(SHOP_ITEMS).flat().some(shopItem => shopItem.name === invItem.name);
+      return invItem.shopSell === true && typeof invItem.price === 'number';
     });
     const itemsPerPage = 7;
     const totalPages = Math.max(1, Math.ceil(sellable.length / itemsPerPage));
