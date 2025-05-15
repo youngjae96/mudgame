@@ -118,6 +118,9 @@ class BattleService {
     } else {
       let monsterDmg = Math.max(1, monster.atk - player.getDef());
       player.hp -= monsterDmg;
+      // 자동 물약 사용 (Player 메서드 활용)
+      const potionResult = player.autoUsePotion();
+      // 반격 로그: 물약 사용 후 HP로 기록
       log.push({
         type: 'battle',
         subtype: 'counter',
@@ -129,8 +132,6 @@ class BattleService {
         playerMaxHp: player.getRealMaxHp(),
         text: `${monster.name}의 반격!`,
       });
-      // 자동 물약 사용 (Player 메서드 활용)
-      const potionResult = player.autoUsePotion();
       if (potionResult) {
         log.push({
           type: 'battle',

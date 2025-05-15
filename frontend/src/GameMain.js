@@ -343,18 +343,22 @@ function PatchNoteTabs() {
   if (!notes.length) return <div style={{ color: '#aaa', textAlign: 'center', margin: '32px 0' }}>패치노트 불러오는 중...</div>;
 
   return (
-    <div style={{ width: '100%', minWidth: 220, maxWidth: 480 }}>
+    <div style={{ width: '100%', minWidth: 220, maxWidth: 700 }}>
       <div
         style={{
           display: 'flex',
           gap: 8,
           marginBottom: 18,
-          justifyContent: 'center',
+          justifyContent: 'flex-start',
           flexWrap: 'nowrap',
           overflowX: 'auto',
           whiteSpace: 'nowrap',
           scrollbarWidth: 'thin',
           scrollbarColor: '#7ecfff #23272f',
+          padding: '0 8px',
+          boxSizing: 'border-box',
+          width: '100%',
+          maxWidth: 700,
         }}
       >
         {notes.map((note, idx) => (
@@ -373,8 +377,9 @@ function PatchNoteTabs() {
               boxShadow: selected === idx ? '0 2px 8px #ffe06644' : '0 1px 4px #0002',
               transition: 'all 0.15s',
               marginBottom: 2,
-              minWidth: 120,
+              minWidth: 100,
               whiteSpace: 'nowrap',
+              flex: '0 0 auto',
             }}
           >
             {note.title}

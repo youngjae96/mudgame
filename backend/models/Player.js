@@ -4,7 +4,7 @@
 // 앞으로 스킬, 퀘스트, 파티 등은 별도 클래스로 분리 권장
 
 const { VILLAGE_POS } = require('../data/map');
-const { ITEM_NAME_MONGHWA, ITEM_NAME_KKUM, ITEM_NAME_HWAN, ITEM_NAME_YOUNG, ITEM_TYPE } = require('../data/items');
+const { ITEM_NAME_MONGHWA, ITEM_NAME_KKUM, ITEM_NAME_HWAN, ITEM_NAME_YOUNG, ITEM_TYPE, ITEM_NAME_IDLE10, ITEM_NAME_IDLE13, ITEM_NAME_IDLE15, ITEM_NAME_IDLE18, ITEM_NAME_IDLE20 } = require('../data/items');
 const { calcNextStatExp } = require('../utils/expUtils');
 
 class Player {
@@ -109,8 +109,12 @@ class Player {
 
   // 실제 전투/표시에는 getAtk()만 사용할 것
   getAtk() {
-    const zeroAtkWeapons = [ITEM_NAME_MONGHWA, ITEM_NAME_KKUM, ITEM_NAME_HWAN, ITEM_NAME_YOUNG];
-    if (this.equipWeapon && zeroAtkWeapons.includes(this.equipWeapon.name)) {
+    // 방치형 무기: atk 0이고 expBonus가 있으면 무조건 공격력 0
+    if (
+      this.equipWeapon &&
+      this.equipWeapon.atk === 0 &&
+      this.equipWeapon.expBonus
+    ) {
       return 0;
     }
     let base = 2 + this.str * 1.5 + this.dex * 0.5 + this.int * 0.3;
