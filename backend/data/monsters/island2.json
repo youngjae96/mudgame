@@ -1,0 +1,6 @@
+[
+  { "name": "섬의 수호자", "maxHp": 700, "atk": 110, "def": 60, "gold": 160, "dropItems": ["천공의 갑옷", "천공의 검"], "dropRates": [0.002, 0.002] },
+  { "name": "섬의 폭군", "maxHp": 750, "atk": 120, "def": 65, "gold": 175, "dropItems": ["천공의 갑옷", "천공의 검"], "dropRates": [0.002, 0.002] },
+  { "name": "섬의 맹독룡", "maxHp": 720, "atk": 115, "def": 62, "gold": 168, "dropItems": ["천공의 갑옷", "천공의 검"], "dropRates": [0.002, 0.002] },
+  { "name": "섬의 그림자", "maxHp": 780, "atk": 125, "def": 70, "gold": 190, "dropItems": ["천공의 갑옷", "천공의 검"], "dropRates": [0.002, 0.002] }
+] 

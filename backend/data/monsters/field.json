@@ -1,0 +1,7 @@
+[
+  { "name": "고블린", "maxHp": 20, "atk": 5, "def": 2, "gold": 6 },
+  { "name": "슬라임", "maxHp": 15, "atk": 3, "def": 1, "gold": 5 },
+  { "name": "해골병사", "maxHp": 35, "atk": 8, "def": 4, "gold": 10 },
+  { "name": "오우거", "maxHp": 60, "atk": 15, "def": 7, "gold": 15 },
+  { "name": "드래곤", "maxHp": 60, "atk": 10, "def": 5, "gold": 15 }
+] 

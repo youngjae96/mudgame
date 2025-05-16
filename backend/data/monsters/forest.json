@@ -1,0 +1,6 @@
+[
+  { "name": "숲의 수호자", "maxHp": 80, "atk": 18, "def": 10, "gold": 18 },
+  { "name": "고대 나무정령", "maxHp": 100, "atk": 15, "def": 14, "gold": 20 },
+  { "name": "숲의 늑대왕", "maxHp": 70, "atk": 22, "def": 8, "gold": 16 },
+  { "name": "엘프 전사", "maxHp": 60, "atk": 20, "def": 9, "gold": 14 }
+] 

@@ -1,0 +1,6 @@
+[
+  { "name": "암흑 미노타우로스", "maxHp": 130, "atk": 28, "def": 16, "gold": 22 },
+  { "name": "동굴 리치", "maxHp": 110, "atk": 32, "def": 14, "gold": 20 },
+  { "name": "지하 괴수", "maxHp": 150, "atk": 25, "def": 20, "gold": 25 },
+  { "name": "암석 골렘", "maxHp": 120, "atk": 22, "def": 25, "gold": 19 }
+] 

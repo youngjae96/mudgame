@@ -47,7 +47,7 @@ export const MESSAGE_SUBTYPES = {
 
 export const MAP_EMOJI = {
   field: '🌱', forest: '🌲', cave: '🪨', cave_entrance: '🕳️', cave_wall: '🧱', village: '🏠',
-  beach: '🏖️', jungle: '🌴', volcano: '🌋', sea: '��', islandfield: '🌾',
+  beach: '🏖️', jungle: '🌴', volcano: '🌋', sea: '🌊', islandfield: '🌾',
   desert: '🏜️',    // 사막
   oasis: '🏝️',     // 오아시스(야자수섬)
   rock: '⛰️',      // 바위지대
