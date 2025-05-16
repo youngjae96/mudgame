@@ -37,6 +37,10 @@ const MinimapCell = styled.div`
     if ($cellType === 'forest') return '#4e944f';
     if ($cellType === 'cave') return '#888';
     if ($cellType === 'village') return '#ffe066';
+    if ($cellType === 'desert') return '#f7d488'; // 사막 노랑
+    if ($cellType === 'oasis') return '#7ed6df'; // 오아시스 파랑
+    if ($cellType === 'rock') return '#b2bec3';  // 바위 회색
+    if ($cellType === 'desertcave') return '#e17055'; // 사막동굴 주황
     return '#181c24';
   }};
   border-radius: 6px;
@@ -67,11 +71,14 @@ const MinimapCell = styled.div`
 function MapModal({ mapSize, mapInfo, onClose }) {
   const emojiMap = MAP_EMOJI;
   const isCave = mapInfo?.world === 3;
+  const regions = mapInfo?.regions || [];
+  const sizeY = regions.length;
+  const sizeX = regions[0]?.length || 0;
   const grid = [];
-  for (let y = 0; y < mapSize; y++) {
+  for (let y = 0; y < sizeY; y++) {
     const row = [];
-    for (let x = 0; x < mapSize; x++) {
-      let cellType = mapInfo?.regions?.[y]?.[x] || 'field';
+    for (let x = 0; x < sizeX; x++) {
+      let cellType = regions[y][x] || 'field';
       let caveZone = null;
       if (isCave) {
         if (y <= 9) caveZone = 'entrance';

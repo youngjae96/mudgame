@@ -39,12 +39,12 @@ class GuildCommand {
       return;
     }
     if (subcmd === '목록') {
-      const guilds = await Guild.find({}, 'name master members');
+      const guilds = await Guild.find({}, 'name master members joinType');
       if (!guilds.length) {
         ws.send(JSON.stringify({ type: 'system', message: '[길드] 생성된 길드가 없습니다.' }));
         return;
       }
-      const list = guilds.map(g => `• ${g.name} (길드장: ${g.master}, 인원: ${g.members.length}/20)`).join('\n');
+      const list = guilds.map(g => `• ${g.name} (길드장: ${g.master}, 인원: ${g.members.length}/20, 가입방식: ${g.joinType === 'approval' ? '승인제' : '자유가입'})`).join('\n');
       ws.send(JSON.stringify({ type: 'system', message: `[길드 목록]\n${list}` }));
       return;
     }
@@ -84,9 +84,20 @@ class GuildCommand {
         const last = lastLoginMap[name];
         return `${name} (${formatLastLogin(last)})`;
       }).join(', ');
+      // 클랜힐 정보 추가
+      // 현재 클랜힐 사용 중인 유저 목록
+      const onlinePlayers = PlayerManager.getAllPlayers();
+      const clanHealers = guild.members.filter(name => onlinePlayers[name] && onlinePlayers[name].clanHealOn);
+      // 총 회복량: 현재 클랜힐 on인 유저들의 회복량 합산
+      const totalHealAmount = clanHealers.reduce((sum, name) => {
+        const p = onlinePlayers[name];
+        if (!p) return sum;
+        const healAmount = 1 + Math.floor((p.int || 0) / 5);
+        return sum + healAmount;
+      }, 0);
       ws.send(JSON.stringify({
         type: 'system',
-        message: `[길드 정보]\n이름: ${guild.name}\n길드장: ${guild.master}\n인원: ${guild.members.length}/20\n가입방식: ${guild.joinType === 'approval' ? '승인제' : '자유가입'}\n멤버: ${memberList}\n공지: ${guild.notice || '(없음)'}`
+        message: `[길드 정보]\n이름: ${guild.name}\n길드장: ${guild.master}\n인원: ${guild.members.length}/20\n가입방식: ${guild.joinType === 'approval' ? '승인제' : '자유가입'}\n멤버: ${memberList}\n공지: ${guild.notice || '(없음)'}\n---\n[클랜힐 정보]\n현재 사용 중: ${clanHealers.length ? clanHealers.join(', ') : '없음'}\n총 회복량: ${totalHealAmount}`
       }));
       return;
     }

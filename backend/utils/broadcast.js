@@ -39,7 +39,6 @@ function sendRoomInfo(player, getRoom, getPlayersInRoom, _MAP_SIZE, VILLAGE_POS,
   const world = player.world || 1;
   const room = getRoom(world, x, y);
   if (!room) {
-    console.error(`[sendRoomInfo] room not found: world=${world}, x=${x}, y=${y}`);
     return;
   }
   const playerList = getPlayersInRoom(world, x, y);
@@ -59,13 +58,17 @@ function sendRoomInfo(player, getRoom, getPlayersInRoom, _MAP_SIZE, VILLAGE_POS,
   }
   // 전체 맵 지역 정보 생성
   const regions = [];
-  for (let yy = 0; yy < mapSize; yy++) {
+  let regionSize = mapSize;
+  if (world === 5) regionSize = 7;
+  for (let yy = 0; yy < regionSize; yy++) {
     const row = [];
-    for (let xx = 0; xx < mapSize; xx++) {
+    for (let xx = 0; xx < regionSize; xx++) {
       const r = getRoom(world, xx, yy);
-      row.push(r ? r.type : ROOM_TYPE.FIELD);
+      if (r) {
+        row.push(r.type);
+      }
     }
-    regions.push(row);
+    if (row.length) regions.push(row);
   }
   player.ws.send(
     JSON.stringify({
@@ -93,7 +96,7 @@ function sendRoomInfo(player, getRoom, getPlayersInRoom, _MAP_SIZE, VILLAGE_POS,
     player.ws.send(
       JSON.stringify({
         type: 'system',
-        message: '[마을 명령어 안내]\n/상점 : 상점 이용\n/여관 : 여관 이용(체력/마나 회복)\n/텔포 : 월드 이동(예: /텔포 무인도, /텔포 무인도2, /텔포 마을)\n/길드 : 길드 명령어 안내(/길드 <생성|가입|수락|탈퇴|추방|공지|정보|목록|해체|채팅|채팅로그> ...)\n/도움말 : 명령어 전체 안내'
+        message: '[마을 명령어 안내]\n/상점 : 상점 이용\n/여관 : 여관 이용(체력/마나 회복)\n/텔포 : 월드 이동(예: /텔포 무인도, /텔포 무인도2, /텔포 사막, /텔포 마을)\n/길드 : 길드 명령어 안내(/길드 <생성|가입|수락|탈퇴|추방|공지|정보|목록|해체|채팅|채팅로그> ...)\n/도움말 : 명령어 전체 안내'
       })
     );
   }

@@ -3,7 +3,7 @@ const http = require('http');
 const { WebSocketServer } = require('ws');
 const cors = require('cors');
 const Player = require('./models/Player');
-const { ITEM_POOL, FIELD_MONSTERS, FOREST_MONSTERS, CAVE_MONSTERS, SHOP_ITEMS, ISLAND_MONSTERS, ISLAND2_MONSTERS } = require('./data/items');
+const { ITEM_POOL, FIELD_MONSTERS, FOREST_MONSTERS, CAVE_MONSTERS, SHOP_ITEMS, ISLAND_MONSTERS, ISLAND2_MONSTERS, DESERT_MONSTERS } = require('./data/items');
 const { MAP_SIZE, VILLAGE_POS, rooms, getRoom, roomsIsland, ISLAND_VILLAGE_POS, roomsCave, MAP_SIZE_CAVE, roomsIsland2, ISLAND2_VILLAGE_POS } = require('./data/map');
 const Monster = require('./models/Monster');
 const {
@@ -54,6 +54,9 @@ const PORT = process.env.PORT || 4000;
 let battleIntervals = {};
 global.currentNotice = null;
 global.wss = wss;
+
+// 한 계정당 하나의 WebSocket만 허용
+const activeSockets = {}; // username: ws
 
 function getPlayersInRoom(world, x, y) {
   return Object.values(PlayerManager.getAllPlayers())
@@ -155,6 +158,13 @@ function respawnMonsterWithDeps(world, x, y) {
       ISLAND2_MONSTERS, ISLAND2_MONSTERS, ISLAND2_MONSTERS, Monster,
       getPlayersInRoom, sendRoomInfo, MAP_SIZE, ISLAND2_VILLAGE_POS, PlayerManager.getAllPlayers()
     );
+  } else if (world === 5) {
+    respawnMonster(
+      world, x, y,
+      getRoom,
+      DESERT_MONSTERS, DESERT_MONSTERS, DESERT_MONSTERS, Monster,
+      getPlayersInRoom, sendRoomInfo, 7, { x: 3, y: 3 }, PlayerManager.getAllPlayers()
+    );
   } else {
     respawnMonster(
       world, x, y,
@@ -243,7 +253,6 @@ wss.on('connection', (ws) => {
         const { name, token } = data;
         if (process.env.DEBUG === 'true') console.log('[서버] join 요청:', { name, token });
         if (!token) {
-//          console.log('[AUTH] 인증 토큰 없음: name=', name, 'ip=', ws._socket?.remoteAddress);
           ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '인증 토큰이 필요합니다.' }));
           ws.close();
           return;
@@ -252,22 +261,31 @@ wss.on('connection', (ws) => {
         try {
           decoded = jwt.verify(token, SECRET);
           if (decoded.username !== name) {
-            console.log('[AUTH] 토큰 username 불일치:', decoded.username, name, 'ip=', ws._socket?.remoteAddress);
             ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '토큰 정보가 일치하지 않습니다.' }));
             ws.close();
             return;
           }
         } catch (e) {
-          console.log('[AUTH] 유효하지 않은 토큰:', token, '에러:', e.message, 'name=', name, 'ip=', ws._socket?.remoteAddress);
           ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '유효하지 않은 토큰입니다.' }));
           ws.close();
           return;
         }
+        // === 중복접속 방지 및 세션 꼬임 완전 방지 ===
+        if (activeSockets[name]) {
+          try {
+            activeSockets[name].send(JSON.stringify({ type: 'system', subtype: 'error', message: '다른 곳에서 로그인되어 접속이 종료됩니다.' }));
+            activeSockets[name].close();
+          } catch {}
+        }
+        delete activeSockets[name];
+        if (PlayerManager.getPlayer(name)) {
+          PlayerManager.removePlayer(name);
+        }
+        activeSockets[name] = ws;
         playerName = name;
         (async () => {
           let pdata = await PlayerData.findOne({ userId: decoded.userId });
           if (!pdata) {
-            if (process.env.DEBUG === 'true') console.log('[서버] PlayerData 없음, 새로 생성', decoded.userId, playerName);
             pdata = await PlayerData.create({
               userId: decoded.userId,
               name: playerName,
@@ -278,7 +296,6 @@ wss.on('connection', (ws) => {
               inventory: [],
             });
           } else {
-            if (process.env.DEBUG === 'true') console.log('[서버] PlayerData 불러옴', pdata);
           }
           const player = new Player(playerName, ws);
           player.world = pdata.world;
@@ -533,6 +550,12 @@ wss.on('connection', (ws) => {
   });
 
   ws.on('close', () => {
+    if (activeSockets[playerName] === ws) {
+      delete activeSockets[playerName];
+    }
+    if (PlayerManager.getPlayer(playerName)) {
+      PlayerManager.removePlayer(playerName);
+    }
     // WebSocket 연결이 끊겼을 때도 동일하게 처리
     if (playerName && PlayerManager.getPlayer(playerName)) {
       const prevWorld = PlayerManager.getPlayer(playerName).world;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import MiniMap from './MiniMap';
 import RoomInfo from './RoomInfo';
@@ -11,6 +11,7 @@ import RoomItems from './RoomItems';
 import RoomMonsters from './RoomMonsters';
 import Modal from './components/Modal';
 import ExpEventBanner from './components/ExpEventBanner';
+import PasswordChangeModal from './components/PasswordChangeModal';
 
 const MobileRoot = styled.div`
   width: 100vw;
@@ -136,10 +137,22 @@ export default function GameMobileMain({
   const [tab, setTab] = useState('room');
   const [chatTab, setChatTab] = useState('all');
   const [showPatchNote, setShowPatchNote] = useState(false);
+  const [showPasswordChange, setShowPasswordChange] = useState(false);
 
   // 방 아이템/몬스터 렌더 함수
   const renderRoomItems = () => <RoomItems room={room} onPickup={handlePickup} />;
   const renderRoomMonsters = () => <RoomMonsters room={room} onAttack={handleAttack} />;
+
+  // 채팅 전송 핸들러 확장
+  const handleSendWithPasswordChange = useCallback((e) => {
+    if (e) e.preventDefault();
+    if (input.trim() === '/비밀번호변경') {
+      setShowPasswordChange(true);
+      setInput('');
+      return;
+    }
+    if (typeof handleSend === 'function') handleSend(e);
+  }, [input, setInput, handleSend]);
 
   return (
     <MobileRoot>
@@ -185,7 +198,7 @@ export default function GameMobileMain({
           <MobileChatMessages>
             <ChatBox messages={allMessages} chatEndRef={chatEndRef} expEventActive={expEventActive} />
           </MobileChatMessages>
-          <MobileChatInput onSubmit={handleSend} autoComplete="off">
+          <MobileChatInput onSubmit={handleSendWithPasswordChange} autoComplete="off">
             <Input
               className="chat-input"
               placeholder={UI_LABELS?.CHAT_PLACEHOLDER || '명령어 또는 채팅 입력...'}
@@ -198,6 +211,11 @@ export default function GameMobileMain({
           </MobileChatInput>
         </MobileChat>
       </MobileMain>
+      <PasswordChangeModal
+        open={showPasswordChange}
+        onClose={() => setShowPasswordChange(false)}
+        onSubmit={async () => ({ success: true })} // 임시 성공 처리
+      />
       <style>{`
         .patchnote-scroll {
           scrollbar-width: thin;

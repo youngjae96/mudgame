@@ -43,25 +43,22 @@ function MiniMap({ room, mapSize, mapInfo, onMove, nearbyRooms, world }) {
   if (!room) return null;
   const VISIBLE_SIZE = 5;
   const half = Math.floor(VISIBLE_SIZE / 2);
-  const startX = Math.max(0, room.x - half);
-  const endX = Math.min(mapSize - 1, room.x + half);
-  const startY = Math.max(0, room.y - half);
-  const endY = Math.min(mapSize - 1, room.y + half);
   const emojiMap = MAP_EMOJI;
-
+  const regions = mapInfo?.regions || [];
+  const sizeY = regions.length;
+  const sizeX = regions[0]?.length || 0;
   const grid = useMemo(() => {
     const rows = [];
-    for (let y = startY; y <= endY; y++) {
+    for (let y = room.y - half; y <= room.y + half; y++) {
       const row = [];
-      for (let x = startX; x <= endX; x++) {
+      for (let x = room.x - half; x <= room.x + half; x++) {
         const isCurrent = room.x === x && room.y === y;
         const isNeighbor =
           (Math.abs(room.x - x) === 1 && room.y === y) ||
           (Math.abs(room.y - y) === 1 && room.x === x);
-        const found = nearbyRooms.find(r => r.x === x && r.y === y);
-        let cellType = 'field';
-        if (found) {
-          cellType = found.type;
+        let cellType = undefined;
+        if (y >= 0 && y < sizeY && x >= 0 && x < sizeX) {
+          cellType = regions[y][x];
         }
         row.push(
           <MinimapCell
@@ -70,9 +67,10 @@ function MiniMap({ room, mapSize, mapInfo, onMove, nearbyRooms, world }) {
             $isCurrent={isCurrent}
             $isNeighbor={isNeighbor}
             onClick={() => isNeighbor && onMove(x, y)}
-            title={`(${x + 1}, ${y + 1})${cellType === 'village' ? ' - 마을' : ''}`}
+            title={cellType ? `(${x + 1}, ${y + 1})${cellType === 'village' ? ' - 마을' : ''}` : ''}
+            style={cellType ? undefined : { background: 'transparent', border: 'none', cursor: 'default' }}
           >
-            {isCurrent ? '●' : (emojiMap[cellType] || '')}
+            {cellType ? (isCurrent ? '●' : (emojiMap[cellType] || '')) : ''}
           </MinimapCell>
         );
       }
@@ -83,7 +81,7 @@ function MiniMap({ room, mapSize, mapInfo, onMove, nearbyRooms, world }) {
       );
     }
     return rows;
-  }, [room, mapSize, mapInfo, nearbyRooms, world, startX, endX, startY, endY, emojiMap, onMove]);
+  }, [room, mapInfo, nearbyRooms, world, onMove, emojiMap, regions, sizeX, sizeY]);
 
   return <MinimapWrapper>{grid}</MinimapWrapper>;
 }

@@ -279,34 +279,16 @@ function getMessageComponent(msg, i) {
  */
 function ChatBox({ messages, chatEndRef, expEventActive }) {
   const wrapperRef = useRef(null);
-  const [autoScroll, setAutoScroll] = useState(true);
-
-  // 스크롤 이벤트 핸들러
-  const handleScroll = (e) => {
-    const el = e.target;
-    // 스크롤이 거의 맨 아래(2px 오차 허용)면 autoScroll 활성화
-    if (el.scrollHeight - el.scrollTop - el.clientHeight < 2) {
-      setAutoScroll(true);
-    } else {
-      setAutoScroll(false);
-    }
-  };
 
   useEffect(() => {
-    if (autoScroll && wrapperRef.current) {
+    if (wrapperRef.current) {
       wrapperRef.current.scrollTop = wrapperRef.current.scrollHeight - wrapperRef.current.clientHeight;
     }
-  }, [messages, autoScroll]);
-
-  useEffect(() => {
-    if (chatEndRef && chatEndRef.current) {
-      chatEndRef.current.scrollIntoView({ behavior: 'auto' });
-    }
-  }, [messages, chatEndRef]);
+  }, [messages]);
 
   const flatMessages = Array.isArray(messages) ? messages.flat(Infinity) : [];
   return (
-    <ChatBoxWrapper ref={wrapperRef} onScroll={handleScroll}>
+    <ChatBoxWrapper ref={wrapperRef}>
       {expEventActive && (
         <div
           style={{
@@ -330,13 +312,13 @@ function ChatBox({ messages, chatEndRef, expEventActive }) {
         </div>
       )}
       {flatMessages.map((msg, i) => getMessageComponent(msg, i))}
-      <div ref={chatEndRef} />
     </ChatBoxWrapper>
   );
 }
 
 export function ChatOnlyBox({ messages, tab, setTab }) {
   const boxRef = useRef(null);
+  const [autoScroll, setAutoScroll] = useState(true);
   // 길드탭일 때는 필터 없이 전체, 나머지는 기존대로
   const filtered = Array.isArray(messages)
     ? (tab === 'guild'
@@ -348,11 +330,26 @@ export function ChatOnlyBox({ messages, tab, setTab }) {
           ))
       )
     : [];
+  // 스크롤 이벤트 핸들러
+  const handleScroll = (e) => {
+    const el = e.target;
+    if (el.scrollHeight - el.scrollTop - el.clientHeight < 2) {
+      setAutoScroll(true);
+    } else {
+      setAutoScroll(false);
+    }
+  };
   useEffect(() => {
     if (boxRef.current) {
-      boxRef.current.scrollTop = boxRef.current.scrollHeight;
+      const el = boxRef.current;
+      if (el.scrollHeight - el.scrollTop - el.clientHeight > 2) {
+        setAutoScroll(false);
+      }
     }
-  }, [filtered]);
+    if (autoScroll && boxRef.current) {
+      boxRef.current.scrollTop = boxRef.current.scrollHeight - boxRef.current.clientHeight;
+    }
+  }, [filtered, autoScroll]);
   return (
     <div style={{ background: '#181c24', borderRadius: 8, padding: 12, marginBottom: 12, boxShadow: '0 2px 8px #0004' }}>
       <div style={{ display: 'flex', gap: 8, marginBottom: 8, justifyContent: 'center' }}>
@@ -361,7 +358,7 @@ export function ChatOnlyBox({ messages, tab, setTab }) {
         <button onClick={() => setTab('guild')} style={{ background: tab === 'guild' ? '#7ecfff' : '#232837', color: tab === 'guild' ? '#232837' : '#7ecfff', border: 'none', borderRadius: 6, padding: '4px 12px', fontWeight: 'bold', fontSize: '1.01rem', cursor: 'pointer', transition: 'all 0.15s' }}>길드</button>
         <button onClick={() => setTab('whisper')} style={{ background: tab === 'whisper' ? '#7ecfff' : '#232837', color: tab === 'whisper' ? '#232837' : '#7ecfff', border: 'none', borderRadius: 6, padding: '4px 12px', fontWeight: 'bold', fontSize: '1.01rem', cursor: 'pointer', transition: 'all 0.15s' }}>귓속말</button>
       </div>
-      <div ref={boxRef} className="patchnote-scroll" style={{ maxHeight: 130, minHeight: 60, overflowY: 'auto', fontSize: '1.01rem', background: 'none', padding: 0, margin: 0, ...(window.innerWidth <= 600 ? { maxHeight: 160 } : {}) }}>
+      <div ref={boxRef} className="patchnote-scroll" style={{ maxHeight: 130, minHeight: 60, overflowY: 'auto', fontSize: '1.01rem', background: 'none', padding: 0, margin: 0, ...(window.innerWidth <= 600 ? { maxHeight: 160 } : {}) }} onScroll={handleScroll}>
         {filtered.length === 0 && <div style={{ color: '#888', textAlign: 'center', marginTop: 16 }}>채팅 메시지가 없습니다.</div>}
         {filtered.map((msg, i) => (
           <div key={i} style={{ color: msg.chatType === 'whisper' ? '#2ecc40' : (msg.chatType === 'global' ? '#ffb347' : (msg.chatType === 'guild' ? '#ff66cc' : '#fff')), marginBottom: 4 }}>

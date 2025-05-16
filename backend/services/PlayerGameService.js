@@ -129,7 +129,6 @@ const PlayerGameService = {
       return;
     }
     if (chatType === 'command') {
-      if (process.env.DEBUG === 'true') console.log('DEBUG handleChat command:', command, args);
       await this.handleCommand({ ws, playerName, command, args, RoomManager: null, getRoom, getPlayersInRoom, sendRoomInfoToAllInRoom, savePlayerData, sendInventory, sendCharacterInfo, broadcast, SHOP_ITEMS, MAP_SIZE, VILLAGE_POS, commandHandlers, sendRoomInfo: sendRoomInfoToAllInRoom, battleIntervals });
       return;
     }
@@ -139,9 +138,6 @@ const PlayerGameService = {
     }
   },
   async handleCommand({ ws, playerName, command, args, RoomManager, getRoom, getPlayersInRoom, sendRoomInfoToAllInRoom, savePlayerData, sendInventory, sendCharacterInfo, broadcast, SHOP_ITEMS, MAP_SIZE, VILLAGE_POS, commandHandlers, sendRoomInfo, battleIntervals }) {
-    if (process.env.DEBUG === 'true') console.log('DEBUG commandHandlers:', commandHandlers);
-    if (process.env.DEBUG === 'true') console.log('DEBUG command:', command);
-    if (process.env.DEBUG === 'true') console.log('DEBUG commandHandlers[command]:', commandHandlers && commandHandlers[command]);
     if (!commandHandlers) {
       ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '명령어 핸들러가 정의되어 있지 않습니다.' }));
       return;

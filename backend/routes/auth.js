@@ -118,4 +118,25 @@ router.get('/me', auth, (req, res) => {
   res.json({ success: true, user: { username: req.user.username, userId: req.user.userId } });
 });
 
+// 비밀번호 변경
+router.post('/change-password', auth, async (req, res) => {
+  const { currentPassword, newPassword, newPasswordConfirm } = req.body;
+  if (!currentPassword || !newPassword || !newPasswordConfirm) {
+    return res.status(400).json({ error: '모든 항목을 입력하세요.' });
+  }
+  if (newPassword !== newPasswordConfirm) {
+    return res.status(400).json({ error: '새 비밀번호가 일치하지 않습니다.' });
+  }
+  if (newPassword.length < 4) {
+    return res.status(400).json({ error: '새 비밀번호는 4자 이상이어야 합니다.' });
+  }
+  const user = await User.findOne({ _id: req.user.userId });
+  if (!user) return res.status(400).json({ error: '유저를 찾을 수 없습니다.' });
+  const ok = await bcrypt.compare(currentPassword, user.password);
+  if (!ok) return res.status(400).json({ error: '현재 비밀번호가 일치하지 않습니다.' });
+  user.password = await bcrypt.hash(newPassword, 10);
+  await user.save();
+  res.json({ success: true });
+});
+
 module.exports = router; 

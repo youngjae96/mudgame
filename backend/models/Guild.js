@@ -10,6 +10,7 @@ const GuildSchema = new mongoose.Schema({
   chatLog: { type: [{ name: String, message: String, time: Date }], default: [] }, // 길드 채팅 로그(최대 15개)
   lastMasterChange: { type: Date, default: Date.now },
   joinType: { type: String, enum: ['free', 'approval'], default: 'free' },
+  clanHealTotal: { type: Number, default: 0 }, // 클랜힐 총 회복량
 });
 
 module.exports = mongoose.model('Guild', GuildSchema); 

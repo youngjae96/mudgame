@@ -37,5 +37,9 @@
   { "name": "환영의 검", "type": "무기", "atk": 0, "expBonus": 1.13, "desc": "환영처럼 스며드는 힘. 힘/민첩 경험치 13% 증가", "drop": true, "shopBuy": false, "shopSell": true, "price": 85000 },
   { "name": "몽중의 검", "type": "무기", "atk": 0, "expBonus": 1.15, "desc": "꿈속에서 깨어난 전설의 방치형 무기. 힘/민첩 경험치 15% 증가", "drop": true, "shopBuy": false, "shopSell": true, "price": 90000 },
   { "name": "영겁의 검", "type": "무기", "atk": 0, "expBonus": 1.18, "desc": "영원한 시간의 흐름을 담은 방치형 무기. 힘/민첩 경험치 18% 증가", "drop": true, "shopBuy": false, "shopSell": true, "price": 95000 },
-  { "name": "초월의 검", "type": "무기", "atk": 0, "expBonus": 1.20, "desc": "모든 한계를 초월한 방치형 무기. 힘/민첩 경험치 20% 증가", "drop": true, "shopBuy": false, "shopSell": true, "price": 100000 }
+  { "name": "초월의 검", "type": "무기", "atk": 0, "expBonus": 1.20, "desc": "모든 한계를 초월한 방치형 무기. 힘/민첩 경험치 20% 증가", "drop": true, "shopBuy": false, "shopSell": true, "price": 100000 },
+  { "name": "태양의 갑옷", "type": "방어구", "def": 44, "dex": 13, "price": 300000, "shopBuy": true, "shopSell": true, "drop": false, "desc": "태양의 가호를 받는 갑옷." },
+  { "name": "사막의 갑옷", "type": "방어구", "def": 48, "dex": 15, "price": 500000, "shopBuy": true, "shopSell": true, "drop": false, "desc": "사막의 모래로 단련된 갑옷." },
+  { "name": "태양의 검", "type": "무기", "atk": 55, "str": 8, "dex": 6, "price": 350000, "shopBuy": true, "shopSell": true, "drop": false, "desc": "태양의 힘이 깃든 강력한 검." },
+  { "name": "사막의 검", "type": "무기", "atk": 68, "str": 11, "price": 600000, "shopBuy": true, "shopSell": true, "drop": false, "desc": "사막의 모래바람처럼 날카로운 검." }
 ] 

@@ -121,6 +121,11 @@ class ShopService {
       foundItem = SHOP_ITEMS[cat].find((item) => item.name === itemName);
       if (foundItem) break;
     }
+    // SHOP_ITEMS에 없으면 ITEM_POOL에서 shopSell: true인 아이템 허용
+    if (!foundItem) {
+      const { ITEM_POOL } = require('../data/items');
+      foundItem = ITEM_POOL.find(i => i.name === itemName && i.shopSell === true && typeof i.price === 'number');
+    }
     // 무인도 드랍템(플레임/서리/용/암흑/천공 시리즈)도 ITEM_POOL에서 찾아 판매 허용
     if (!foundItem) {
       const ISLAND_DROP_ITEMS = [
@@ -143,7 +148,7 @@ class ShopService {
     // 소모품(중첩 물약) 판매 로직
     if ((player.inventory[idx].type && (player.inventory[idx].type.toLowerCase() === 'consumable' || player.inventory[idx].type === '잡화')) && player.inventory[idx].count) {
       if (count > player.inventory[idx].count) count = player.inventory[idx].count;
-      const sellPrice = Math.floor(foundItem.price * 0.5) * count;
+      const sellPrice = Math.floor(foundItem.price * 0.4) * count;
       player.gold += sellPrice;
       player.inventory[idx].count -= count;
       player.inventory[idx].total -= (foundItem.total || player.inventory[idx].perUse || 0) * count;
@@ -161,7 +166,7 @@ class ShopService {
         ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '이 아이템은 한 번에 1개만 판매할 수 있습니다.' }));
         return;
       }
-      const sellPrice = Math.floor(foundItem.price * 0.5);
+      const sellPrice = Math.floor(foundItem.price * 0.4);
       player.gold += sellPrice;
       player.inventory.splice(idx, 1);
       await this.savePlayerData(playerName).catch(() => {});

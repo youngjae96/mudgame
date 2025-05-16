@@ -44,8 +44,6 @@ class BattleService {
     if (global.expDoubleEvent) {
       expBonus *= 1.2;
     }
-    // 로그 출력: 경험치 보너스 및 실제 지급량
-    // console.log(`[Battle] ${player.name} vs ${monster.name} | expBonus: ${expBonus} | strExp: ${1.5 * expBonus} | dexExp: ${0.75 * expBonus} | 이벤트:${!!global.expDoubleEvent}`);
 
     if (player.gainStrExp) player.gainStrExp(1.5 * expBonus);
     if (player.gainDexExp) player.gainDexExp(0.75 * expBonus);
@@ -87,8 +85,6 @@ class BattleService {
             if (!found && Array.isArray(ITEM_POOL)) {
               found = ITEM_POOL.find(i => i.name === itemName);
             }
-            // 디버깅용 로그 추가
-            // console.log('[드랍시도]', { itemName, found, inventoryLen: player.inventory.length });
             if (found) {
               const addSuccess = player.addToInventory({ ...found }, player.ws);
               if (addSuccess) {
@@ -109,8 +105,6 @@ class BattleService {
                   message: `인벤토리가 가득 차서 ${itemName}을(를) 획득하지 못했습니다.`
                 });
               }
-            } else {
-              // console.log('[드랍실패]', { itemName });
             }
           }
         });

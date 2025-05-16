@@ -10,6 +10,7 @@ import CharacterInfo from './CharacterInfo';
 import Button from './components/Button';
 import Input from './components/Input';
 import Modal from './components/Modal';
+import PasswordChangeModal from './components/PasswordChangeModal';
 
 const Container = styled.div`
   max-width: 1100px;
@@ -146,6 +147,7 @@ function GameMain({
   const [showChatOnly, setShowChatOnly] = useState(false);
   const [showPatchNote, setShowPatchNote] = useState(false);
   const [chatTab, setChatTab] = useState('all'); // all, local, guild, whisper
+  const [showPasswordChange, setShowPasswordChange] = useState(false);
 
   const commandList = [
     { cmd: '/전 <메시지>', desc: '전체 채팅(축약)' },
@@ -165,6 +167,7 @@ function GameMain({
     { cmd: '/길드 <생성|가입|수락|탈퇴|추방|공지|정보|목록|해체(길드장)> ...', desc: '길드 관련 명령어' },
     { cmd: '/랭킹', desc: 'TOP 10 스탯 랭킹' },
     { cmd: '/방명록', desc: '방명록(글 목록/쓰기)' },
+    { cmd: '/비밀번호변경', desc: '비밀번호 변경' },
     { cmd: '/도움말', desc: '명령어 전체 안내' },
   ];
 
@@ -173,6 +176,18 @@ function GameMain({
   // 방 몬스터 UI 분리
   const renderRoomMonsters = useCallback(() => <RoomMonsters room={room} onAttack={handleAttack} />, [room, handleAttack]);
   const renderCharacterInfo = useCallback(() => <CharacterInfo name={name} room={room} character={character} />, [name, room, character]);
+
+  // 채팅 전송 핸들러 확장
+  const handleSendWithPasswordChange = useCallback((e) => {
+    if (e) e.preventDefault();
+    if (input.trim() === '/비밀번호변경') {
+      setShowPasswordChange(true);
+      setInput('');
+      return;
+    }
+    // 기존 handleSend 로직 (props.handleSend)
+    if (typeof handleSend === 'function') handleSend(e);
+  }, [input, setInput, handleSend]);
 
   return (
     <>
@@ -227,7 +242,7 @@ function GameMain({
             )}
             {showChatOnly && <ChatOnlyBox messages={chatTab === 'guild' ? guildChatLogMessages : chatLogMessages} tab={chatTab} setTab={setChatTab} />}
             <ChatBox messages={allMessages} chatEndRef={chatEndRef} expEventActive={expEventActive} />
-            <form className="input-form" onSubmit={handleSend} style={{ display: 'flex', alignItems: 'center' }}>
+            <form className="input-form" onSubmit={handleSendWithPasswordChange} style={{ display: 'flex', alignItems: 'center' }}>
               <Input
                 className="chat-input"
                 placeholder={UI_LABELS.CHAT_PLACEHOLDER}
@@ -287,6 +302,11 @@ function GameMain({
                 </div>
               </div>
             </Modal>
+            <PasswordChangeModal
+              open={showPasswordChange}
+              onClose={() => setShowPasswordChange(false)}
+              onSubmit={async () => ({ success: true })} // 임시 성공 처리
+            />
           </ChatSection>
           <PlayerListPanel>
             <PlayerList players={players} renderCharacterInfo={renderCharacterInfo} inventory={inventory} gold={character?.gold} />

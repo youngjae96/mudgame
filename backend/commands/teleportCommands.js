@@ -110,6 +110,26 @@ class TeleportCommand {
         ws.send(JSON.stringify({ type: 'system', subtype: 'guide', message: '[텔레포트] 무인도 동굴 입구에서만 동굴로 들어갈 수 있습니다.' }));
       }
       return;
+    } else if (dest === '사막') {
+      if (player.world === 1 && player.position.x === 4 && player.position.y === 4) {
+        if (player.clanHealOn) {
+          player.clanHealOn = false;
+          ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '텔레포트로 클랜힐이 비활성화되었습니다.' }));
+        }
+        RoomManager.removePlayerFromRoom(playerName, player.world, player.position.x, player.position.y);
+        player.world = 5;
+        player.position = { x: 3, y: 3 };
+        RoomManager.addPlayerToRoom(playerName, player.world, player.position.x, player.position.y);
+        PlayerManager.addPlayer(playerName, player);
+        ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '[텔레포트] 사막 마을로 이동합니다!' }));
+        sendRoomInfo(player, getRoom, getPlayersInRoom, 7, { x: 3, y: 3 });
+        sendInventory(player);
+        sendCharacterInfo(player);
+        sendRoomInfoToAllInRoom(PlayerManager.getAllPlayers(), player.world, player.position.x, player.position.y, getRoom, getPlayersInRoom, 7, { x: 3, y: 3 });
+      } else {
+        ws.send(JSON.stringify({ type: 'system', subtype: 'guide', message: '[텔레포트] 마을 광장에서만 사막으로 이동할 수 있습니다.' }));
+      }
+      return;
     } else {
       ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[텔레포트] 지원하지 않는 지역입니다. (예: /텔포 무인도, /텔포 마을)' }));
     }

@@ -32,6 +32,8 @@ async function clanHealTick(PlayerManager, Guild) {
   // clanHealOn인 유저 목록
   const healers = Object.values(allPlayers).filter(p => p.clanHealOn);
   if (!healers.length) return;
+  // 길드별 총 회복량 누적용 맵
+  const guildHealMap = {};
   for (const healer of healers) {
     // 길드가 없으면 클랜힐 자동 중단
     if (!healer.guildName) {
@@ -73,15 +75,16 @@ async function clanHealTick(PlayerManager, Guild) {
     const healedNames = [];
     for (const target of targets) {
       const realMaxHp = typeof target.getRealMaxHp === 'function' ? target.getRealMaxHp() : target.maxHp;
-      const before = target.hp;
-      if (target.hp < realMaxHp) {
-        target.hp = Math.min(realMaxHp, target.hp + healAmount);
-        const after = target.hp;
-        healedNames.push(target.name);
-        // HP가 변한 유저에게 캐릭터 정보 실시간 전송
-        if (target.ws && target.ws.readyState === 1) {
-          require('./utils/broadcast').sendCharacterInfo(target);
-        }
+      // 실제 회복량이 아니라, 힐러의 회복량을 무조건 합산
+      const healed = healAmount;
+      target.hp = Math.min(realMaxHp, target.hp + healAmount);
+      healedNames.push(target.name);
+      if (target.ws && target.ws.readyState === 1) {
+        require('./utils/broadcast').sendCharacterInfo(target);
+      }
+      healer.clanHealTotal = (healer.clanHealTotal || 0) + healed;
+      if (healer.guildName && healed > 0) {
+        guildHealMap[healer.guildName] = (guildHealMap[healer.guildName] || 0) + healed;
       }
     }
     // 힐러 본인에게만 안내 메시지 전송
@@ -100,6 +103,13 @@ async function clanHealTick(PlayerManager, Guild) {
     } else {
       healer.intExp = (healer.intExp || 0) + intExpAmount;
     }
+  }
+  // 모든 힐러 처리 후, 길드별로 총 회복량을 한 번에 DB에 반영
+  for (const [guildName, totalHealed] of Object.entries(guildHealMap)) {
+    await Guild.updateOne(
+      { name: guildName },
+      { $inc: { clanHealTotal: totalHealed } }
+    );
   }
 }
 

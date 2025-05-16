@@ -1,6 +1,6 @@
 const Room = require('../utils/Room');
 const Monster = require('../models/Monster');
-const { FIELD_MONSTERS, FOREST_MONSTERS, CAVE_MONSTERS, ISLAND_MONSTERS, CAVE_BOSS_MONSTERS, ISLAND2_MONSTERS } = require('./items');
+const { FIELD_MONSTERS, FOREST_MONSTERS, CAVE_MONSTERS, ISLAND_MONSTERS, CAVE_BOSS_MONSTERS, ISLAND2_MONSTERS, DESERT_MONSTERS } = require('./items');
 
 const MAP_SIZE = 9;
 const VILLAGE_POS = { x: 4, y: 4 };
@@ -15,6 +15,10 @@ const ROOM_TYPE = {
   JUNGLE: 'jungle',
   VOLCANO: 'volcano',
   ISLANDFIELD: 'islandfield',
+  DESERT: 'desert',
+  OASIS: 'oasis',
+  ROCK: 'rock',
+  DESERTCAVE: 'desertcave',
 };
 
 const FIELD_TYPES = [
@@ -292,8 +296,60 @@ if (caveEntrance) {
   caveEntrance.description = '깊고 어두운 동굴로 들어가는 입구입니다. 여기서 "/입장" 명령어를 입력하면 동굴로 들어갈 수 있습니다.';
 }
 
+// 사막맵(월드5)
+const MAP_SIZE_DESERT = 7;
+const DESERT_VILLAGE_POS = { x: 3, y: 3 };
+const roomsDesert = [];
+for (let y = 0; y < MAP_SIZE_DESERT; y++) {
+  for (let x = 0; x < MAP_SIZE_DESERT; x++) {
+    let type, name, description;
+    let monsters = [];
+    // 오브젝트 랜덤
+    const rand = Math.random();
+    if (x === DESERT_VILLAGE_POS.x && y === DESERT_VILLAGE_POS.y) {
+      type = ROOM_TYPE.VILLAGE;
+      name = '사막 마을';
+      description = '사막 한가운데의 작은 오아시스 마을입니다. 야자수와 우물이 보입니다.';
+    } else if ((x === 0 || x === MAP_SIZE_DESERT-1 || y === 0 || y === MAP_SIZE_DESERT-1)) {
+      type = ROOM_TYPE.DESERT;
+      name = '사막 외곽';
+      description = '끝없이 펼쳐진 모래 언덕. 바람에 흔들리는 선인장과 바위가 드문드문 보입니다.';
+      if (rand < 0.2) description += ' 멀리 해골이 보입니다.';
+      if (rand < 0.5) monsters.push(new Monster(DESERT_MONSTERS[Math.floor(Math.random()*DESERT_MONSTERS.length)], x, y));
+    } else if (rand < 0.10) {
+      type = ROOM_TYPE.OASIS;
+      name = '작은 오아시스';
+      description = '맑은 물이 고인 오아시스. 야자수와 풀, 새들이 모여듭니다.';
+      if (rand < 0.05) description += ' 오아시스에 낙타가 쉬고 있습니다.';
+      if (Math.random() < 0.5) monsters.push(new Monster(DESERT_MONSTERS[Math.floor(Math.random()*DESERT_MONSTERS.length)], x, y));
+    } else if (rand < 0.18) {
+      type = ROOM_TYPE.ROCK;
+      name = '바위지대';
+      description = '거대한 바위와 돌무더기가 흩어져 있습니다.';
+      if (rand < 0.14) description += ' 바위 틈에 작은 선인장이 자랍니다.';
+      if (Math.random() < 0.5) monsters.push(new Monster(DESERT_MONSTERS[Math.floor(Math.random()*DESERT_MONSTERS.length)], x, y));
+    } else if (rand < 0.23) {
+      type = ROOM_TYPE.DESERTCAVE;
+      name = '사막 동굴';
+      description = '모래 언덕 아래 어둡고 서늘한 동굴 입구가 있습니다.';
+      if (rand < 0.25) description += ' 동굴 앞에 해골이 널려 있습니다.';
+      if (Math.random() < 0.7) monsters.push(new Monster(DESERT_MONSTERS[Math.floor(Math.random()*DESERT_MONSTERS.length)], x, y));
+    } else {
+      type = ROOM_TYPE.DESERT;
+      name = '사막';
+      description = '뜨거운 태양 아래 펼쳐진 사막. 발자국과 선인장이 보입니다.';
+      if (rand < 0.4) description += ' 작은 선인장이 자라고 있습니다.';
+      if (rand > 0.7) description += ' 멀리 오아시스가 보이는 것 같습니다.';
+      if (Math.random() < 0.5) monsters.push(new Monster(DESERT_MONSTERS[Math.floor(Math.random()*DESERT_MONSTERS.length)], x, y));
+    }
+    const room = new Room(x, y, type, name, description, 5);
+    for (const m of monsters) room.monsters.push(m);
+    roomsDesert.push(room);
+  }
+}
+
 // worlds 객체를 모든 맵 생성 이후에 선언
-const worlds = { 1: rooms, 2: roomsIsland, 3: roomsCave, 4: roomsIsland2 };
+const worlds = { 1: rooms, 2: roomsIsland, 3: roomsCave, 4: roomsIsland2, 5: roomsDesert };
 function getRoom(world, x, y) {
   const arr = worlds[world] || rooms;
   return arr.find(r => r.x === x && r.y === y);

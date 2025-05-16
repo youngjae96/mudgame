@@ -34,6 +34,8 @@ class Player {
     // 채팅 쿨타임
     this.lastGlobalChat = 0;
     this.lastLocalChat = 0;
+    // 클랜힐 누적 회복량
+    this.clanHealTotal = 0;
   }
 
   // 모든 경험치 보너스를 곱해서 반환 (type: 'str'|'dex'|'int', extra: 임시 보너스)

@@ -172,8 +172,6 @@ function useWebSocket(onDisconnect) {
       setAllMessages((msgs) => [...msgs, { type: 'system', message: SYSTEM_MESSAGES.DISCONNECTED }]);
       setWsError('WebSocket 연결 종료');
       if (onDisconnect) onDisconnect();
-      if (reconnectTimeout.current) clearTimeout(reconnectTimeout.current);
-      reconnectTimeout.current = setTimeout(handleConnect, 2000);
     };
     ws.current.onmessage = (event) => {
       const data = JSON.parse(event.data);
