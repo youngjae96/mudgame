@@ -119,7 +119,7 @@ class Player {
     ) {
       return 0;
     }
-    let base = 2 + this.str * 1.5 + this.dex * 0.5 + this.int * 0.3;
+    let base = 2 + this.str * 1.5 + this.dex * 0.5 + this.int * 0.45;
     if (this.equipWeapon) {
       base += this.equipWeapon.atk || 0;
       base += (this.equipWeapon.str || 0) * 1.5;
@@ -130,7 +130,7 @@ class Player {
 
   // 실제 전투/표시에는 getDef()만 사용할 것
   getDef() {
-    let base = 1 + this.dex * 1.2 + this.str * 0.3 + this.int * 0.2;
+    let base = 1 + this.dex * 1.2 + this.str * 0.3 + this.int * 0.35;
     if (this.equipArmor) {
       base += this.equipArmor.def || 0;
       base += (this.equipArmor.dex || 0) * 1.2;

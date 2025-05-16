@@ -56,30 +56,13 @@ export const login = (username, password) =>
 export const register = (username, password) =>
   api.post('/api/auth/register', { username, password });
 
-// 401(Access Token 만료) 발생 시 Refresh Token으로 자동 갱신 및 재시도 인터셉터
+// 401(Access Token 만료) 발생 시 바로 로그아웃 인터셉터
 api.interceptors.response.use(
   res => res,
-  async err => {
-    const originalRequest = err.config;
-    if (err.response && err.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-      const refreshToken = localStorage.getItem('refreshToken');
-      if (refreshToken) {
-        try {
-          const resp = await api.post('/api/auth/refresh', { refreshToken });
-          if (resp.data && resp.data.accessToken) {
-            localStorage.setItem('jwtToken', resp.data.accessToken);
-            // 요청 헤더 갱신 후 재시도
-            originalRequest.headers['Authorization'] = `Bearer ${resp.data.accessToken}`;
-            return api(originalRequest);
-          }
-        } catch (e) {
-          // Refresh Token도 만료/실패: 로그아웃 필요
-          localStorage.removeItem('jwtToken');
-          localStorage.removeItem('refreshToken');
-          window.location.reload(); // 또는 로그아웃 처리
-        }
-      }
+  err => {
+    if (err.response && err.response.status === 401) {
+      localStorage.removeItem('jwtToken');
+      window.location.reload();
     }
     return Promise.reject(err);
   }

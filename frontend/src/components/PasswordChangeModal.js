@@ -37,6 +37,8 @@ function PasswordChangeModal({ open, onClose, onSubmit }) {
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const API_URL = process.env.REACT_APP_API_URL || '';
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -53,7 +55,7 @@ function PasswordChangeModal({ open, onClose, onSubmit }) {
     setLoading(true);
     try {
       const accessToken = localStorage.getItem('jwtToken');
-      const res = await fetch('/api/auth/change-password', {
+      const res = await fetch(`${API_URL}/api/auth/change-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

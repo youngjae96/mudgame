@@ -6,7 +6,6 @@ const UserSchema = new mongoose.Schema({
   createdIp: { type: String },
   lastLoginIp: { type: String },
   lastLoginAt: { type: Date },
-  banned: { type: Boolean, default: false },
-  refreshToken: { type: String },
+  banned: { type: Boolean, default: false }
 });
 module.exports = mongoose.model('User', UserSchema); 

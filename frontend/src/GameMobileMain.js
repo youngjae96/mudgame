@@ -126,6 +126,29 @@ const MobileContent = styled(MobilePanel)`
   padding: 6px 4px 4px 4px;
 `;
 
+// 명령어 목록을 상단에 상수로 선언하여 중복을 방지
+const commandList = [
+  { cmd: '/전 <메시지>', desc: '전체 채팅(축약)' },
+  { cmd: '<메시지>', desc: '지역 채팅(명령어 없이 입력)' },
+  { cmd: '/동 /서 /남 /북', desc: '방향 이동(오른쪽/왼쪽/아래/위, 또는 맵 터치)' },
+  { cmd: '/누구', desc: '현재 접속중인 플레이어 목록 보기' },
+  { cmd: '/장착 <아이템명>', desc: '장비 장착' },
+  { cmd: '/해제 무기, /해제 방어구', desc: '장비 해제' },
+  { cmd: '/정보', desc: '내 능력치 확인' },
+  { cmd: '/정보 <닉네임>', desc: '다른 유저 능력치 확인' },
+  { cmd: '/귓 <닉네임> <메시지>', desc: '귓속말(비공개 메시지)' },
+  { cmd: '/귀환', desc: '1번 마을(마을 광장)으로 귀환' },
+  { cmd: '/장비', desc: '내 장비 정보' },
+  { cmd: '/지도', desc: '전체 맵 보기' },
+  { cmd: '/텔포 <지역>', desc: '월드 이동(예: 무인도, 마을)' },
+  { cmd: '/길 <메시지>', desc: '길드 채팅' },
+  { cmd: '/길드 <생성|가입|수락|탈퇴|추방|공지|정보|목록|해체(길드장)> ...', desc: '길드 관련 명령어' },
+  { cmd: '/랭킹', desc: 'TOP 10 스탯 랭킹' },
+  { cmd: '/방명록', desc: '방명록(글 목록/쓰기)' },
+  { cmd: '/비밀번호변경', desc: '비밀번호 변경' },
+  { cmd: '/도움말', desc: '명령어 전체 안내' },
+];
+
 export default function GameMobileMain({
   room, mapSize, mapInfo, handleMove, nearbyRooms,
   chatLogMessages, guildChatLogMessages, chatEndRef, handleSend, input, setInput,
@@ -138,6 +161,7 @@ export default function GameMobileMain({
   const [chatTab, setChatTab] = useState('all');
   const [showPatchNote, setShowPatchNote] = useState(false);
   const [showPasswordChange, setShowPasswordChange] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
 
   // 방 아이템/몬스터 렌더 함수
   const renderRoomItems = () => <RoomItems room={room} onPickup={handlePickup} />;
@@ -148,6 +172,11 @@ export default function GameMobileMain({
     if (e) e.preventDefault();
     if (input.trim() === '/비밀번호변경') {
       setShowPasswordChange(true);
+      setInput('');
+      return;
+    }
+    if (input.trim() === '/도움말') {
+      setShowHelp(true);
       setInput('');
       return;
     }
@@ -208,6 +237,29 @@ export default function GameMobileMain({
               style={{ fontSize: '1.15rem', padding: '8px 10px' }}
             />
             <Button className="send-btn" type="submit" aria-label="전송" size="md" style={{ fontSize: '1.1rem', padding: '8px 16px' }}>{UI_LABELS?.SEND || '전송'}</Button>
+            <Button
+              type="button"
+              style={{
+                marginLeft: 6,
+                fontWeight: 'normal',
+                fontSize: '1.1rem',
+                width: 28,
+                height: 28,
+                borderRadius: '50%',
+                background: 'none',
+                border: 'none',
+                color: '#2196f3',
+                minWidth: 0,
+                boxShadow: 'none',
+                padding: 0,
+                lineHeight: '28px',
+                cursor: 'pointer',
+              }}
+              aria-label="명령어 안내"
+              onClick={() => setShowHelp(true)}
+            >
+              ?
+            </Button>
           </MobileChatInput>
         </MobileChat>
       </MobileMain>
@@ -216,6 +268,29 @@ export default function GameMobileMain({
         onClose={() => setShowPasswordChange(false)}
         onSubmit={async () => ({ success: true })} // 임시 성공 처리
       />
+      <Modal open={showHelp} onClose={() => setShowHelp(false)} title="명령어 안내">
+        <div style={{ maxHeight: 380, overflowY: 'auto', width: 320 }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '1.02rem' }}>
+            <thead>
+              <tr style={{ borderBottom: '2px solid #444' }}>
+                <th style={{ textAlign: 'left', padding: '6px 4px', color: '#ffe066' }}>명령어</th>
+                <th style={{ textAlign: 'left', padding: '6px 4px', color: '#7ecfff' }}>설명</th>
+              </tr>
+            </thead>
+            <tbody>
+              {commandList.map((c, i) => (
+                <tr key={i} style={{ borderBottom: '1px solid #333' }}>
+                  <td style={{ padding: '6px 4px' }}>{c.cmd}</td>
+                  <td style={{ padding: '6px 4px' }}>{c.desc}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div style={{ marginTop: 18, color: '#aaa', fontSize: '0.98rem', textAlign: 'center' }}>
+            <b>Tip:</b> 명령어는 채팅창에 직접 입력하세요.
+          </div>
+        </div>
+      </Modal>
       <style>{`
         .patchnote-scroll {
           scrollbar-width: thin;

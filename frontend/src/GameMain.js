@@ -185,6 +185,11 @@ function GameMain({
       setInput('');
       return;
     }
+    if (input.trim() === '/도움말') {
+      setShowHelp(true);
+      setInput('');
+      return;
+    }
     // 기존 handleSend 로직 (props.handleSend)
     if (typeof handleSend === 'function') handleSend(e);
   }, [input, setInput, handleSend]);

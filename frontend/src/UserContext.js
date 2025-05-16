@@ -18,9 +18,8 @@ export function UserProvider({ children }) {
     setLoading(true);
     try {
       const res = await apiLogin(username, password);
-      if (res.data.success && res.data.accessToken && res.data.refreshToken) {
+      if (res.data.success && res.data.accessToken) {
         localStorage.setItem('jwtToken', res.data.accessToken);
-        localStorage.setItem('refreshToken', res.data.refreshToken);
         setToken(res.data.accessToken);
         setIsLoggedIn(true);
         setUser({ name: username });
@@ -53,7 +52,6 @@ export function UserProvider({ children }) {
   // 로그아웃
   const logout = () => {
     localStorage.removeItem('jwtToken');
-    localStorage.removeItem('refreshToken');
     setToken('');
     setIsLoggedIn(false);
     setUser(null);

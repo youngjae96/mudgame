@@ -258,6 +258,10 @@ function useWebSocket(onDisconnect) {
   const handleSend = (e) => {
     e.preventDefault();
     if (!input.trim()) return;
+    if (input.trim() === '/도움말') {
+      setInput('');
+      return;
+    }
     if (input.trim() === COMMANDS.INFO) {
       ws.current.send(JSON.stringify({ type: 'stat' }));
       setInput('');
