@@ -41,5 +41,6 @@
   { "name": "태양의 갑옷", "type": "방어구", "def": 44, "dex": 13, "price": 300000, "shopBuy": true, "shopSell": true, "drop": false, "desc": "태양의 가호를 받는 갑옷." },
   { "name": "사막의 갑옷", "type": "방어구", "def": 48, "dex": 15, "price": 500000, "shopBuy": true, "shopSell": true, "drop": false, "desc": "사막의 모래로 단련된 갑옷." },
   { "name": "태양의 검", "type": "무기", "atk": 55, "str": 8, "dex": 6, "price": 350000, "shopBuy": true, "shopSell": true, "drop": false, "desc": "태양의 힘이 깃든 강력한 검." },
-  { "name": "사막의 검", "type": "무기", "atk": 68, "str": 11, "price": 600000, "shopBuy": true, "shopSell": true, "drop": false, "desc": "사막의 모래바람처럼 날카로운 검." }
+  { "name": "사막의 검", "type": "무기", "atk": 68, "str": 11, "price": 600000, "shopBuy": true, "shopSell": true, "drop": false, "desc": "사막의 모래바람처럼 날카로운 검." },
+  { "name": "사탕", "type": "잡화", "price": 13000, "shopBuy": true, "shopSell": true, "drop": true, "desc": "먹으면 30분 동안 경험치 +10%. 중첩 사용 시 최대 12시간까지 연장. /사용사탕: 사탕 사용, /사탕: 남은 시간 확인", "total": 1 }
 ] 

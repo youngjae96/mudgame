@@ -34,6 +34,28 @@ class SaveCommand {
     return playerServiceInstance.handleSaveCommand(args);
   }
 }
+class CandyCommand {
+  async execute(args) {
+    return playerServiceInstance.useCandyItem(args);
+  }
+}
+class CandyBuffStatusCommand {
+  async execute(args) {
+    const { ws, playerName, players } = args;
+    const player = players[playerName];
+    if (!player) return;
+    const now = Date.now();
+    const leftSec = Math.floor((player.expCandyBuffUntil - now) / 1000);
+    if (player.expCandyBuffUntil && leftSec > 0) {
+      const hour = Math.floor(leftSec / 3600);
+      const min = Math.floor((leftSec % 3600) / 60);
+      const sec = leftSec % 60;
+      ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `경험치 사탕 버프 남은 시간: ${hour}시간 ${min}분 ${sec}초` }));
+    } else {
+      ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '경험치 사탕 버프가 없습니다.' }));
+    }
+  }
+}
 
 module.exports = {
   setPlayerServiceInstance,
@@ -41,4 +63,6 @@ module.exports = {
   UnequipCommand,
   MapCommand,
   SaveCommand,
+  CandyCommand,
+  CandyBuffStatusCommand,
 }; 

@@ -54,7 +54,24 @@ class ShopService {
     }
     // 인벤토리 공간 체크 및 아이템 추가
     let addSuccess = false;
-    if ((foundItem.type && (foundItem.type.toLowerCase() === 'consumable' || foundItem.type === '잡화')) && foundItem.total) {
+    // 사탕만 별도 처리
+    if (itemName === '사탕') {
+      const existingItem = player.inventory.find(item => item.name === '사탕');
+      let curCount = existingItem ? (existingItem.count || 1) : 0;
+      if (curCount + count > 50) {
+        ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: `${itemName}은(는) 최대 50개까지만 보유할 수 있습니다.` }));
+        return;
+      }
+      if (existingItem) {
+        addSuccess = true;
+        existingItem.count = curCount + count;
+        if ('total' in existingItem) delete existingItem.total;
+      } else {
+        const newCandy = { ...foundItem, count: count };
+        if ('total' in newCandy) delete newCandy.total;
+        addSuccess = player.addToInventory(newCandy, ws);
+      }
+    } else if ((foundItem.type && (foundItem.type.toLowerCase() === 'consumable' || foundItem.type === '잡화')) && foundItem.total) {
       const existingItem = player.inventory.find(item =>
         item.name === itemName &&
         (item.type && (item.type.toLowerCase() === 'consumable' || item.type === '잡화'))

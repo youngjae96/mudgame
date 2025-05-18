@@ -80,29 +80,36 @@ body {
 
 .input-form {
   display: flex;
-  gap: 8px;
+  gap: 4px;
+  width: 100%;
 }
 
 .chat-input {
   flex: 1;
-  padding: 10px 14px;
-  border-radius: 8px;
+  min-width: 0;
+  padding: 10px 0 10px 14px;
+  border-radius: 8px 0 0 8px;
   border: none;
+  border-right: none;
   background: #232837;
   color: #fff;
   font-size: 1rem;
+  box-sizing: border-box;
 }
 
 .send-btn {
   padding: 10px 18px;
-  border-radius: 8px;
+  border-radius: 0 8px 8px 0;
   border: none;
+  border-left: 1.5px solid #232837;
   background: #7ecfff;
   color: #181c24;
   font-weight: bold;
   font-size: 1rem;
   cursor: pointer;
   transition: background 0.2s;
+  margin-left: 0;
+  box-sizing: border-box;
 }
 
 .left-panel {

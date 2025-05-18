@@ -203,6 +203,7 @@ async function savePlayerData(playerName) {
     pdata.intExpMax = player.intExpMax;
     pdata.equipWeapon = player.equipWeapon;
     pdata.equipArmor = player.equipArmor;
+    pdata.expCandyBuffUntil = player.expCandyBuffUntil;
     pdata.updatedAt = new Date();
     await pdata.save();
   } catch (err) {
@@ -304,6 +305,7 @@ async function handleJoin({ ws, data, wss, PlayerManager, RoomManager, PlayerDat
   player.intExpMax = pdata.intExpMax || 10;
   player.equipWeapon = pdata.equipWeapon || null;
   player.equipArmor = pdata.equipArmor || null;
+  player.expCandyBuffUntil = pdata.expCandyBuffUntil || null;
   // 길드 정보 동기화
   const guild = await Guild.findOne({ members: name });
   if (guild) {
@@ -585,6 +587,10 @@ wss.on('connection', (ws) => {
         await handleClose({ ws, playerName, PlayerManager, wss, sendPlayerList, broadcast, sendRoomInfoToAllInRoom, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS, PlayerGameService });
         return;
       }
+      if (data.type === 'ping') {
+        ws.send(JSON.stringify({ type: 'pong' }));
+        return;
+      }
       ws.send(JSON.stringify({ type: 'error', message: '알 수 없는 메시지 타입입니다.' }));
     } catch (err) {
       console.error('[WebSocket 에러]', err);
@@ -596,14 +602,11 @@ wss.on('connection', (ws) => {
     if (activeSockets[playerName] === ws) {
       delete activeSockets[playerName];
     }
-    if (PlayerManager.getPlayer(playerName)) {
-      PlayerManager.removePlayer(playerName);
-    }
-    // WebSocket 연결이 끊겼을 때도 동일하게 처리
-    if (playerName && PlayerManager.getPlayer(playerName)) {
-      const prevWorld = PlayerManager.getPlayer(playerName).world;
-      const prevX = PlayerManager.getPlayer(playerName).position.x;
-      const prevY = PlayerManager.getPlayer(playerName).position.y;
+    const player = PlayerManager.getPlayer(playerName);
+    if (player) {
+      const prevWorld = player.world;
+      const prevX = player.position.x;
+      const prevY = player.position.y;
       PlayerManager.removePlayer(playerName);
       sendPlayerList(wss, PlayerManager.getAllPlayers());
       broadcast(wss, { type: 'system', subtype: 'event', message: `${playerName}님이 퇴장했습니다.` });
@@ -651,6 +654,7 @@ setInterval(() => {
   if (isEventTime) {
     if (!global.expDoubleEvent) {
       global.expDoubleEvent = true;
+      global.EVENT_EXP_BONUS = 1.2;
       if (typeof global.wss !== 'undefined') {
         broadcast(global.wss, { type: 'notice', notice: '[자동] 경험치 1.2배 이벤트가 시작되었습니다! (토 09:00 ~ 일 21:00)' });
         Object.values(PlayerManager.getAllPlayers()).forEach(p => sendCharacterInfo(p));
@@ -660,6 +664,7 @@ setInterval(() => {
   } else {
     if (global.expDoubleEvent) {
       global.expDoubleEvent = false;
+      global.EVENT_EXP_BONUS = undefined;
       if (typeof global.wss !== 'undefined') {
         broadcast(global.wss, { type: 'notice', notice: '[자동] 경험치 1.2배 이벤트가 종료되었습니다.' });
         Object.values(PlayerManager.getAllPlayers()).forEach(p => sendCharacterInfo(p));

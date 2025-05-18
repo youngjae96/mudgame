@@ -24,5 +24,6 @@ const PlayerDataSchema = new mongoose.Schema({
   intExpMax: Number,
   equipWeapon: Object,
   equipArmor: Object,
+  expCandyBuffUntil: { type: Number, default: 0 },
 });
 module.exports = mongoose.model('PlayerData', PlayerDataSchema); 

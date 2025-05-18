@@ -280,13 +280,16 @@ function getMessageComponent(msg, i) {
 function ChatBox({ messages, chatEndRef, expEventActive }) {
   const wrapperRef = useRef(null);
 
+  // 최대 100개 메시지만 유지
+  const MAX_MESSAGES = 100;
+  const flatMessages = Array.isArray(messages) ? messages.flat(Infinity).slice(-MAX_MESSAGES) : [];
+
   useEffect(() => {
     if (wrapperRef.current) {
       wrapperRef.current.scrollTop = wrapperRef.current.scrollHeight - wrapperRef.current.clientHeight;
     }
-  }, [messages]);
+  }, [flatMessages]);
 
-  const flatMessages = Array.isArray(messages) ? messages.flat(Infinity) : [];
   return (
     <ChatBoxWrapper ref={wrapperRef}>
       {expEventActive && (
@@ -319,15 +322,16 @@ function ChatBox({ messages, chatEndRef, expEventActive }) {
 export function ChatOnlyBox({ messages, tab, setTab }) {
   const boxRef = useRef(null);
   const [autoScroll, setAutoScroll] = useState(true);
+  const MAX_MESSAGES = 100;
   // 길드탭일 때는 필터 없이 전체, 나머지는 기존대로
   const filtered = Array.isArray(messages)
     ? (tab === 'guild'
-        ? messages
+        ? messages.slice(-MAX_MESSAGES)
         : messages.filter(msg => msg.type === 'chat' && (
             (tab === 'all' && msg.chatType === 'global') ||
             (tab === 'local' && msg.chatType === 'local') ||
             (tab === 'whisper' && msg.chatType === 'whisper')
-          ))
+          )).slice(-MAX_MESSAGES)
       )
     : [];
   // 스크롤 이벤트 핸들러
@@ -357,14 +361,18 @@ export function ChatOnlyBox({ messages, tab, setTab }) {
         <button onClick={() => setTab('local')} style={{ background: tab === 'local' ? '#7ecfff' : '#232837', color: tab === 'local' ? '#232837' : '#7ecfff', border: 'none', borderRadius: 6, padding: '4px 12px', fontWeight: 'bold', fontSize: '1.01rem', cursor: 'pointer', transition: 'all 0.15s' }}>지역</button>
         <button onClick={() => setTab('guild')} style={{ background: tab === 'guild' ? '#7ecfff' : '#232837', color: tab === 'guild' ? '#232837' : '#7ecfff', border: 'none', borderRadius: 6, padding: '4px 12px', fontWeight: 'bold', fontSize: '1.01rem', cursor: 'pointer', transition: 'all 0.15s' }}>길드</button>
         <button onClick={() => setTab('whisper')} style={{ background: tab === 'whisper' ? '#7ecfff' : '#232837', color: tab === 'whisper' ? '#232837' : '#7ecfff', border: 'none', borderRadius: 6, padding: '4px 12px', fontWeight: 'bold', fontSize: '1.01rem', cursor: 'pointer', transition: 'all 0.15s' }}>귓속말</button>
+        <button onClick={() => setTab('battle')} style={{ background: tab === 'battle' ? '#7ecfff' : '#232837', color: tab === 'battle' ? '#232837' : '#7ecfff', border: 'none', borderRadius: 6, padding: '4px 12px', fontWeight: 'bold', fontSize: '1.01rem', cursor: 'pointer', transition: 'all 0.15s' }}>전투로그</button>
       </div>
       <div ref={boxRef} className="patchnote-scroll" style={{ maxHeight: 130, minHeight: 60, overflowY: 'auto', fontSize: '1.01rem', background: 'none', padding: 0, margin: 0, ...(window.innerWidth <= 600 ? { maxHeight: 160 } : {}) }} onScroll={handleScroll}>
-        {filtered.length === 0 && <div style={{ color: '#888', textAlign: 'center', marginTop: 16 }}>채팅 메시지가 없습니다.</div>}
-        {filtered.map((msg, i) => (
-          <div key={i} style={{ color: msg.chatType === 'whisper' ? '#2ecc40' : (msg.chatType === 'global' ? '#ffb347' : (msg.chatType === 'guild' ? '#ff66cc' : '#fff')), marginBottom: 4 }}>
-            <span style={{ fontWeight: 'bold' }}>[{msg.chatType === 'global' ? '전체' : msg.chatType === 'local' ? '지역' : msg.chatType === 'guild' ? '길드' : '귓속말'}] {msg.name}:</span> {msg.message}
-          </div>
-        ))}
+        {filtered.length === 0 && tab !== 'battle' && <div style={{ color: '#888', textAlign: 'center', marginTop: 16 }}>채팅 메시지가 없습니다.</div>}
+        {tab === 'battle'
+          ? (Array.isArray(messages) ? messages.filter(msg => msg.type === 'battle') : []).map((msg, i) => <BattleMessage key={i} msg={msg} />)
+          : filtered.map((msg, i) => (
+            <div key={i} style={{ color: msg.chatType === 'whisper' ? '#2ecc40' : (msg.chatType === 'global' ? '#ffb347' : (msg.chatType === 'guild' ? '#ff66cc' : '#fff')), marginBottom: 4 }}>
+              <span style={{ fontWeight: 'bold' }}>[{msg.chatType === 'global' ? '전체' : msg.chatType === 'local' ? '지역' : msg.chatType === 'guild' ? '길드' : '귓속말'}] {msg.name}:</span> {msg.message}
+            </div>
+          ))}
+        {tab === 'battle' && (Array.isArray(messages) ? messages.filter(msg => msg.type === 'battle').length === 0 : true) && <div style={{ color: '#888', textAlign: 'center', marginTop: 16 }}>전투 로그가 없습니다.</div>}
       </div>
     </div>
   );

@@ -12,7 +12,7 @@ const { InnCommand } = require('./commands/innCommands');
 const { TeleportCommand } = require('./commands/teleportCommands');
 const { BuyCommand, SellCommand, setShopServiceInstance } = require('./commands/buySellCommands');
 const PlayerController = require('./controllers/PlayerController');
-const { EquipCommand, UnequipCommand, MapCommand, SaveCommand, setPlayerServiceInstance: setPlayerCmdServiceInstance } = require('./commands/playerCommands');
+const { EquipCommand, UnequipCommand, MapCommand, SaveCommand, CandyCommand, CandyBuffStatusCommand, setPlayerServiceInstance: setPlayerCmdServiceInstance } = require('./commands/playerCommands');
 
 function setupCommands({ shopService, playerService }) {
   setShopServiceInstance(shopService);
@@ -44,6 +44,8 @@ const commandHandlers = {
   '/상점': new ShopCommand(),
   '/상점판매': new ShopSellCommand(),
   '/방명록': new GuestbookCommand(),
+  '/사용사탕': new CandyCommand(),
+  '/사탕': new CandyBuffStatusCommand(),
 };
 
 module.exports = {

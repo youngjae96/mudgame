@@ -2,6 +2,7 @@
 const { ITEM_POOL, SHOP_ITEMS } = require('../data/items');
 const { broadcast } = require('../utils/broadcast');
 const { PlayerManager } = require('../playerManager');
+const { setExpEventBonus, clearExpEventBonus } = require('../utils/expEvent');
 
 class AdminCommand {
   async execute({ ws, playerName, message, players, getRoom, sendInventory, sendCharacterInfo, savePlayerData }) {
@@ -172,7 +173,7 @@ class AdminCommand {
       return;
     }
     if (subcmd === '경험치') {
-      global.expDoubleEvent = true;
+      setExpEventBonus(1.2);
       if (typeof global.wss !== 'undefined') {
         broadcast(global.wss, { type: 'notice', notice: '경험치 1.2배 이벤트가 시작되었습니다! (테스트/운영용)' });
         const { PlayerManager } = require('../playerManager');
@@ -183,7 +184,7 @@ class AdminCommand {
       return;
     }
     if (subcmd === '경험치해제') {
-      global.expDoubleEvent = false;
+      clearExpEventBonus();
       if (typeof global.wss !== 'undefined') {
         broadcast(global.wss, { type: 'notice', notice: '경험치 1.2배 이벤트가 종료되었습니다.' });
         const { PlayerManager } = require('../playerManager');

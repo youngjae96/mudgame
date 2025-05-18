@@ -60,37 +60,23 @@ const ChatSection = styled.div`
   max-height: 600px;
   height: 100%;
   min-width: 320px;
-  max-width: 600px;
+  max-width: 100%;
   width: 100%;
-  margin: 0 auto;
+  margin: 0;
   justify-content: flex-start;
 `;
 const PlayerListPanel = styled.div`
-  flex: none;
   background: #181c24;
   border-radius: 8px;
   padding: 16px;
-  max-height: 520px;
-  overflow-y: auto;
+  min-width: 220px;
+  max-width: 260px;
   box-shadow: 0 2px 8px #0004;
-  min-width: 200px;
-  max-width: 220px;
-  /* 스크롤바 커스텀 */
-  scrollbar-width: thin;
-  scrollbar-color: #7ecfff #23272f;
-  &::-webkit-scrollbar {
-    width: 8px;
-    background: #23272f;
-    border-radius: 8px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: linear-gradient(120deg, #7ecfff 60%, #4fa3e3 100%);
-    border-radius: 8px;
-    min-height: 40px;
-  }
-  &::-webkit-scrollbar-thumb:hover {
-    background: #4fa3e3;
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+  height: auto;
 `;
 /**
  * 게임 메인 화면 컴포넌트
@@ -146,7 +132,7 @@ function GameMain({
   const [showHelp, setShowHelp] = useState(false);
   const [showChatOnly, setShowChatOnly] = useState(false);
   const [showPatchNote, setShowPatchNote] = useState(false);
-  const [chatTab, setChatTab] = useState('all'); // all, local, guild, whisper
+  const [chatTab, setChatTab] = useState('all'); // all, local, guild, whisper, battle
   const [showPasswordChange, setShowPasswordChange] = useState(false);
 
   const commandList = [
@@ -163,6 +149,15 @@ function GameMain({
     { cmd: '/장비', desc: '내 장비 정보' },
     { cmd: '/지도', desc: '전체 맵 보기' },
     { cmd: '/텔포 <지역>', desc: '월드 이동(예: 무인도, 마을)' },
+    { cmd: '/상점', desc: '상점 열기' },
+    { cmd: '/상점판매', desc: '상점 판매' },
+    { cmd: '/여관', desc: '여관(회복)' },
+    { cmd: '/구매 <아이템명>', desc: '아이템 구매' },
+    { cmd: '/판매 <아이템명>', desc: '아이템 판매' },
+    { cmd: '/착용 <아이템명>', desc: '아이템 착용' },
+    { cmd: '/사용 <아이템명>', desc: '아이템 사용' },
+    { cmd: '/사용사탕', desc: '사탕 사용' },
+    { cmd: '/클랜힐', desc: '클랜힐 스크롤 사용' },
     { cmd: '/길 <메시지>', desc: '길드 채팅' },
     { cmd: '/길드 <생성|가입|수락|탈퇴|추방|공지|정보|목록|해체(길드장)> ...', desc: '길드 관련 명령어' },
     { cmd: '/랭킹', desc: 'TOP 10 스탯 랭킹' },
@@ -193,6 +188,11 @@ function GameMain({
     // 기존 handleSend 로직 (props.handleSend)
     if (typeof handleSend === 'function') handleSend(e);
   }, [input, setInput, handleSend]);
+
+  useEffect(() => {
+    window.setInput = setInput;
+    return () => { window.setInput = null; };
+  }, [setInput]);
 
   return (
     <>
@@ -245,8 +245,8 @@ function GameMain({
                 <PatchNoteTabs />
               </Modal>
             )}
-            {showChatOnly && <ChatOnlyBox messages={chatTab === 'guild' ? guildChatLogMessages : chatLogMessages} tab={chatTab} setTab={setChatTab} />}
-            <ChatBox messages={allMessages} chatEndRef={chatEndRef} expEventActive={expEventActive} />
+            {showChatOnly && <ChatOnlyBox messages={chatTab === 'guild' ? guildChatLogMessages : chatTab === 'battle' ? allMessages.filter(msg => msg.type === 'battle') : chatLogMessages} tab={chatTab} setTab={setChatTab} />}
+            <ChatBox messages={allMessages.filter(msg => msg.type !== 'battle')} chatEndRef={chatEndRef} expEventActive={expEventActive} />
             <form className="input-form" onSubmit={handleSendWithPasswordChange} style={{ display: 'flex', alignItems: 'center' }}>
               <Input
                 className="chat-input"
@@ -255,6 +255,7 @@ function GameMain({
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 autoFocus
+                commandList={commandList}
               />
               <Button className="send-btn" type="submit" aria-label="전송">{UI_LABELS.SEND}</Button>
               <Button

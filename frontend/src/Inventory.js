@@ -50,9 +50,15 @@ const InventoryLi = styled.li`
   gap: 2px;
 `;
 
-function Inventory({ inventory, gold }) {
+function Inventory({ inventory, gold, onItemCommandClick }) {
   // 슬롯(종류) 개수
   const slotCount = inventory ? inventory.length : 0;
+
+  // 아이템별 명령어 매핑
+  const itemCommandMap = {
+    '클랜힐 스크롤': '/클랜힐',
+    // 필요시 다른 아이템도 추가
+  };
 
   return (
     <InventoryWrapper>
@@ -64,19 +70,36 @@ function Inventory({ inventory, gold }) {
         <InventoryEmpty>인벤토리가 비어 있습니다.</InventoryEmpty>
       ) : (
         <InventoryUl>
-          {inventory.map((item, idx) => (
-            <InventoryLi key={idx}>
-              {typeof item === 'string' ? item : (
-                <>
-                  <span style={{ fontWeight: 'bold', color: '#ffe066' }}>
-                    {item.name}
-                    {item.type && (item.type.toLowerCase() === 'consumable' || item.type === '잡화') && item.count ? ` x${item.count} (남은 사용: ${item.total})` : ''}
-                  </span>
-                  {item.desc && <span style={{ color: '#b3c6e0', fontSize: '0.95em' }}>{item.desc}</span>}
-                </>
-              )}
-            </InventoryLi>
-          ))}
+          {inventory.map((item, idx) => {
+            const name = typeof item === 'string' ? item : item.name;
+            let command = itemCommandMap[name];
+            // 무기/방어구 자동 명령어
+            if (!command && typeof item === 'object' && item.type && (item.type === '무기' || item.type === '방어구')) {
+              command = `/장착 ${item.name}`;
+            }
+            // 사탕 자동 명령어
+            if (!command && name === '사탕') {
+              command = '/사용사탕';
+            }
+            return (
+              <InventoryLi key={idx}
+                style={command ? { cursor: 'pointer', background: '#23293a', borderRadius: 6, transition: 'background 0.15s' } : {}}
+                onClick={command && onItemCommandClick ? () => onItemCommandClick(command) : undefined}
+                title={command ? `${command} 명령어 자동입력` : undefined}
+              >
+                {typeof item === 'string' ? item : (
+                  <>
+                    <span style={{ fontWeight: 'bold', color: '#ffe066' }}>
+                      {item.name}
+                      {item.name === '사탕' && item.count ? ` x${item.count}` : ''}
+                      {item.name !== '사탕' && item.type && (item.type.toLowerCase() === 'consumable' || item.type === '잡화') && item.count ? ` x${item.count} (남은 사용: ${item.total})` : ''}
+                    </span>
+                    {item.desc && <span style={{ color: '#b3c6e0', fontSize: '0.95em' }}>{item.desc}</span>}
+                  </>
+                )}
+              </InventoryLi>
+            );
+          })}
         </InventoryUl>
       )}
     </InventoryWrapper>

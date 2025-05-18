@@ -36,18 +36,17 @@ class Player {
     this.lastLocalChat = 0;
     // 클랜힐 누적 회복량
     this.clanHealTotal = 0;
+    this.expCandyBuffUntil = 0; // 사탕 경험치 버프 만료 시간(타임스탬프)
   }
 
   // 모든 경험치 보너스를 곱해서 반환 (type: 'str'|'dex'|'int', extra: 임시 보너스)
   getExpBonus(type = '', extra = 1) {
     let bonus = 1;
-    // 무기 보너스
     if (this.equipWeapon && this.equipWeapon.expBonus) bonus *= this.equipWeapon.expBonus;
-    // 임시(전투 등) 보너스
     if (extra && typeof extra === 'number') bonus *= extra;
-    // 글로벌 이벤트 보너스
     if (global && global.EVENT_EXP_BONUS) bonus *= global.EVENT_EXP_BONUS;
-    // 필요시 type별 분기, 기타 보너스 추가 가능
+    const candyActive = this.expCandyBuffUntil && Date.now() < this.expCandyBuffUntil;
+    if (candyActive) bonus *= 1.1;
     return bonus;
   }
 
@@ -62,32 +61,47 @@ class Player {
   gainStrExp(amount = 1, extraBonus = 1) {
     const realAmount = amount * this.getExpBonus('str', extraBonus);
     this.strExp += realAmount;
+    let levelUp = 0;
     while (this.strExp >= this.strExpMax) {
       this.strExp -= this.strExpMax;
       this.str++;
+      levelUp++;
       this.strExpMax = calcNextStatExp(this.strExpMax);
+    }
+    if (levelUp > 0) {
+      console.log(`[LEVEL UP] str +${levelUp} (현재 str: ${this.str})`);
     }
   }
 
   gainDexExp(amount = 1, extraBonus = 1) {
     const realAmount = amount * this.getExpBonus('dex', extraBonus);
     this.dexExp += realAmount;
+    let levelUp = 0;
     while (this.dexExp >= this.dexExpMax) {
       this.dexExp -= this.dexExpMax;
       this.dex++;
+      levelUp++;
       this.dexExpMax = calcNextStatExp(this.dexExpMax);
+    }
+    if (levelUp > 0) {
+      console.log(`[LEVEL UP] dex +${levelUp} (현재 dex: ${this.dex})`);
     }
   }
 
   gainIntExp(amount = 1, extraBonus = 1) {
     const realAmount = amount * this.getExpBonus('int', extraBonus);
     this.intExp += realAmount;
+    let levelUp = 0;
     while (this.intExp >= this.intExpMax) {
       this.intExp -= this.intExpMax;
       this.int++;
+      levelUp++;
       this.intExpMax = calcNextStatExp(this.intExpMax);
       this.maxMp += 2;
       this.hp = Math.min(this.hp, this.getRealMaxHp());
+    }
+    if (levelUp > 0) {
+      console.log(`[LEVEL UP] int +${levelUp} (현재 int: ${this.int})`);
     }
   }
 
@@ -193,6 +207,17 @@ class Player {
   }
 
   addToInventory(item, ws) {
+    // 사탕만 스택 처리
+    if (item.name === '사탕') {
+      const existing = this.inventory.find(i => i.name === '사탕');
+      if (existing) {
+        existing.count = (existing.count || 1) + (item.count || 1);
+        return true;
+      }
+      item.count = item.count || 1;
+      this.inventory.push(item);
+      return true;
+    }
     // 중첩 소모품(잡화/consumable)일 경우 count 50개 제한
     if ((item.type === ITEM_TYPE.CONSUMABLE || item.type === '잡화' || (item.type && item.type.toLowerCase() === 'consumable')) && item.name) {
       const existing = this.inventory.find(i => i.name === item.name && (i.type === ITEM_TYPE.CONSUMABLE || i.type === '잡화' || (i.type && i.type.toLowerCase() === 'consumable')));

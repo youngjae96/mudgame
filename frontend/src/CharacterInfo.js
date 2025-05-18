@@ -4,8 +4,8 @@ import styled from 'styled-components';
 const CharacterInfoWrapper = styled.div`
   background: #232837;
   border-radius: 10px;
-  padding: 14px 16px 10px 16px;
-  margin-bottom: 18px;
+  padding: 14px 10px 10px 10px;
+  margin-bottom: 0;
   box-shadow: 0 2px 8px #0002;
 `;
 const CharacterTitle = styled.div`
@@ -24,28 +24,10 @@ const CharacterRow = styled.div`
 `;
 const CharacterStats = styled.div`
   margin-top: 10px;
-  background: #181c24;
-  border-radius: 8px;
-  padding: 10px 12px 8px 12px;
-  box-shadow: 0 1px 4px #0002;
-  max-height: 180px;
-  overflow-y: auto;
-  /* 스크롤바 커스텀 */
-  scrollbar-width: thin;
-  scrollbar-color: #7ecfff #23272f;
-  &::-webkit-scrollbar {
-    width: 8px;
-    background: #23272f;
-    border-radius: 8px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: linear-gradient(120deg, #7ecfff 60%, #4fa3e3 100%);
-    border-radius: 8px;
-    min-height: 40px;
-  }
-  &::-webkit-scrollbar-thumb:hover {
-    background: #4fa3e3;
-  }
+  background: none;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
 `;
 const StatRow = styled.div`
   display: flex;
@@ -54,6 +36,7 @@ const StatRow = styled.div`
   color: #ffe066;
   margin-bottom: 3px;
   font-family: 'Consolas', 'Pretendard', 'Noto Sans KR', Arial, sans-serif;
+  align-items: center;
   & span:first-child {
     color: #7ecfff;
     font-weight: bold;
@@ -62,6 +45,8 @@ const StatRow = styled.div`
   & span:last-child {
     color: #fff;
     font-weight: bold;
+    text-align: right;
+    min-width: 36px;
   }
 `;
 const GaugeBar = styled.div`
@@ -72,6 +57,7 @@ const GaugeBar = styled.div`
   margin-bottom: 6px;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 1px 4px #0002;
 `;
 const GaugeFill = styled.div`
   height: 100%;

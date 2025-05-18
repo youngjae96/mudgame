@@ -67,6 +67,41 @@ class PlayerService {
       ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '해제할 수 있는 장비 종류는 무기, 방어구입니다.' }));
     }
   }
+
+  /**
+   * 달콤한 사탕 사용 (경험치 버프)
+   */
+  async useCandyItem({ ws, playerName, players }) {
+    const player = players[playerName];
+    if (!player) return;
+    const candy = player.inventory.find(item => item.name === '사탕');
+    if (!candy || (candy.count || 1) < 1) {
+      ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '인벤토리에 사탕이 없습니다.' }));
+      return;
+    }
+    // 사탕 1개 차감
+    candy.count = (candy.count || 1) - 1;
+    if (candy.count <= 0) {
+      player.inventory = player.inventory.filter(item => item !== candy);
+    }
+    // 현재 버프 만료시간과 비교하여 30분 연장(최대 12시간)
+    const maxBuff = 12 * 60 * 60 * 1000; // 12시간
+    const addBuff = 30 * 60 * 1000; // 30분
+    const now = Date.now();
+    const left = player.expCandyBuffUntil - now;
+    if (left >= maxBuff - addBuff) {
+      ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '사탕 버프가 최대치(12시간)에 가깝게 남아 있어 사용할 수 없습니다. (30분 이하만 연장 가능)' }));
+      return;
+    }
+    let newUntil = Math.max(player.expCandyBuffUntil || 0, now) + addBuff;
+    if (newUntil - now > maxBuff) newUntil = now + maxBuff;
+    player.expCandyBuffUntil = newUntil;
+    await this.savePlayerData(playerName).catch(() => {});
+    this.sendCharacterInfo(player);
+    this.sendInventory(player);
+    const leftSec = Math.floor((player.expCandyBuffUntil - now) / 1000);
+    ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `달콤한 사탕을 사용했습니다! 경험치 +20% (${leftSec}초 남음)` }));
+  }
 }
 
 module.exports = PlayerService; 

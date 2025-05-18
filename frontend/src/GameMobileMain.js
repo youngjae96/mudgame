@@ -12,6 +12,7 @@ import RoomMonsters from './RoomMonsters';
 import Modal from './components/Modal';
 import ExpEventBanner from './components/ExpEventBanner';
 import PasswordChangeModal from './components/PasswordChangeModal';
+import InventoryPanel from './components/InventoryPanel';
 
 const MobileRoot = styled.div`
   width: 100vw;
@@ -162,6 +163,7 @@ export default function GameMobileMain({
   const [showPatchNote, setShowPatchNote] = useState(false);
   const [showPasswordChange, setShowPasswordChange] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+  const [showMobileInventory, setShowMobileInventory] = useState(false);
 
   // 방 아이템/몬스터 렌더 함수
   const renderRoomItems = () => <RoomItems room={room} onPickup={handlePickup} />;
@@ -182,6 +184,11 @@ export default function GameMobileMain({
     }
     if (typeof handleSend === 'function') handleSend(e);
   }, [input, setInput, handleSend]);
+
+  useEffect(() => {
+    window.setInput = setInput;
+    return () => { window.setInput = null; };
+  }, [setInput]);
 
   return (
     <MobileRoot>
@@ -216,7 +223,23 @@ export default function GameMobileMain({
         <MobileContent>
           {tab === 'room' && <RoomInfo room={room} renderRoomItems={renderRoomItems} renderRoomMonsters={renderRoomMonsters} />}
           {tab === 'info' && <CharacterInfo name={name} room={room} character={character} />}
-          {tab === 'inv' && <Inventory inventory={inventory} gold={character?.gold} />}
+          {tab === 'inv' && (
+            <>
+              <Button style={{ width: '100%', fontSize: '1.1rem', margin: '12px 0' }} onClick={() => setShowMobileInventory(true)}>
+                인벤토리 열기
+              </Button>
+              <InventoryPanel open={showMobileInventory} onClose={() => setShowMobileInventory(false)} $isMobile={true}>
+                <Inventory
+                  inventory={inventory}
+                  gold={character?.gold}
+                  onItemCommandClick={cmd => {
+                    if (window.setInput) window.setInput(cmd);
+                    setShowMobileInventory(false);
+                  }}
+                />
+              </InventoryPanel>
+            </>
+          )}
           {tab === 'chat' && <ChatOnlyBox
             messages={chatTab === 'guild' ? guildChatLogMessages : chatLogMessages}
             tab={chatTab}
@@ -235,6 +258,7 @@ export default function GameMobileMain({
               value={input}
               onChange={e => setInput(e.target.value)}
               style={{ fontSize: '1.15rem', padding: '8px 10px' }}
+              commandList={commandList}
             />
             <Button className="send-btn" type="submit" aria-label="전송" size="md" style={{ fontSize: '1.1rem', padding: '8px 16px' }}>{UI_LABELS?.SEND || '전송'}</Button>
             <Button
