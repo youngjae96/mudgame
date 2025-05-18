@@ -12383,4 +12383,304 @@
     "$date": "2025-05-18T05:18:13.760Z"
   },
   "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68297c5a986665302f8aaa06"
+  },
+  "username": "콩커피",
+  "password": "$2b$10$qKo3Uer/8m7FFi66LCXC0eHwzcEfjwhX9kBrYzymVarjhp1w1c0ey",
+  "banned": false,
+  "createdAt": {
+    "$date": "2025-05-18T06:21:14.676Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68298305986665302f94a8e5"
+  },
+  "username": "1222224444",
+  "password": "$2b$10$Bp2XyeBYZOGxeMRZKv8NcuDT1inWLwyr9BLugJC6Mkdyv4BzjQcbi",
+  "banned": false,
+  "createdAt": {
+    "$date": "2025-05-18T06:49:41.887Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68298310986665302f94b8c6"
+  },
+  "username": "999988887777",
+  "password": "$2b$10$iUKv0UfMbE7pT/pOCH8ksusSoZbkKUaiLxt5PVL9Hyh/2sFq.lrN6",
+  "banned": false,
+  "createdAt": {
+    "$date": "2025-05-18T06:49:52.402Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68298327986665302f94daea"
+  },
+  "username": "hbys107",
+  "password": "$2b$10$TCwHhkMEhr3f3f1pDy9t8O49sLrxfON5.NRght6d1yDqHkrWevI5u",
+  "banned": false,
+  "createdAt": {
+    "$date": "2025-05-18T06:50:15.087Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68298337986665302f94f2b1"
+  },
+  "username": "김땡수",
+  "password": "$2b$10$x8pZC4nNhG6cjAbbLgCg7OD9oDVcG2UXV5hRlw6TqYdVOAIqdZCFu",
+  "banned": false,
+  "createdAt": {
+    "$date": "2025-05-18T06:50:31.057Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "682984e9986665302f978b1d"
+  },
+  "username": "zamt",
+  "password": "$2b$10$CoxAD/n8IPwS3PaqC15AeuID0NwhKdIPHLP4zhECI9fvtzm55zNlW",
+  "banned": false,
+  "createdAt": {
+    "$date": "2025-05-18T06:57:45.362Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "682984fc986665302f97a942"
+  },
+  "username": "미친곰",
+  "password": "$2b$10$ge.mQ5x3VBOKVQ.K8CdkGuGX/bYW6hlMKcSg92rFF09ZxMS8wXM76",
+  "banned": false,
+  "createdAt": {
+    "$date": "2025-05-18T06:58:04.059Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68298515986665302f97d1fa"
+  },
+  "username": "씹승현",
+  "password": "$2b$10$7jbQWWZJUzeeFviHYpumIO7m163FEMNsYDLoXGEjCrpkryaDOoF.y",
+  "banned": false,
+  "createdAt": {
+    "$date": "2025-05-18T06:58:29.381Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68298583986665302f98830d"
+  },
+  "username": "flower12",
+  "password": "$2b$10$hjr.VXlYI7JKJ1JHxX7vPukJSWaCI64V0zpib1BMY/6bzU2PYG5hu",
+  "banned": false,
+  "createdAt": {
+    "$date": "2025-05-18T07:00:19.261Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "682985c7986665302f98f076"
+  },
+  "username": "장쯔",
+  "password": "$2b$10$kq78pjW3xd.CafYBt762uuiZDGGyLSArh9KVJItz.IvABJRByBJ7.",
+  "banned": false,
+  "createdAt": {
+    "$date": "2025-05-18T07:01:27.131Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6829870d986665302f9afc0b"
+  },
+  "username": "홍원기시발",
+  "password": "$2b$10$xkXHvOAPSgKeNe4jZrdDhuoHPquUqQYVR4bjfwmtYIy1WbpW7uku6",
+  "banned": false,
+  "createdAt": {
+    "$date": "2025-05-18T07:06:53.185Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68298918986665302f9e45c8"
+  },
+  "username": "쿠쿠",
+  "password": "$2b$10$bbGF7b8tUjJRL7bTscSmnOgxYDuoiy2OHGHDu88Ujp4gP87DjlWym",
+  "banned": false,
+  "createdAt": {
+    "$date": "2025-05-18T07:15:36.662Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68298952986665302f9ea232"
+  },
+  "username": "으악",
+  "password": "$2b$10$PfVEdGLE.pBuXD9M52F1Y.n1FwecudWfugRqSgBkIkqON7VYgNZ.O",
+  "banned": false,
+  "createdAt": {
+    "$date": "2025-05-18T07:16:34.063Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68298a1a986665302f9fe22c"
+  },
+  "username": "193",
+  "password": "$2b$10$ZTty6zgCvGpB./M5Jeo/8.qI8dYhewADOSBcDfU.AmCqmOfIG8SlC",
+  "banned": false,
+  "createdAt": {
+    "$date": "2025-05-18T07:19:54.463Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68298ac1986665302fa0ee2b"
+  },
+  "username": "소케2",
+  "password": "$2b$10$lD0uVsuGCBWGB3X9XRvFUORq/M3Oan4AJ9gprYZSKwrasn53vXeMm",
+  "banned": false,
+  "createdAt": {
+    "$date": "2025-05-18T07:22:41.862Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68298b21986665302fa1875b"
+  },
+  "username": "JUN",
+  "password": "$2b$10$GpG1QyTZN5fsc2rVkMNLMO5Kfm5v9ABoRiE0HOSkj.gV52QPA1GOy",
+  "banned": false,
+  "createdAt": {
+    "$date": "2025-05-18T07:24:17.476Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68298e5b986665302fa6f8f5"
+  },
+  "username": "Alalqpqp",
+  "password": "$2b$10$2EvDjLHfAmbceBfka/CNQeR6qdNe.YEISiNLCu7U8B5Zjq1OEF5D6",
+  "banned": false,
+  "createdAt": {
+    "$date": "2025-05-18T07:38:03.961Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "682990cb986665302fab1e94"
+  },
+  "username": "purmir",
+  "password": "$2b$10$ynUvDvNryp62GfJEGDybpO0seTY/wbk0Hv4ybQrLMLQ.xQlJ7.4wm",
+  "banned": false,
+  "createdAt": {
+    "$date": "2025-05-18T07:48:27.286Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "682991d7986665302face518"
+  },
+  "username": "steinilee",
+  "password": "$2b$10$72sLMnO4Lko/.UOBopO8..dJRgtcU1Ooiot3HYrWcXEDnsbzYY3Ti",
+  "banned": false,
+  "createdAt": {
+    "$date": "2025-05-18T07:52:55.964Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68299a66986665302fbab665"
+  },
+  "username": "badr",
+  "password": "$2b$10$GroZoBLKIOplILJ2g1MXUeezBOXa2s9XJklMHJf8kt3lSXJGXYV1W",
+  "banned": false,
+  "createdAt": {
+    "$date": "2025-05-18T08:29:26.369Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6829aa32986665302fd37db2"
+  },
+  "username": "Dora",
+  "password": "$2b$10$m11/eTO5N4aKlPD/qe124uxM7skt38hoCT4Rv.Gg8W/.JhVP7/6Bm",
+  "banned": false,
+  "createdAt": {
+    "$date": "2025-05-18T09:36:50.195Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6829b500986665302fe4df27"
+  },
+  "username": "a12344",
+  "password": "$2b$10$URkeFLQZtmocUFZMu3HmZO545PbX0TIvMaKTsteIGuK3dSfPiJMBa",
+  "banned": false,
+  "createdAt": {
+    "$date": "2025-05-18T10:22:56.755Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6829c151986665302ff69272"
+  },
+  "username": "ㅂㅈㄷ",
+  "password": "$2b$10$/DUUoR2QqsWqwJvYhW2yvOYbcUAgwhqKJRvyeMVzgHYp0JTWuLlau",
+  "banned": false,
+  "createdAt": {
+    "$date": "2025-05-18T11:15:29.865Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6829c341986665302ff919e2"
+  },
+  "username": "개씹병신새끼들",
+  "password": "$2b$10$rIzH2wHR/K8C1SNkcEMHteKymGMLX8uqz8IL1ff20qpfW5WTgye0i",
+  "banned": false,
+  "createdAt": {
+    "$date": "2025-05-18T11:23:45.567Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6829c81d986665302fff7b79"
+  },
+  "username": "미나리",
+  "password": "$2b$10$MUTGG/YUd090R8NaqlQ6p.VMtXnfIYYRv3PWgS3bmBWcvzxDDrCmC",
+  "banned": false,
+  "createdAt": {
+    "$date": "2025-05-18T11:44:29.862Z"
+  },
+  "__v": 0
 }]

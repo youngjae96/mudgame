@@ -666,7 +666,6 @@ setInterval(() => {
       global.expDoubleEvent = false;
       global.EVENT_EXP_BONUS = undefined;
       if (typeof global.wss !== 'undefined') {
-        broadcast(global.wss, { type: 'notice', notice: '[자동] 경험치 1.2배 이벤트가 종료되었습니다.' });
         Object.values(PlayerManager.getAllPlayers()).forEach(p => sendCharacterInfo(p));
       }
       console.log('[경험치이벤트] 자동 종료 (토 09:00 ~ 일 21:00)');

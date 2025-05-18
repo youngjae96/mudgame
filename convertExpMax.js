@@ -52,7 +52,7 @@ function main() {
     const createdAt = userId ? new Date(userCreatedAtMap[userId]) : null;
     let ratio = 1.16;
     let cumRatio = 1.16;
-    if (createdAt && createdAt < CUTOFF_DATE) cumRatio = 1.21;
+    if (createdAt && createdAt < CUTOFF_DATE) cumRatio = 1.2;
 
     // 디버깅 로그
     console.log(`name: ${user.name}, userId: ${userId}, createdAt: ${createdAt}, cumRatio: ${cumRatio}`);

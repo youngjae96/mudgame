@@ -9,8 +9,8 @@
     "name": "admin",
     "world": 4,
     "position": {
-      "x": 6,
-      "y": 6
+      "x": 4,
+      "y": 7
     },
     "hp": 92,
     "maxHp": 60,
@@ -88,7 +88,7 @@
     },
     "equipArmor": null,
     "updatedAt": {
-      "$date": "2025-05-18T05:34:39.889Z"
+      "$date": "2025-05-18T11:46:40.046Z"
     },
     "__v": 1274
   },
@@ -186,9 +186,9 @@
     "maxHp": 146,
     "mp": 68,
     "maxMp": 74,
-    "str": 65,
-    "dex": 60,
-    "int": 44,
+    "str": 63,
+    "dex": 59,
+    "int": 43,
     "atk": 3,
     "def": 1,
     "gold": 536036,
@@ -203,13 +203,13 @@
         "name": "대형 물약",
         "type": "잡화",
         "perUse": 23,
-        "total": 435300,
+        "total": 7638,
         "desc": "한 번에 23 회복, 총 10000회 사용 가능",
         "price": 300,
         "shopBuy": true,
         "shopSell": true,
         "drop": false,
-        "count": 44
+        "count": 1
       },
       {
         "name": "천공의 검",
@@ -221,12 +221,12 @@
         "price": 8000
       }
     ],
-    "strExp": 76736.42990560038,
-    "strExpMax": 279848,
-    "dexExp": 52651.21495287362,
-    "dexExpMax": 133224,
+    "strExp": 161925.82564381068,
+    "strExpMax": 207965,
+    "dexExp": 95245.91282202414,
+    "dexExpMax": 114844,
     "intExp": 11486.708000001294,
-    "intExpMax": 12370,
+    "intExpMax": 10660,
     "equipWeapon": {
       "name": "영겁의 검",
       "type": "무기",
@@ -248,9 +248,9 @@
       "price": 9000
     },
     "updatedAt": {
-      "$date": "2025-05-18T05:35:06.646Z"
+      "$date": "2025-05-18T11:47:11.576Z"
     },
-    "__v": 530996
+    "__v": 549590
   },
   {
     "_id": {
@@ -299,19 +299,19 @@
     "name": "애플",
     "world": 3,
     "position": {
-      "x": 5,
-      "y": 24
+      "x": 9,
+      "y": 27
     },
-    "hp": 200,
+    "hp": 201,
     "maxHp": 140,
     "mp": 10,
     "maxMp": 72,
-    "str": 62,
+    "str": 61,
     "dex": 57,
     "int": 42,
     "atk": 3,
     "def": 1,
-    "gold": 34202,
+    "gold": 50540,
     "inventory": [
       {
         "name": "클랜힐 스크롤",
@@ -323,24 +323,13 @@
         "name": "대형 물약",
         "type": "잡화",
         "perUse": 23,
-        "total": 269828,
+        "total": 1642,
         "desc": "한 번에 23 회복, 총 10000회 사용 가능",
         "price": 300,
         "shopBuy": true,
         "shopSell": true,
         "drop": false,
-        "count": 27
-      },
-      {
-        "name": "환영의 검",
-        "type": "무기",
-        "atk": 0,
-        "expBonus": 1.13,
-        "desc": "환영처럼 스며드는 힘. 힘/민첩 경험치 13% 증가",
-        "drop": true,
-        "shopBuy": false,
-        "shopSell": true,
-        "price": 85000
+        "count": 1
       },
       {
         "name": "영원의 검",
@@ -352,25 +341,47 @@
         "shopBuy": true,
         "shopSell": true,
         "drop": false
+      },
+      {
+        "name": "환상의 검",
+        "type": "무기",
+        "price": 40000,
+        "desc": "방치형 무기. 힘/민첩 경험치 5% 증가 (상점에서 판매 가능)",
+        "atk": 0,
+        "expBonus": 1.05,
+        "shopBuy": true,
+        "shopSell": true,
+        "drop": false
+      },
+      {
+        "name": "천공의 검",
+        "desc": "하늘의 힘이 깃든 검",
+        "atk": 45,
+        "str": 6,
+        "dex": 4,
+        "type": "무기",
+        "price": 8000,
+        "shopBuy": false,
+        "shopSell": true,
+        "drop": true
       }
     ],
-    "strExp": 59922.418423109055,
-    "strExpMax": 179276,
-    "dexExp": 45571.209211568326,
+    "strExp": 122072.91846430689,
+    "strExpMax": 154544,
+    "dexExp": 4227.459232139494,
     "dexExpMax": 85341,
     "intExp": 8973.800000002695,
     "intExpMax": 9186,
     "equipWeapon": {
-      "name": "천공의 검",
-      "desc": "하늘의 힘이 깃든 검",
-      "atk": 45,
-      "str": 6,
-      "dex": 4,
+      "name": "환영의 검",
       "type": "무기",
-      "price": 8000,
+      "atk": 0,
+      "expBonus": 1.13,
+      "desc": "환영처럼 스며드는 힘. 힘/민첩 경험치 13% 증가",
+      "drop": true,
       "shopBuy": false,
       "shopSell": true,
-      "drop": true
+      "price": 85000
     },
     "equipArmor": {
       "name": "천공의 갑옷",
@@ -385,9 +396,9 @@
       "drop": true
     },
     "updatedAt": {
-      "$date": "2025-05-18T05:34:57.679Z"
+      "$date": "2025-05-18T11:47:12.049Z"
     },
-    "__v": 364996
+    "__v": 380178
   },
   {
     "_id": {
@@ -480,7 +491,7 @@
     "maxHp": 63,
     "mp": 10,
     "maxMp": 10,
-    "str": 19,
+    "str": 18,
     "dex": 15,
     "int": 5,
     "atk": 3,
@@ -597,7 +608,7 @@
       }
     ],
     "strExp": 182.68399999999997,
-    "strExpMax": 275,
+    "strExpMax": 233,
     "dexExp": 127.34199999999939,
     "dexExpMax": 139,
     "intExp": 0,
@@ -742,7 +753,7 @@
     "mp": 10,
     "maxMp": 10,
     "str": 34,
-    "dex": 30,
+    "dex": 29,
     "int": 5,
     "atk": 3,
     "def": 1,
@@ -770,7 +781,7 @@
     "strExp": 1665.4510000003013,
     "strExpMax": 2782,
     "dexExp": 1402.2255000001599,
-    "dexExpMax": 1524,
+    "dexExpMax": 1310,
     "intExp": 0,
     "intExpMax": 10,
     "equipWeapon": {
@@ -1731,9 +1742,9 @@
     "maxHp": 143,
     "mp": 10,
     "maxMp": 66,
-    "str": 57,
-    "dex": 52,
-    "int": 39,
+    "str": 55,
+    "dex": 51,
+    "int": 38,
     "atk": 3,
     "def": 1,
     "gold": 96,
@@ -1764,11 +1775,11 @@
       }
     ],
     "strExp": 7337.179640110183,
-    "strExpMax": 85341,
+    "strExpMax": 63415,
     "dexExp": 11776.589820051888,
-    "dexExpMax": 40617,
+    "dexExpMax": 35011,
     "intExp": 4481.100000000799,
-    "intExpMax": 5875,
+    "intExpMax": 5061,
     "equipWeapon": {
       "name": "환상의 검",
       "type": "무기",
@@ -2514,8 +2525,8 @@
     "maxHp": 131,
     "mp": 10,
     "maxMp": 10,
-    "str": 47,
-    "dex": 42,
+    "str": 46,
+    "dex": 41,
     "int": 5,
     "atk": 3,
     "def": 1,
@@ -2548,9 +2559,9 @@
       }
     ],
     "strExp": 11015.31549999865,
-    "strExpMax": 19324,
+    "strExpMax": 16655,
     "dexExp": 7678.657749998551,
-    "dexExpMax": 9186,
+    "dexExpMax": 7915,
     "intExp": 0,
     "intExpMax": 10,
     "equipWeapon": {
@@ -3741,9 +3752,9 @@
     "maxHp": 143,
     "mp": 64,
     "maxMp": 68,
-    "str": 64,
-    "dex": 59,
-    "int": 39,
+    "str": 62,
+    "dex": 57,
+    "int": 38,
     "atk": 3,
     "def": 1,
     "gold": 928211,
@@ -3876,11 +3887,11 @@
       }
     ],
     "strExp": 150997.72187055522,
-    "strExpMax": 241244,
+    "strExpMax": 179276,
     "dexExp": 94998.86093523928,
-    "dexExpMax": 114844,
+    "dexExpMax": 85341,
     "intExp": 78.2280000009213,
-    "intExpMax": 5875,
+    "intExpMax": 5061,
     "equipWeapon": {
       "name": "사막의 검",
       "type": "무기",
@@ -3925,9 +3936,9 @@
     "maxHp": 143,
     "mp": 62,
     "maxMp": 62,
-    "str": 59,
-    "dex": 54,
-    "int": 36,
+    "str": 57,
+    "dex": 53,
+    "int": 35,
     "atk": 3,
     "def": 1,
     "gold": 153243,
@@ -4014,11 +4025,11 @@
       }
     ],
     "strExp": 80871.53830380413,
-    "strExpMax": 114844,
+    "strExpMax": 85341,
     "dexExp": 438.2691519038216,
-    "dexExpMax": 54664,
+    "dexExpMax": 47120,
     "intExp": 1538.899999999967,
-    "intExpMax": 3754,
+    "intExpMax": 3232,
     "equipWeapon": {
       "name": "천공의 검",
       "description": "하늘의 힘이 깃든 검",
@@ -4613,18 +4624,18 @@
     "world": 3,
     "position": {
       "x": 2,
-      "y": 11
+      "y": 13
     },
     "hp": 203,
     "maxHp": 143,
     "mp": 62,
     "maxMp": 62,
-    "str": 65,
-    "dex": 60,
-    "int": 36,
+    "str": 63,
+    "dex": 59,
+    "int": 35,
     "atk": 3,
     "def": 1,
-    "gold": 400867,
+    "gold": 401797,
     "inventory": [
       {
         "name": "클랜힐 스크롤",
@@ -4672,10 +4683,10 @@
         "name": "대형 물약",
         "type": "잡화",
         "perUse": 23,
-        "total": 124085,
+        "total": 105333,
         "desc": "한 번에 23 회복, 총 10000회 사용 가능",
         "price": 300,
-        "count": 13
+        "count": 11
       },
       {
         "name": "용의 검",
@@ -4774,12 +4785,12 @@
         "desc": "사막의 모래바람처럼 날카로운 검."
       }
     ],
-    "strExp": 87270.0765611853,
-    "strExpMax": 279848,
-    "dexExp": 66582.03828052699,
-    "dexExpMax": 133224,
+    "strExp": 172300.46858509048,
+    "strExpMax": 207965,
+    "dexExp": 109097.23429247945,
+    "dexExpMax": 114844,
     "intExp": 3230.5380000001123,
-    "intExpMax": 3754,
+    "intExpMax": 3232,
     "equipWeapon": {
       "name": "초월의 검",
       "type": "무기",
@@ -4801,9 +4812,9 @@
       "price": 9000
     },
     "updatedAt": {
-      "$date": "2025-05-18T05:35:07.049Z"
+      "$date": "2025-05-18T11:47:11.751Z"
     },
-    "__v": 572152
+    "__v": 590701
   },
   {
     "_id": {
@@ -4886,8 +4897,8 @@
     "maxHp": 105,
     "mp": 10,
     "maxMp": 10,
-    "str": 36,
-    "dex": 32,
+    "str": 35,
+    "dex": 31,
     "int": 5,
     "atk": 3,
     "def": 1,
@@ -5070,9 +5081,9 @@
       }
     ],
     "strExp": 3297.641999999887,
-    "strExpMax": 3754,
+    "strExpMax": 3232,
     "dexExp": 445.32099999997905,
-    "dexExpMax": 2060,
+    "dexExpMax": 1772,
     "intExp": 0,
     "intExpMax": 10,
     "equipWeapon": {
@@ -5424,8 +5435,8 @@
     "maxHp": 99,
     "mp": 10,
     "maxMp": 10,
-    "str": 40,
-    "dex": 35,
+    "str": 39,
+    "dex": 34,
     "int": 5,
     "atk": 3,
     "def": 1,
@@ -5763,9 +5774,9 @@
       }
     ],
     "strExp": 4639.212000000291,
-    "strExpMax": 6819,
+    "strExpMax": 5875,
     "dexExp": 43.606000000336174,
-    "dexExpMax": 3232,
+    "dexExpMax": 2782,
     "intExp": 0,
     "intExpMax": 10,
     "equipWeapon": {
@@ -6441,7 +6452,7 @@
     "mp": 10,
     "maxMp": 10,
     "str": 30,
-    "dex": 26,
+    "dex": 25,
     "int": 5,
     "atk": 3,
     "def": 1,
@@ -6512,7 +6523,7 @@
     "strExp": 85.00400000005507,
     "strExpMax": 1524,
     "dexExp": 456.0020000000283,
-    "dexExpMax": 829,
+    "dexExpMax": 711,
     "intExp": 0,
     "intExpMax": 10,
     "equipWeapon": {
@@ -6554,8 +6565,8 @@
     "maxHp": 137,
     "mp": 10,
     "maxMp": 10,
-    "str": 59,
-    "dex": 54,
+    "str": 57,
+    "dex": 53,
     "int": 5,
     "atk": 3,
     "def": 1,
@@ -6591,9 +6602,9 @@
       }
     ],
     "strExp": 79000.0720240601,
-    "strExpMax": 114844,
+    "strExpMax": 85341,
     "dexExp": 49142.5360120112,
-    "dexExpMax": 54664,
+    "dexExpMax": 47120,
     "intExp": 0,
     "intExpMax": 10,
     "equipWeapon": {
@@ -7051,8 +7062,8 @@
     "maxHp": 99,
     "mp": 10,
     "maxMp": 10,
-    "str": 39,
-    "dex": 34,
+    "str": 38,
+    "dex": 33,
     "int": 5,
     "atk": 3,
     "def": 1,
@@ -7078,9 +7089,9 @@
       }
     ],
     "strExp": 4741.003790099842,
-    "strExpMax": 5875,
+    "strExpMax": 5061,
     "dexExp": 521.0018950501293,
-    "dexExpMax": 2782,
+    "dexExpMax": 2394,
     "intExp": 0,
     "intExpMax": 10,
     "equipWeapon": {
@@ -7280,19 +7291,19 @@
     "name": "펌푸보이",
     "world": 3,
     "position": {
-      "x": 27,
-      "y": 9
+      "x": 28,
+      "y": 0
     },
-    "hp": 159,
+    "hp": 192,
     "maxHp": 134,
     "mp": 64,
     "maxMp": 70,
-    "str": 59,
-    "dex": 54,
-    "int": 41,
+    "str": 58,
+    "dex": 53,
+    "int": 40,
     "atk": 3,
     "def": 1,
-    "gold": 107945,
+    "gold": 125637,
     "inventory": [
       {
         "name": "클랜힐 스크롤",
@@ -7314,13 +7325,13 @@
         "name": "대형 물약",
         "type": "잡화",
         "perUse": 23,
-        "total": 312697,
+        "total": 247024,
         "desc": "한 번에 23 회복, 총 10000회 사용 가능",
         "price": 300,
         "shopBuy": true,
         "shopSell": true,
         "drop": false,
-        "count": 32
+        "count": 25
       },
       {
         "name": "신비의 검",
@@ -7332,22 +7343,33 @@
         "shopBuy": false,
         "shopSell": true,
         "price": 80000
+      },
+      {
+        "name": "용의 검",
+        "description": "드래곤의 힘이 깃든 검",
+        "atk": 36,
+        "str": 5,
+        "dex": 3,
+        "type": "무기",
+        "price": 2500
       }
     ],
-    "strExp": 75209.18766821314,
-    "strExpMax": 114844,
-    "dexExp": 45817.09383414159,
-    "dexExpMax": 54664,
+    "strExp": 28168.129573682414,
+    "strExpMax": 99000,
+    "dexExp": 22415.06478686419,
+    "dexExpMax": 47120,
     "intExp": 2762.5010000004895,
-    "intExpMax": 7915,
+    "intExpMax": 6819,
     "equipWeapon": {
-      "name": "용의 검",
-      "description": "드래곤의 힘이 깃든 검",
-      "atk": 36,
-      "str": 5,
-      "dex": 3,
+      "name": "영겁의 검",
       "type": "무기",
-      "price": 2500
+      "atk": 0,
+      "expBonus": 1.18,
+      "desc": "영원한 시간의 흐름을 담은 방치형 무기. 힘/민첩 경험치 18% 증가",
+      "drop": true,
+      "shopBuy": false,
+      "shopSell": true,
+      "price": 95000
     },
     "equipArmor": {
       "name": "용의 갑옷",
@@ -7359,9 +7381,9 @@
       "price": 2600
     },
     "updatedAt": {
-      "$date": "2025-05-17T17:42:44.890Z"
+      "$date": "2025-05-18T11:47:12.455Z"
     },
-    "__v": 289336
+    "__v": 301056
   },
   {
     "_id": {
@@ -8537,7 +8559,7 @@
     "mp": 10,
     "maxMp": 10,
     "str": 35,
-    "dex": 31,
+    "dex": 30,
     "int": 5,
     "atk": 3,
     "def": 1,
@@ -8563,7 +8585,7 @@
     "strExp": 390.50700000021243,
     "strExpMax": 3232,
     "dexExp": 833.7535000000374,
-    "dexExpMax": 1772,
+    "dexExpMax": 1524,
     "intExp": 0,
     "intExpMax": 10,
     "equipWeapon": {
@@ -8950,8 +8972,8 @@
     "maxHp": 64,
     "mp": 10,
     "maxMp": 10,
-    "str": 36,
-    "dex": 31,
+    "str": 35,
+    "dex": 30,
     "int": 5,
     "atk": 3,
     "def": 1,
@@ -8987,9 +9009,9 @@
       }
     ],
     "strExp": 1561.0100000000198,
-    "strExpMax": 3754,
+    "strExpMax": 3232,
     "dexExp": 1419.0049999999844,
-    "dexExpMax": 1772,
+    "dexExpMax": 1524,
     "intExp": 0,
     "intExpMax": 10,
     "equipWeapon": {
@@ -9341,7 +9363,7 @@
     "maxHp": 95,
     "mp": 10,
     "maxMp": 10,
-    "str": 32,
+    "str": 31,
     "dex": 27,
     "int": 5,
     "atk": 3,
@@ -9384,7 +9406,7 @@
       }
     ],
     "strExp": 689.1879999999255,
-    "strExpMax": 2060,
+    "strExpMax": 1772,
     "dexExp": 803.0939999999874,
     "dexExpMax": 966,
     "intExp": 0,
@@ -9622,19 +9644,19 @@
     "name": "trowe",
     "world": 5,
     "position": {
-      "x": 4,
-      "y": 0
+      "x": 3,
+      "y": 6
     },
-    "hp": 189,
+    "hp": 191,
     "maxHp": 57,
     "mp": 10,
     "maxMp": 62,
-    "str": 59,
-    "dex": 55,
-    "int": 36,
+    "str": 58,
+    "dex": 54,
+    "int": 35,
     "atk": 3,
     "def": 1,
-    "gold": 1288538,
+    "gold": 1277738,
     "inventory": [
       {
         "name": "클랜힐 스크롤",
@@ -9646,10 +9668,10 @@
         "name": "대형 물약",
         "type": "잡화",
         "perUse": 23,
-        "total": 257170,
+        "total": 306780,
         "desc": "한 번에 23 회복, 총 10000회 사용 가능",
         "price": 300,
-        "count": 26
+        "count": 31
       },
       {
         "name": "환상의 검",
@@ -9728,12 +9750,12 @@
         "desc": "사막의 모래바람처럼 날카로운 검."
       }
     ],
-    "strExp": 82583.22969259173,
-    "strExpMax": 114844,
-    "dexExp": 8616.6148463013,
-    "dexExpMax": 63415,
+    "strExp": 67718.37525259335,
+    "strExpMax": 99000,
+    "dexExp": 44637.68762627897,
+    "dexExpMax": 54664,
     "intExp": 1432.4637999999725,
-    "intExpMax": 3754,
+    "intExpMax": 3232,
     "equipWeapon": {
       "name": "영원의 검",
       "type": "무기",
@@ -9757,9 +9779,9 @@
       "desc": "사막의 모래로 단련된 갑옷."
     },
     "updatedAt": {
-      "$date": "2025-05-18T05:35:07.580Z"
+      "$date": "2025-05-18T11:47:12.043Z"
     },
-    "__v": 209456
+    "__v": 227894
   },
   {
     "_id": {
@@ -9860,7 +9882,7 @@
     "maxHp": 86,
     "mp": 10,
     "maxMp": 10,
-    "str": 28,
+    "str": 27,
     "dex": 23,
     "int": 5,
     "atk": 3,
@@ -9914,7 +9936,7 @@
       }
     ],
     "strExp": 110.82808999999128,
-    "strExpMax": 1125,
+    "strExpMax": 966,
     "dexExp": 394.4140449999985,
     "dexExpMax": 521,
     "intExp": 0,
@@ -10169,7 +10191,7 @@
     "maxHp": 104,
     "mp": 10,
     "maxMp": 10,
-    "str": 42,
+    "str": 41,
     "dex": 37,
     "int": 5,
     "atk": 3,
@@ -10231,7 +10253,7 @@
       }
     ],
     "strExp": 6417.382350000175,
-    "strExpMax": 9186,
+    "strExpMax": 7915,
     "dexExp": 4417.191175000042,
     "dexExpMax": 4359,
     "intExp": 0,
@@ -10869,8 +10891,8 @@
     "maxHp": 78,
     "mp": 10,
     "maxMp": 10,
-    "str": 25,
-    "dex": 21,
+    "str": 24,
+    "dex": 20,
     "int": 5,
     "atk": 3,
     "def": 1,
@@ -10914,9 +10936,9 @@
       }
     ],
     "strExp": 449.3969999999921,
-    "strExpMax": 711,
+    "strExpMax": 609,
     "dexExp": 141.69849999999835,
-    "dexExpMax": 380,
+    "dexExpMax": 324,
     "intExp": 0,
     "intExpMax": 10,
     "equipWeapon": {
@@ -11557,7 +11579,7 @@
     "mp": 10,
     "maxMp": 10,
     "str": 33,
-    "dex": 29,
+    "dex": 28,
     "int": 5,
     "atk": 3,
     "def": 1,
@@ -11621,7 +11643,7 @@
     "strExp": 1273.004000000109,
     "strExpMax": 2394,
     "dexExp": 1146.5020000000666,
-    "dexExpMax": 1310,
+    "dexExpMax": 1125,
     "intExp": 0,
     "intExpMax": 10,
     "equipWeapon": {
@@ -11662,8 +11684,8 @@
     "maxHp": 102,
     "mp": 10,
     "maxMp": 10,
-    "str": 50,
-    "dex": 45,
+    "str": 48,
+    "dex": 44,
     "int": 5,
     "atk": 3,
     "def": 1,
@@ -11689,9 +11711,9 @@
       }
     ],
     "strExp": 13699.72733030388,
-    "strExpMax": 30178,
+    "strExpMax": 22420,
     "dexExp": 9807.863665152307,
-    "dexExpMax": 14354,
+    "dexExpMax": 12370,
     "intExp": 0,
     "intExpMax": 10,
     "equipWeapon": {
@@ -13012,8 +13034,8 @@
     "maxHp": 30,
     "mp": 10,
     "maxMp": 10,
-    "str": 42,
-    "dex": 37,
+    "str": 41,
+    "dex": 36,
     "int": 5,
     "atk": 3,
     "def": 1,
@@ -13120,9 +13142,9 @@
       }
     ],
     "strExp": 2109.5170000015996,
-    "strExpMax": 9186,
+    "strExpMax": 7915,
     "dexExp": 2263.2585000007466,
-    "dexExpMax": 4359,
+    "dexExpMax": 3754,
     "intExp": 0,
     "intExpMax": 10,
     "equipWeapon": {
@@ -13600,13 +13622,13 @@
       "x": 1,
       "y": 2
     },
-    "hp": 200,
+    "hp": 201,
     "maxHp": 30,
     "mp": 10,
     "maxMp": 74,
-    "str": 62,
+    "str": 61,
     "dex": 57,
-    "int": 43,
+    "int": 42,
     "atk": 3,
     "def": 1,
     "gold": 1323780,
@@ -13736,10 +13758,10 @@
         "name": "대형 물약",
         "type": "잡화",
         "perUse": 23,
-        "total": 377515,
+        "total": 254651,
         "desc": "한 번에 23 회복, 총 10000회 사용 가능",
         "price": 300,
-        "count": 38
+        "count": 26
       },
       {
         "name": "천공의 갑옷",
@@ -13803,12 +13825,12 @@
         "desc": "사막의 모래바람처럼 날카로운 검."
       }
     ],
-    "strExp": 66531.41137439002,
-    "strExpMax": 179276,
-    "dexExp": 49349.705687189526,
+    "strExp": 158685.05953451197,
+    "strExpMax": 154544,
+    "dexExp": 17928.5297672249,
     "dexExpMax": 85341,
     "intExp": 2732.7080000003994,
-    "intExpMax": 10660,
+    "intExpMax": 9186,
     "equipWeapon": {
       "name": "초월의 검",
       "type": "무기",
@@ -13832,9 +13854,9 @@
       "desc": "사막의 모래로 단련된 갑옷."
     },
     "updatedAt": {
-      "$date": "2025-05-18T05:35:07.480Z"
+      "$date": "2025-05-18T11:47:12.373Z"
     },
-    "__v": 395480
+    "__v": 414065
   },
   {
     "_id": {
@@ -13890,9 +13912,9 @@
     "maxHp": 30,
     "mp": 44,
     "maxMp": 68,
-    "str": 49,
-    "dex": 45,
-    "int": 40,
+    "str": 48,
+    "dex": 44,
+    "int": 39,
     "atk": 3,
     "def": 1,
     "gold": 103608,
@@ -13951,11 +13973,11 @@
       }
     ],
     "strExp": 6786.917399996743,
-    "strExpMax": 26012,
+    "strExpMax": 22420,
     "dexExp": 6366.458699998284,
-    "dexExpMax": 14354,
+    "dexExpMax": 12370,
     "intExp": 4960.900000001305,
-    "intExpMax": 6819,
+    "intExpMax": 5875,
     "equipWeapon": {
       "name": "용의 검",
       "description": "드래곤의 힘이 깃든 검",
@@ -15530,8 +15552,8 @@
     "maxHp": 30,
     "mp": 10,
     "maxMp": 10,
-    "str": 28,
-    "dex": 24,
+    "str": 27,
+    "dex": 23,
     "int": 5,
     "atk": 3,
     "def": 1,
@@ -15575,9 +15597,9 @@
       }
     ],
     "strExp": 301.4690000000182,
-    "strExpMax": 1125,
+    "strExpMax": 966,
     "dexExp": 489.7345000000117,
-    "dexExpMax": 609,
+    "dexExpMax": 521,
     "intExp": 0,
     "intExpMax": 10,
     "equipWeapon": {
@@ -15651,27 +15673,27 @@
       "x": 4,
       "y": 4
     },
-    "hp": 49,
+    "hp": 34,
     "maxHp": 30,
     "mp": 10,
     "maxMp": 10,
-    "str": 6,
-    "dex": 5,
+    "str": 8,
+    "dex": 7,
     "int": 5,
     "atk": 3,
     "def": 1,
-    "gold": 0,
+    "gold": 86,
     "inventory": [],
-    "strExp": 3.484,
-    "strExpMax": 16,
-    "dexExp": 6.742,
-    "dexExpMax": 10,
+    "strExp": 14.73439999999998,
+    "strExpMax": 31,
+    "dexExp": 6.867199999999988,
+    "dexExpMax": 23,
     "intExp": 0,
     "intExpMax": 10,
     "equipWeapon": null,
     "equipArmor": null,
     "updatedAt": {
-      "$date": "2025-05-10T02:10:52.640Z"
+      "$date": "2025-05-18T05:58:39.881Z"
     },
     "__v": 0
   },
@@ -15956,7 +15978,7 @@
     "mp": 10,
     "maxMp": 10,
     "str": 34,
-    "dex": 30,
+    "dex": 29,
     "int": 5,
     "atk": 3,
     "def": 1,
@@ -15982,7 +16004,7 @@
     "strExp": 732.5180000000292,
     "strExpMax": 2782,
     "dexExp": 935.7590000000367,
-    "dexExpMax": 1524,
+    "dexExpMax": 1310,
     "intExp": 0,
     "intExpMax": 10,
     "equipWeapon": {
@@ -16173,8 +16195,8 @@
     "maxHp": 30,
     "mp": 48,
     "maxMp": 56,
-    "str": 50,
-    "dex": 45,
+    "str": 49,
+    "dex": 44,
     "int": 31,
     "atk": 3,
     "def": 1,
@@ -16206,9 +16228,9 @@
       }
     ],
     "strExp": 23410.36989999815,
-    "strExpMax": 30178,
+    "strExpMax": 26012,
     "dexExp": 841.1849499983924,
-    "dexExpMax": 14354,
+    "dexExpMax": 12370,
     "intExp": 38.4999999998799,
     "intExpMax": 1772,
     "equipWeapon": {
@@ -16252,8 +16274,8 @@
     "maxHp": 30,
     "mp": 32,
     "maxMp": 34,
-    "str": 52,
-    "dex": 47,
+    "str": 51,
+    "dex": 46,
     "int": 18,
     "atk": 3,
     "def": 1,
@@ -16285,9 +16307,9 @@
       }
     ],
     "strExp": 19708.070445277495,
-    "strExpMax": 40617,
+    "strExpMax": 35011,
     "dexExp": 13972.035222635184,
-    "dexExpMax": 19324,
+    "dexExpMax": 16655,
     "intExp": 99.00000000000043,
     "intExpMax": 233,
     "equipWeapon": {
@@ -16892,8 +16914,8 @@
     "maxHp": 30,
     "mp": 10,
     "maxMp": 28,
-    "str": 57,
-    "dex": 52,
+    "str": 55,
+    "dex": 51,
     "int": 15,
     "atk": 3,
     "def": 1,
@@ -16953,9 +16975,9 @@
       }
     ],
     "strExp": 3964.175552378961,
-    "strExpMax": 85341,
+    "strExpMax": 63415,
     "dexExp": 10090.08777618091,
-    "dexExpMax": 40617,
+    "dexExpMax": 35011,
     "intExp": 56.99999999999957,
     "intExpMax": 139,
     "equipWeapon": {
@@ -17109,9 +17131,9 @@
     "maxHp": 30,
     "mp": 58,
     "maxMp": 62,
-    "str": 45,
-    "dex": 40,
-    "int": 36,
+    "str": 44,
+    "dex": 39,
+    "int": 35,
     "atk": 3,
     "def": 1,
     "gold": 4572,
@@ -17142,11 +17164,11 @@
       }
     ],
     "strExp": 12295.552159998702,
-    "strExpMax": 14354,
+    "strExpMax": 12370,
     "dexExp": 1093.7760800003139,
-    "dexExpMax": 6819,
+    "dexExpMax": 5875,
     "intExp": 2662.100000000035,
-    "intExpMax": 3754,
+    "intExpMax": 3232,
     "equipWeapon": {
       "name": "영원의 검",
       "type": "무기",
@@ -17292,16 +17314,16 @@
     "name": "치우",
     "world": 5,
     "position": {
-      "x": 3,
-      "y": 3
+      "x": 2,
+      "y": 4
     },
-    "hp": 192,
+    "hp": 194,
     "maxHp": 30,
     "mp": 64,
-    "maxMp": 66,
-    "str": 60,
-    "dex": 55,
-    "int": 38,
+    "maxMp": 70,
+    "str": 58,
+    "dex": 54,
+    "int": 39,
     "atk": 3,
     "def": 1,
     "gold": 296019,
@@ -17316,10 +17338,10 @@
         "name": "대형 물약",
         "type": "잡화",
         "perUse": 23,
-        "total": 382638,
+        "total": 363958,
         "desc": "한 번에 23 회복, 총 10000회 사용 가능",
         "price": 300,
-        "count": 39
+        "count": 37
       },
       {
         "name": "사막의 검",
@@ -17333,12 +17355,12 @@
         "desc": "사막의 모래바람처럼 날카로운 검."
       }
     ],
-    "strExp": 78014.11534678593,
-    "strExpMax": 133224,
-    "dexExp": 50317.05767339943,
-    "dexExpMax": 63415,
-    "intExp": 3065.907000000156,
-    "intExpMax": 5061,
+    "strExp": 86577.43793879726,
+    "strExpMax": 99000,
+    "dexExp": 786.7189694040547,
+    "dexExpMax": 54664,
+    "intExp": 963.8910000004637,
+    "intExpMax": 5875,
     "equipWeapon": {
       "name": "초월의 검",
       "type": "무기",
@@ -17362,9 +17384,9 @@
       "desc": "사막의 모래로 단련된 갑옷."
     },
     "updatedAt": {
-      "$date": "2025-05-18T05:34:39.901Z"
+      "$date": "2025-05-18T11:47:12.510Z"
     },
-    "__v": 298946
+    "__v": 300677
   },
   {
     "_id": {
@@ -17978,12 +18000,12 @@
       "x": 5,
       "y": 7
     },
-    "hp": 151,
+    "hp": 152,
     "maxHp": 30,
     "mp": 10,
-    "maxMp": 78,
-    "str": 41,
-    "dex": 37,
+    "maxMp": 80,
+    "str": 40,
+    "dex": 36,
     "int": 46,
     "atk": 3,
     "def": 1,
@@ -18016,10 +18038,10 @@
       }
     ],
     "strExp": 7021.39900000144,
-    "strExpMax": 7915,
+    "strExpMax": 6819,
     "dexExp": 720.1995000008053,
-    "dexExpMax": 4359,
-    "intExp": 9621.540000003883,
+    "dexExpMax": 3754,
+    "intExp": 5655.3400000031625,
     "intExpMax": 16655,
     "equipWeapon": {
       "name": "용의 검",
@@ -18046,7 +18068,7 @@
       "drop": true
     },
     "updatedAt": {
-      "$date": "2025-05-18T05:34:39.887Z"
+      "$date": "2025-05-18T11:46:40.040Z"
     },
     "__v": 16820
   },
@@ -18296,27 +18318,27 @@
       "$oid": "6820773f5062c91771f795a5"
     },
     "name": "두유가꿀맛",
-    "world": 1,
+    "world": 2,
     "position": {
-      "x": 4,
-      "y": 4
+      "x": 6,
+      "y": 7
     },
-    "hp": 83,
+    "hp": 86,
     "maxHp": 30,
     "mp": 10,
     "maxMp": 10,
-    "str": 20,
-    "dex": 16,
+    "str": 21,
+    "dex": 17,
     "int": 5,
     "atk": 3,
     "def": 1,
-    "gold": 10492,
+    "gold": 11298,
     "inventory": [
       {
         "name": "대형 물약",
         "type": "잡화",
         "perUse": 23,
-        "total": 6100,
+        "total": 5642,
         "desc": "한 번에 23 회복, 총 10000회 사용 가능",
         "price": 300,
         "count": 1
@@ -18331,10 +18353,10 @@
         "price": 1500
       }
     ],
-    "strExp": 296.27000000000015,
-    "strExpMax": 324,
-    "dexExp": 172.13500000000002,
-    "dexExpMax": 166,
+    "strExp": 187.68899999999982,
+    "strExpMax": 380,
+    "dexExp": 100.84449999999985,
+    "dexExpMax": 197,
     "intExp": 0,
     "intExpMax": 10,
     "equipWeapon": {
@@ -18356,9 +18378,9 @@
       "price": 1400
     },
     "updatedAt": {
-      "$date": "2025-05-11T11:53:15.248Z"
+      "$date": "2025-05-18T10:10:48.189Z"
     },
-    "__v": 385
+    "__v": 459
   },
   {
     "_id": {
@@ -18414,8 +18436,8 @@
     "maxHp": 30,
     "mp": 10,
     "maxMp": 82,
-    "str": 42,
-    "dex": 37,
+    "str": 41,
+    "dex": 36,
     "int": 48,
     "atk": 3,
     "def": 1,
@@ -18445,10 +18467,10 @@
       }
     ],
     "strExp": 3163.346800001195,
-    "strExpMax": 9186,
+    "strExpMax": 7915,
     "dexExp": 2790.1734000005267,
-    "dexExpMax": 4359,
-    "intExp": 11807.779999997403,
+    "dexExpMax": 3754,
+    "intExp": 20512.579999999376,
     "intExpMax": 22420,
     "equipWeapon": {
       "name": "플레임소드",
@@ -18469,7 +18491,7 @@
       "price": 1400
     },
     "updatedAt": {
-      "$date": "2025-05-18T05:34:39.897Z"
+      "$date": "2025-05-18T11:46:40.057Z"
     },
     "__v": 34826
   },
@@ -20429,31 +20451,31 @@
     "name": "먹마",
     "world": 3,
     "position": {
-      "x": 3,
-      "y": 0
+      "x": 11,
+      "y": 18
     },
-    "hp": 183,
+    "hp": 186,
     "maxHp": 30,
     "mp": 64,
     "maxMp": 64,
     "str": 56,
     "dex": 51,
-    "int": 37,
+    "int": 36,
     "atk": 3,
     "def": 1,
-    "gold": 208346,
+    "gold": 261138,
     "inventory": [
       {
         "name": "대형 물약",
         "type": "잡화",
         "perUse": 23,
-        "total": 69437,
+        "total": 150546,
         "desc": "한 번에 23 회복, 총 10000회 사용 가능",
         "price": 300,
         "shopBuy": true,
         "shopSell": true,
         "drop": false,
-        "count": 7
+        "count": 16
       },
       {
         "name": "클랜힐 스크롤",
@@ -20465,15 +20487,15 @@
         "desc": "접속해있는 길드원들의 HP가 회복됩니다. /클랜힐 명령어로 사용 가능"
       },
       {
-        "name": "몽중의 검",
+        "name": "환상의 검",
         "type": "무기",
+        "price": 40000,
+        "desc": "방치형 무기. 힘/민첩 경험치 5% 증가 (상점에서 판매 가능)",
         "atk": 0,
-        "expBonus": 1.15,
-        "desc": "꿈속에서 깨어난 전설의 방치형 무기. 힘/민첩 경험치 15% 증가",
-        "drop": true,
-        "shopBuy": false,
+        "expBonus": 1.05,
+        "shopBuy": true,
         "shopSell": true,
-        "price": 90000
+        "drop": false
       },
       {
         "name": "천공의 검",
@@ -20488,12 +20510,12 @@
         "drop": true
       }
     ],
-    "strExp": 28362.222045108058,
+    "strExp": 26090.537125100334,
     "strExpMax": 73566,
-    "dexExp": 20186.11102255225,
+    "dexExp": 19991.268562550646,
     "dexExpMax": 35011,
     "intExp": 280.76500000016335,
-    "intExpMax": 4359,
+    "intExpMax": 3754,
     "equipWeapon": {
       "name": "초월의 검",
       "type": "무기",
@@ -20518,9 +20540,9 @@
       "drop": true
     },
     "updatedAt": {
-      "$date": "2025-05-18T00:59:54.169Z"
+      "$date": "2025-05-18T11:47:12.075Z"
     },
-    "__v": 109202
+    "__v": 120581
   },
   {
     "_id": {
@@ -20761,8 +20783,8 @@
     "maxHp": 30,
     "mp": 10,
     "maxMp": 10,
-    "str": 53,
-    "dex": 48,
+    "str": 52,
+    "dex": 47,
     "int": 5,
     "atk": 3,
     "def": 1,
@@ -20798,9 +20820,9 @@
       }
     ],
     "strExp": 15710.408700016947,
-    "strExpMax": 47120,
+    "strExpMax": 40617,
     "dexExp": 12650.204350015665,
-    "dexExpMax": 22420,
+    "dexExpMax": 19324,
     "intExp": 0,
     "intExpMax": 10,
     "equipWeapon": {
@@ -20825,7 +20847,7 @@
       "drop": true
     },
     "updatedAt": {
-      "$date": "2025-05-18T05:34:39.901Z"
+      "$date": "2025-05-18T08:39:59.915Z"
     },
     "__v": 139961
   },
@@ -21913,7 +21935,7 @@
     "maxHp": 30,
     "mp": 10,
     "maxMp": 10,
-    "str": 21,
+    "str": 20,
     "dex": 17,
     "int": 5,
     "atk": 3,
@@ -21940,7 +21962,7 @@
       }
     ],
     "strExp": 134.48499999999862,
-    "strExpMax": 380,
+    "strExpMax": 324,
     "dexExp": 74.24249999999908,
     "dexExpMax": 197,
     "intExp": 0,
@@ -22050,42 +22072,31 @@
     "name": "대빵",
     "world": 4,
     "position": {
-      "x": 6,
-      "y": 4
+      "x": 7,
+      "y": 7
     },
-    "hp": 179,
+    "hp": 182,
     "maxHp": 30,
     "mp": 48,
     "maxMp": 48,
-    "str": 56,
-    "dex": 51,
+    "str": 55,
+    "dex": 50,
     "int": 26,
     "atk": 3,
     "def": 1,
-    "gold": 148590,
+    "gold": 151759,
     "inventory": [
       {
         "name": "대형 물약",
         "type": "잡화",
         "perUse": 23,
-        "total": 207911,
+        "total": 165832,
         "desc": "한 번에 23 회복, 총 10000회 사용 가능",
         "price": 300,
         "shopBuy": true,
         "shopSell": true,
         "drop": false,
-        "count": 21
-      },
-      {
-        "name": "환상의 검",
-        "type": "무기",
-        "price": 40000,
-        "desc": "방치형 무기. 힘/민첩 경험치 5% 증가 (상점에서 판매 가능)",
-        "atk": 0,
-        "expBonus": 1.05,
-        "shopBuy": true,
-        "shopSell": true,
-        "drop": false
+        "count": 17
       },
       {
         "name": "클랜힐 스크롤",
@@ -22097,52 +22108,51 @@
         "desc": "접속해있는 길드원들의 HP가 회복됩니다. /클랜힐 명령어로 사용 가능"
       },
       {
-        "name": "용의 검",
-        "desc": "드래곤의 힘이 깃든 검",
-        "atk": 36,
-        "str": 5,
-        "dex": 3,
+        "name": "천공의 검",
+        "desc": "하늘의 힘이 깃든 검",
+        "atk": 45,
+        "str": 6,
+        "dex": 4,
         "type": "무기",
-        "price": 2500,
+        "price": 8000,
         "shopBuy": false,
         "shopSell": true,
         "drop": true
       }
     ],
-    "strExp": 6093.3820383899865,
-    "strExpMax": 73566,
-    "dexExp": 2842.691019194847,
-    "dexExpMax": 35011,
+    "strExp": 6805.577002352301,
+    "strExpMax": 63415,
+    "dexExp": 3079.2885011759927,
+    "dexExpMax": 30178,
     "intExp": 7.600000000003311,
     "intExpMax": 829,
     "equipWeapon": {
-      "name": "천공의 검",
-      "desc": "하늘의 힘이 깃든 검",
-      "atk": 45,
-      "str": 6,
-      "dex": 4,
+      "name": "영원의 검",
       "type": "무기",
-      "price": 8000,
-      "shopBuy": false,
+      "price": 80000,
+      "desc": "방치형 무기. 힘/민첩 경험치 7% 증가 (상점에서 판매 가능)",
+      "atk": 0,
+      "expBonus": 1.07,
+      "shopBuy": true,
       "shopSell": true,
-      "drop": true
+      "drop": false
     },
     "equipArmor": {
-      "name": "용의 갑옷",
-      "desc": "드래곤의 힘이 깃든 갑옷",
-      "def": 28,
-      "str": 3,
-      "dex": 2,
+      "name": "천공의 갑옷",
+      "desc": "하늘의 힘이 깃든 갑옷",
+      "def": 35,
+      "str": 4,
+      "dex": 3,
       "type": "방어구",
-      "price": 2600,
+      "price": 9000,
       "shopBuy": false,
       "shopSell": true,
       "drop": true
     },
     "updatedAt": {
-      "$date": "2025-05-18T05:34:52.362Z"
+      "$date": "2025-05-18T10:33:16.380Z"
     },
-    "__v": 50010
+    "__v": 58448
   },
   {
     "_id": {
@@ -22198,8 +22208,8 @@
     "maxHp": 30,
     "mp": 10,
     "maxMp": 10,
-    "str": 47,
-    "dex": 42,
+    "str": 46,
+    "dex": 41,
     "int": 5,
     "atk": 3,
     "def": 1,
@@ -22225,9 +22235,9 @@
       }
     ],
     "strExp": 12056.148999990233,
-    "strExpMax": 19324,
+    "strExpMax": 16655,
     "dexExp": 8199.07449999479,
-    "dexExpMax": 9186,
+    "dexExpMax": 7915,
     "intExp": 0,
     "intExpMax": 10,
     "equipWeapon": {
@@ -22989,8 +22999,8 @@
     "maxHp": 30,
     "mp": 10,
     "maxMp": 10,
-    "str": 41,
-    "dex": 37,
+    "str": 40,
+    "dex": 36,
     "int": 5,
     "atk": 3,
     "def": 1,
@@ -23022,9 +23032,9 @@
       }
     ],
     "strExp": 6005.003000001433,
-    "strExpMax": 7915,
+    "strExpMax": 6819,
     "dexExp": 212.0015000009179,
-    "dexExpMax": 4359,
+    "dexExpMax": 3754,
     "intExp": 0,
     "intExpMax": 10,
     "equipWeapon": {
@@ -24713,7 +24723,7 @@
       "x": 5,
       "y": 1
     },
-    "hp": 160,
+    "hp": 163,
     "maxHp": 30,
     "mp": 10,
     "maxMp": 10,
@@ -24728,7 +24738,7 @@
         "name": "대형 물약",
         "type": "잡화",
         "perUse": 23,
-        "total": 39246,
+        "total": 30751,
         "desc": "한 번에 23 회복, 총 10000회 사용 가능",
         "price": 300,
         "shopBuy": true,
@@ -24749,9 +24759,9 @@
         "drop": true
       }
     ],
-    "strExp": 15402.47019999974,
+    "strExp": 8341.29499999477,
     "strExpMax": 40617,
-    "dexExp": 11327.73509999824,
+    "dexExp": 8341.147499998082,
     "dexExpMax": 19324,
     "intExp": 0,
     "intExpMax": 10,
@@ -24778,9 +24788,9 @@
       "desc": "황금으로 만든 최고의 갑옷"
     },
     "updatedAt": {
-      "$date": "2025-05-18T05:35:07.767Z"
+      "$date": "2025-05-18T11:43:59.996Z"
     },
-    "__v": 88080
+    "__v": 96572
   },
   {
     "_id": {
@@ -24836,7 +24846,7 @@
     "maxHp": 30,
     "mp": 10,
     "maxMp": 10,
-    "str": 42,
+    "str": 41,
     "dex": 37,
     "int": 5,
     "atk": 3,
@@ -24881,7 +24891,7 @@
       }
     ],
     "strExp": 5107.977428998958,
-    "strExpMax": 9186,
+    "strExpMax": 7915,
     "dexExp": 3762.488714499347,
     "dexExpMax": 4359,
     "intExp": 0,
@@ -24924,19 +24934,19 @@
     "name": "ranan",
     "world": 4,
     "position": {
-      "x": 6,
-      "y": 6
+      "x": 3,
+      "y": 1
     },
-    "hp": 188,
+    "hp": 192,
     "maxHp": 30,
     "mp": 10,
     "maxMp": 62,
     "str": 58,
-    "dex": 53,
+    "dex": 54,
     "int": 35,
     "atk": 3,
     "def": 1,
-    "gold": 37933,
+    "gold": 61858,
     "inventory": [
       {
         "name": "클랜힐 스크롤",
@@ -24951,43 +24961,43 @@
         "name": "대형 물약",
         "type": "잡화",
         "perUse": 23,
-        "total": 17821,
+        "total": 59306,
         "desc": "한 번에 23 회복, 총 10000회 사용 가능",
         "price": 300,
         "shopBuy": true,
         "shopSell": true,
         "drop": false,
-        "count": 2
+        "count": 6
       },
       {
-        "name": "암흑검",
-        "desc": "어둠의 힘이 깃든 검",
-        "atk": 32,
-        "str": 3,
-        "dex": 5,
+        "name": "초월의 검",
         "type": "무기",
-        "price": 2100,
+        "atk": 0,
+        "expBonus": 1.2,
+        "desc": "모든 한계를 초월한 방치형 무기. 힘/민첩 경험치 20% 증가",
+        "drop": true,
         "shopBuy": false,
         "shopSell": true,
-        "drop": true
+        "price": 100000
       }
     ],
-    "strExp": 26553.00335200066,
+    "strExp": 48555.008072000215,
     "strExpMax": 99000,
-    "dexExp": 19769.00167600126,
-    "dexExpMax": 47120,
+    "dexExp": 400.5040360010563,
+    "dexExpMax": 54664,
     "intExp": 165.2399999999036,
     "intExpMax": 3232,
     "equipWeapon": {
-      "name": "초월의 검",
+      "name": "암흑검",
+      "desc": "어둠의 힘이 깃든 검",
+      "atk": 32,
+      "str": 3,
+      "dex": 5,
       "type": "무기",
-      "atk": 0,
-      "expBonus": 1.2,
-      "desc": "모든 한계를 초월한 방치형 무기. 힘/민첩 경험치 20% 증가",
-      "drop": true,
+      "price": 2100,
       "shopBuy": false,
       "shopSell": true,
-      "price": 100000
+      "drop": true
     },
     "equipArmor": {
       "name": "천공의 갑옷",
@@ -25002,9 +25012,9 @@
       "drop": true
     },
     "updatedAt": {
-      "$date": "2025-05-18T05:35:07.573Z"
+      "$date": "2025-05-18T11:47:13.029Z"
     },
-    "__v": 103541
+    "__v": 121139
   },
   {
     "_id": {
@@ -25127,63 +25137,31 @@
     "name": "그리머바보",
     "world": 2,
     "position": {
-      "x": 2,
-      "y": 6
+      "x": 5,
+      "y": 5
     },
     "hp": 172,
     "maxHp": 30,
     "mp": 10,
     "maxMp": 10,
-    "str": 57,
-    "dex": 52,
+    "str": 56,
+    "dex": 51,
     "int": 5,
     "atk": 3,
     "def": 1,
-    "gold": 23996,
+    "gold": 47937,
     "inventory": [
-      {
-        "name": "나무검",
-        "type": "무기",
-        "atk": 2,
-        "price": 30,
-        "shopBuy": true,
-        "shopSell": true,
-        "drop": false,
-        "desc": "초보자용 나무로 만든 검"
-      },
-      {
-        "name": "몽환의 검",
-        "type": "무기",
-        "price": 100,
-        "desc": "공격해도 몬스터 HP가 깎이지 않음. 스탯 경험치만 오름.",
-        "atk": 0,
-        "shopBuy": true,
-        "shopSell": true,
-        "drop": false
-      },
       {
         "name": "소형 물약",
         "type": "잡화",
         "perUse": 15,
-        "total": 8366,
+        "total": 19157,
         "price": 25,
         "shopBuy": true,
         "shopSell": true,
         "drop": false,
         "desc": "HP 15 회복",
-        "count": 9
-      },
-      {
-        "name": "금검",
-        "type": "무기",
-        "atk": 20,
-        "str": 3,
-        "dex": 2,
-        "price": 1200,
-        "shopBuy": true,
-        "shopSell": true,
-        "drop": false,
-        "desc": "황금으로 만든 최고의 검"
+        "count": 20
       },
       {
         "name": "초소형 물약",
@@ -25198,118 +25176,34 @@
         "count": 50
       },
       {
-        "name": "금갑옷",
-        "type": "방어구",
-        "def": 18,
-        "dex": 3,
-        "str": 2,
-        "price": 1100,
-        "shopBuy": true,
-        "shopSell": true,
-        "drop": false,
-        "desc": "황금으로 만든 최고의 갑옷"
-      },
-      {
-        "name": "플레임아머",
-        "desc": "불꽃의 힘이 깃든 갑옷",
-        "def": 22,
-        "str": 2,
-        "dex": 2,
-        "type": "방어구",
-        "price": 1400,
-        "shopBuy": false,
-        "shopSell": true,
-        "drop": true
-      },
-      {
-        "name": "서리갑옷",
-        "desc": "얼음의 힘이 깃든 갑옷",
-        "def": 18,
-        "str": 1,
-        "dex": 3,
-        "type": "방어구",
-        "price": 1500,
-        "shopBuy": false,
-        "shopSell": true,
-        "drop": true
-      },
-      {
-        "name": "플레임소드",
-        "desc": "불꽃의 힘이 깃든 검",
-        "atk": 28,
-        "str": 4,
-        "dex": 2,
+        "name": "암흑검",
+        "desc": "어둠의 힘이 깃든 검",
+        "atk": 32,
+        "str": 3,
+        "dex": 5,
         "type": "무기",
-        "price": 1500,
-        "shopBuy": false,
-        "shopSell": true,
-        "drop": true
-      },
-      {
-        "name": "꿈결의 검",
-        "type": "무기",
-        "price": 20000,
-        "desc": "방치형 무기. 힘/민첩 경험치 3% 증가 (상점에서 판매 가능)",
-        "atk": 0,
-        "expBonus": 1.03,
-        "shopBuy": true,
-        "shopSell": true,
-        "drop": false
-      },
-      {
-        "name": "플레임소드",
-        "desc": "불꽃의 힘이 깃든 검",
-        "atk": 28,
-        "str": 4,
-        "dex": 2,
-        "type": "무기",
-        "price": 1500,
-        "shopBuy": false,
-        "shopSell": true,
-        "drop": true
-      },
-      {
-        "name": "암흑갑옷",
-        "desc": "어둠의 힘이 깃든 갑옷",
-        "def": 25,
-        "str": 2,
-        "dex": 4,
-        "type": "방어구",
-        "price": 2200,
-        "shopBuy": false,
-        "shopSell": true,
-        "drop": true
-      },
-      {
-        "name": "플레임소드",
-        "desc": "불꽃의 힘이 깃든 검",
-        "atk": 28,
-        "str": 4,
-        "dex": 2,
-        "type": "무기",
-        "price": 1500,
+        "price": 2100,
         "shopBuy": false,
         "shopSell": true,
         "drop": true
       }
     ],
-    "strExp": 3459.2791148595597,
-    "strExpMax": 85341,
-    "dexExp": 3185.6395574296257,
-    "dexExpMax": 40617,
+    "strExp": 33273.44545117749,
+    "strExpMax": 73566,
+    "dexExp": 18092.722725590236,
+    "dexExpMax": 35011,
     "intExp": 0,
     "intExpMax": 10,
     "equipWeapon": {
-      "name": "암흑검",
-      "desc": "어둠의 힘이 깃든 검",
-      "atk": 32,
-      "str": 3,
-      "dex": 5,
+      "name": "꿈결의 검",
       "type": "무기",
-      "price": 2100,
-      "shopBuy": false,
+      "price": 20000,
+      "desc": "방치형 무기. 힘/민첩 경험치 3% 증가 (상점에서 판매 가능)",
+      "atk": 0,
+      "expBonus": 1.03,
+      "shopBuy": true,
       "shopSell": true,
-      "drop": true
+      "drop": false
     },
     "equipArmor": {
       "name": "용의 갑옷",
@@ -25324,9 +25218,9 @@
       "drop": true
     },
     "updatedAt": {
-      "$date": "2025-05-18T05:35:07.859Z"
+      "$date": "2025-05-18T11:47:12.027Z"
     },
-    "__v": 126854
+    "__v": 135876
   },
   {
     "_id": {
@@ -25527,9 +25421,9 @@
     "maxHp": 30,
     "mp": 50,
     "maxMp": 74,
-    "str": 46,
-    "dex": 41,
-    "int": 43,
+    "str": 45,
+    "dex": 40,
+    "int": 42,
     "atk": 3,
     "def": 1,
     "gold": 60106,
@@ -25568,11 +25462,11 @@
       }
     ],
     "strExp": 6275.480651199453,
-    "strExpMax": 16655,
+    "strExpMax": 14354,
     "dexExp": 4797.2403255994905,
-    "dexExpMax": 7915,
+    "dexExpMax": 6819,
     "intExp": 2643.7199999993945,
-    "intExpMax": 10660,
+    "intExpMax": 9186,
     "equipWeapon": {
       "name": "암흑검",
       "desc": "어둠의 힘이 깃든 검",
@@ -25690,7 +25584,7 @@
     "mp": 10,
     "maxMp": 10,
     "str": 38,
-    "dex": 34,
+    "dex": 33,
     "int": 5,
     "atk": 3,
     "def": 1,
@@ -25722,7 +25616,7 @@
     "strExp": 3286.9091999998436,
     "strExpMax": 5061,
     "dexExp": 2456.9545999999386,
-    "dexExpMax": 2782,
+    "dexExpMax": 2394,
     "intExp": 0,
     "intExpMax": 10,
     "equipWeapon": {
@@ -25886,25 +25780,25 @@
     "name": "ohyes",
     "world": 3,
     "position": {
-      "x": 13,
-      "y": 7
+      "x": 26,
+      "y": 19
     },
-    "hp": 178,
+    "hp": 171,
     "maxHp": 30,
     "mp": 52,
-    "maxMp": 56,
-    "str": 55,
-    "dex": 50,
-    "int": 32,
+    "maxMp": 60,
+    "str": 53,
+    "dex": 48,
+    "int": 33,
     "atk": 3,
     "def": 1,
-    "gold": 28856,
+    "gold": 32560,
     "inventory": [
       {
         "name": "대형 물약",
         "type": "잡화",
         "perUse": 23,
-        "total": 238618,
+        "total": 235152,
         "desc": "한 번에 23 회복, 총 10000회 사용 가능",
         "price": 300,
         "shopBuy": true,
@@ -25933,12 +25827,12 @@
         "drop": false
       }
     ],
-    "strExp": 10368.166707168393,
-    "strExpMax": 63415,
-    "dexExp": 9873.583353584057,
-    "dexExpMax": 30178,
-    "intExp": 173.2799999999687,
-    "intExpMax": 2060,
+    "strExp": 11058.814107168331,
+    "strExpMax": 47120,
+    "dexExp": 10218.907053584122,
+    "dexExpMax": 22420,
+    "intExp": 671.0799999999158,
+    "intExpMax": 2394,
     "equipWeapon": {
       "name": "천공의 검",
       "desc": "하늘의 힘이 깃든 검",
@@ -25964,9 +25858,9 @@
       "drop": true
     },
     "updatedAt": {
-      "$date": "2025-05-18T05:34:39.873Z"
+      "$date": "2025-05-18T07:51:59.965Z"
     },
-    "__v": 92825
+    "__v": 93031
   },
   {
     "_id": {
@@ -26258,43 +26152,31 @@
     "name": "나나얌",
     "world": 2,
     "position": {
-      "x": 2,
-      "y": 3
+      "x": 3,
+      "y": 7
     },
-    "hp": 168,
+    "hp": 175,
     "maxHp": 30,
     "mp": 10,
     "maxMp": 10,
-    "str": 56,
-    "dex": 50,
+    "str": 57,
+    "dex": 52,
     "int": 5,
     "atk": 3,
     "def": 1,
-    "gold": 9220,
+    "gold": 21045,
     "inventory": [
       {
         "name": "대형 물약",
         "type": "잡화",
         "perUse": 23,
-        "total": 43574,
+        "total": 8422,
         "desc": "한 번에 23 회복, 총 10000회 사용 가능",
         "price": 300,
         "shopBuy": true,
         "shopSell": true,
         "drop": false,
-        "count": 5
-      },
-      {
-        "name": "플레임아머",
-        "desc": "불꽃의 힘이 깃든 갑옷",
-        "def": 22,
-        "str": 2,
-        "dex": 2,
-        "type": "방어구",
-        "price": 1400,
-        "shopBuy": false,
-        "shopSell": true,
-        "drop": true
+        "count": 1
       },
       {
         "name": "암흑검",
@@ -26309,18 +26191,19 @@
         "drop": true
       }
     ],
-    "strExp": 6186.19170000428,
-    "strExpMax": 73566,
-    "dexExp": 9897.595850002457,
-    "dexExpMax": 30178,
+    "strExp": 14189.813150006506,
+    "strExpMax": 85341,
+    "dexExp": 1822.9065750045054,
+    "dexExpMax": 40617,
     "intExp": 0,
     "intExpMax": 10,
     "equipWeapon": {
-      "name": "몽환의 검",
+      "name": "환상의 검",
       "type": "무기",
-      "price": 100,
-      "desc": "공격해도 몬스터 HP가 깎이지 않음. 스탯 경험치만 오름.",
+      "price": 40000,
+      "desc": "방치형 무기. 힘/민첩 경험치 5% 증가 (상점에서 판매 가능)",
       "atk": 0,
+      "expBonus": 1.05,
       "shopBuy": true,
       "shopSell": true,
       "drop": false
@@ -26338,9 +26221,9 @@
       "drop": true
     },
     "updatedAt": {
-      "$date": "2025-05-18T05:35:07.306Z"
+      "$date": "2025-05-18T11:47:12.215Z"
     },
-    "__v": 57364
+    "__v": 75179
   },
   {
     "_id": {
@@ -26359,8 +26242,8 @@
     "maxHp": 30,
     "mp": 10,
     "maxMp": 10,
-    "str": 37,
-    "dex": 32,
+    "str": 36,
+    "dex": 31,
     "int": 5,
     "atk": 3,
     "def": 1,
@@ -26379,9 +26262,9 @@
       }
     ],
     "strExp": 1416.5329999998046,
-    "strExpMax": 4359,
+    "strExpMax": 3754,
     "dexExp": 1016.7664999998914,
-    "dexExpMax": 2060,
+    "dexExpMax": 1772,
     "intExp": 0,
     "intExpMax": 10,
     "equipWeapon": {
@@ -26653,8 +26536,8 @@
     "maxHp": 30,
     "mp": 10,
     "maxMp": 10,
-    "str": 44,
-    "dex": 39,
+    "str": 43,
+    "dex": 38,
     "int": 5,
     "atk": 3,
     "def": 1,
@@ -26770,9 +26653,9 @@
       }
     ],
     "strExp": 3929.2936203605827,
-    "strExpMax": 12370,
+    "strExpMax": 10660,
     "dexExp": 2245.14681018028,
-    "dexExpMax": 5875,
+    "dexExpMax": 5061,
     "intExp": 0,
     "intExpMax": 10,
     "equipWeapon": {
@@ -26814,30 +26697,30 @@
     "world": 3,
     "position": {
       "x": 19,
-      "y": 1
+      "y": 0
     },
-    "hp": 188,
+    "hp": 192,
     "maxHp": 30,
     "mp": 60,
-    "maxMp": 60,
+    "maxMp": 66,
     "str": 58,
     "dex": 53,
-    "int": 34,
+    "int": 37,
     "atk": 3,
     "def": 1,
-    "gold": 295909,
+    "gold": 296134,
     "inventory": [
       {
         "name": "대형 물약",
         "type": "잡화",
         "perUse": 23,
-        "total": 370948,
+        "total": 366237,
         "desc": "한 번에 23 회복, 총 10000회 사용 가능",
         "price": 300,
         "shopBuy": true,
         "shopSell": true,
         "drop": false,
-        "count": 38
+        "count": 37
       },
       {
         "name": "클랜힐 스크롤",
@@ -26860,6 +26743,17 @@
         "drop": false
       },
       {
+        "name": "신비의 검",
+        "type": "무기",
+        "atk": 0,
+        "expBonus": 1.1,
+        "desc": "신비로운 힘이 깃든 방치형 무기. 힘/민첩 경험치 10% 증가",
+        "drop": true,
+        "shopBuy": false,
+        "shopSell": true,
+        "price": 80000
+      },
+      {
         "name": "천공의 검",
         "desc": "하늘의 힘이 깃든 검",
         "atk": 45,
@@ -26870,41 +26764,32 @@
         "shopBuy": false,
         "shopSell": true,
         "drop": true
+      },
+      {
+        "name": "천공의 갑옷",
+        "desc": "하늘의 힘이 깃든 갑옷",
+        "def": 35,
+        "str": 4,
+        "dex": 3,
+        "type": "방어구",
+        "price": 9000,
+        "shopBuy": false,
+        "shopSell": true,
+        "drop": true
       }
     ],
-    "strExp": 29006.35400980443,
+    "strExp": 1592.719697814064,
     "strExpMax": 99000,
-    "dexExp": 19463.177004905512,
+    "dexExp": 6477.359848906713,
     "dexExpMax": 47120,
-    "intExp": 105.23679999992066,
-    "intExpMax": 2782,
-    "equipWeapon": {
-      "name": "신비의 검",
-      "type": "무기",
-      "atk": 0,
-      "expBonus": 1.1,
-      "desc": "신비로운 힘이 깃든 방치형 무기. 힘/민첩 경험치 10% 증가",
-      "drop": true,
-      "shopBuy": false,
-      "shopSell": true,
-      "price": 80000
-    },
-    "equipArmor": {
-      "name": "천공의 갑옷",
-      "desc": "하늘의 힘이 깃든 갑옷",
-      "def": 35,
-      "str": 4,
-      "dex": 3,
-      "type": "방어구",
-      "price": 9000,
-      "shopBuy": false,
-      "shopSell": true,
-      "drop": true
-    },
+    "intExp": 1544.5967999997538,
+    "intExpMax": 4359,
+    "equipWeapon": null,
+    "equipArmor": null,
     "updatedAt": {
-      "$date": "2025-05-18T05:35:07.847Z"
+      "$date": "2025-05-18T11:46:40.006Z"
     },
-    "__v": 94710
+    "__v": 98760
   },
   {
     "_id": {
@@ -28520,21 +28405,21 @@
       "$oid": "6826c175409f7cda74543c72"
     },
     "name": "방치왕",
-    "world": 3,
+    "world": 5,
     "position": {
-      "x": 6,
-      "y": 7
+      "x": 4,
+      "y": 6
     },
-    "hp": 195,
+    "hp": 201,
     "maxHp": 30,
     "mp": 10,
     "maxMp": 64,
-    "str": 51,
-    "dex": 47,
+    "str": 53,
+    "dex": 49,
     "int": 32,
     "atk": 3,
     "def": 1,
-    "gold": 52355,
+    "gold": 57918,
     "inventory": [
       {
         "name": "클랜힐 스크롤",
@@ -28549,25 +28434,13 @@
         "name": "대형 물약",
         "type": "잡화",
         "perUse": 23,
-        "total": 242416,
+        "total": 361185,
         "desc": "한 번에 23 회복, 총 10000회 사용 가능",
         "price": 300,
         "shopBuy": true,
         "shopSell": true,
         "drop": false,
-        "count": 25
-      },
-      {
-        "name": "천공의 검",
-        "desc": "하늘의 힘이 깃든 검",
-        "atk": 45,
-        "str": 6,
-        "dex": 4,
-        "type": "무기",
-        "price": 8000,
-        "shopBuy": false,
-        "shopSell": true,
-        "drop": true
+        "count": 37
       },
       {
         "name": "천공의 갑옷",
@@ -28580,12 +28453,35 @@
         "shopBuy": false,
         "shopSell": true,
         "drop": true
+      },
+      {
+        "name": "영원의 검",
+        "type": "무기",
+        "price": 80000,
+        "desc": "방치형 무기. 힘/민첩 경험치 7% 증가 (상점에서 판매 가능)",
+        "atk": 0,
+        "expBonus": 1.07,
+        "shopBuy": true,
+        "shopSell": true,
+        "drop": false
+      },
+      {
+        "name": "천공의 검",
+        "desc": "하늘의 힘이 깃든 검",
+        "atk": 45,
+        "str": 6,
+        "dex": 4,
+        "type": "무기",
+        "price": 8000,
+        "shopBuy": false,
+        "shopSell": true,
+        "drop": true
       }
     ],
-    "strExp": 34689.42381076272,
-    "strExpMax": 35011,
-    "dexExp": 6547.711905380247,
-    "dexExpMax": 19324,
+    "strExp": 45425.761706752135,
+    "strExpMax": 47120,
+    "dexExp": 7985.880853375673,
+    "dexExpMax": 26012,
     "intExp": 1137.3059999999646,
     "intExpMax": 2060,
     "equipWeapon": {
@@ -28611,9 +28507,9 @@
       "desc": "사막의 모래로 단련된 갑옷."
     },
     "updatedAt": {
-      "$date": "2025-05-18T05:35:08.126Z"
+      "$date": "2025-05-18T11:47:12.361Z"
     },
-    "__v": 78271
+    "__v": 96304
   },
   {
     "_id": {
@@ -31445,41 +31341,28 @@
       "$oid": "6827f324986665302f8e2c72"
     },
     "name": "빵빵",
-    "world": 1,
+    "world": 2,
     "position": {
-      "x": 8,
-      "y": 7
+      "x": 4,
+      "y": 1
     },
-    "hp": 160,
+    "hp": 167,
     "maxHp": 30,
     "mp": 10,
     "maxMp": 10,
-    "str": 44,
-    "dex": 40,
+    "str": 47,
+    "dex": 42,
     "int": 5,
     "atk": 3,
     "def": 1,
-    "gold": 462,
-    "inventory": [
-      {
-        "name": "대형 물약",
-        "type": "잡화",
-        "perUse": 23,
-        "total": 12536,
-        "desc": "한 번에 23 회복, 총 10000회 사용 가능",
-        "price": 300,
-        "shopBuy": true,
-        "shopSell": true,
-        "drop": false,
-        "count": 2
-      }
-    ],
+    "gold": 741,
+    "inventory": [],
     "updatedAt": {
-      "$date": "2025-05-18T05:35:07.161Z"
+      "$date": "2025-05-18T10:33:12.778Z"
     },
-    "__v": 27436,
-    "dexExp": 1299.7667000004108,
-    "dexExpMax": 6819,
+    "__v": 39911,
+    "dexExp": 3650.7853000011073,
+    "dexExpMax": 9186,
     "equipArmor": null,
     "equipWeapon": {
       "name": "몽환의 검",
@@ -31493,8 +31376,8 @@
     },
     "intExp": 0,
     "intExpMax": 10,
-    "strExp": 9588.533400000826,
-    "strExpMax": 12370
+    "strExp": 379.5706000026488,
+    "strExpMax": 19324
   },
   {
     "_id": {
@@ -31652,31 +31535,31 @@
     "name": "버섯수프",
     "world": 2,
     "position": {
-      "x": 7,
-      "y": 4
+      "x": 6,
+      "y": 2
     },
-    "hp": 178,
+    "hp": 183,
     "maxHp": 30,
     "mp": 10,
     "maxMp": 10,
-    "str": 50,
-    "dex": 46,
+    "str": 52,
+    "dex": 47,
     "int": 5,
     "atk": 3,
     "def": 1,
-    "gold": 60631,
+    "gold": 70475,
     "inventory": [
       {
         "name": "대형 물약",
         "type": "잡화",
         "perUse": 23,
-        "total": 214051,
+        "total": 358687,
         "desc": "한 번에 23 회복, 총 10000회 사용 가능",
         "price": 300,
         "shopBuy": true,
         "shopSell": true,
         "drop": false,
-        "count": 22
+        "count": 36
       },
       {
         "name": "서리검",
@@ -31703,36 +31586,24 @@
         "drop": true
       },
       {
-        "name": "플레임소드",
-        "desc": "불꽃의 힘이 깃든 검",
-        "atk": 28,
-        "str": 4,
-        "dex": 2,
+        "name": "천공의 검",
+        "desc": "하늘의 힘이 깃든 검",
+        "atk": 45,
+        "str": 6,
+        "dex": 4,
         "type": "무기",
-        "price": 1500,
-        "shopBuy": false,
-        "shopSell": true,
-        "drop": true
-      },
-      {
-        "name": "플레임소드",
-        "desc": "불꽃의 힘이 깃든 검",
-        "atk": 28,
-        "str": 4,
-        "dex": 2,
-        "type": "무기",
-        "price": 1500,
+        "price": 8000,
         "shopBuy": false,
         "shopSell": true,
         "drop": true
       }
     ],
     "updatedAt": {
-      "$date": "2025-05-18T05:35:07.471Z"
+      "$date": "2025-05-18T11:47:12.786Z"
     },
-    "__v": 62800,
-    "dexExp": 795.2726003957621,
-    "dexExpMax": 16655,
+    "__v": 80607,
+    "dexExp": 16723.310001396138,
+    "dexExpMax": 19324,
     "equipArmor": {
       "name": "용의 갑옷",
       "desc": "드래곤의 힘이 깃든 갑옷",
@@ -31758,8 +31629,8 @@
     },
     "intExp": 0,
     "intExpMax": 10,
-    "strExp": 20052.545200792672,
-    "strExpMax": 30178
+    "strExp": 20029.620002793377,
+    "strExpMax": 40617
   },
   {
     "_id": {
@@ -32272,23 +32143,36 @@
       "x": 4,
       "y": 4
     },
-    "hp": 83,
+    "hp": 98,
     "maxHp": 30,
     "mp": 10,
     "maxMp": 10,
-    "str": 18,
-    "dex": 15,
+    "str": 23,
+    "dex": 20,
     "int": 5,
     "atk": 3,
     "def": 1,
-    "gold": 509,
-    "inventory": [],
+    "gold": 791,
+    "inventory": [
+      {
+        "name": "금검",
+        "type": "무기",
+        "atk": 20,
+        "str": 3,
+        "dex": 2,
+        "price": 1200,
+        "shopBuy": true,
+        "shopSell": true,
+        "drop": false,
+        "desc": "황금으로 만든 최고의 검"
+      }
+    ],
     "updatedAt": {
-      "$date": "2025-05-17T08:45:19.295Z"
+      "$date": "2025-05-18T11:46:40.055Z"
     },
-    "__v": 10,
-    "dexExp": 80.44699999999973,
-    "dexExpMax": 139,
+    "__v": 14,
+    "dexExp": 31.3851000000001,
+    "dexExpMax": 324,
     "equipArmor": {
       "name": "금갑옷",
       "type": "방어구",
@@ -32302,21 +32186,19 @@
       "desc": "황금으로 만든 최고의 갑옷"
     },
     "equipWeapon": {
-      "name": "금검",
+      "name": "몽환의 검",
       "type": "무기",
-      "atk": 20,
-      "str": 3,
-      "dex": 2,
-      "price": 1200,
+      "price": 100,
+      "desc": "특수한 힘이 깃든 방치형 무기. 힘/민첩 경험치만 오름(HP 피해 없음)",
+      "atk": 0,
       "shopBuy": true,
       "shopSell": true,
-      "drop": false,
-      "desc": "황금으로 만든 최고의 검"
+      "drop": false
     },
     "intExp": 0,
     "intExpMax": 10,
-    "strExp": 184.89399999999966,
-    "strExpMax": 233
+    "strExp": 449.77019999999874,
+    "strExpMax": 521
   },
   {
     "_id": {
@@ -32474,7 +32356,7 @@
       }
     ],
     "updatedAt": {
-      "$date": "2025-05-18T05:34:39.893Z"
+      "$date": "2025-05-18T11:46:39.996Z"
     },
     "__v": 11,
     "dexExp": 41.310400000000186,
@@ -32552,10 +32434,10 @@
     "name": "닝닝",
     "world": 1,
     "position": {
-      "x": 2,
+      "x": 3,
       "y": 5
     },
-    "hp": 67,
+    "hp": 66,
     "maxHp": 30,
     "mp": 10,
     "maxMp": 10,
@@ -32564,13 +32446,13 @@
     "int": 5,
     "atk": 3,
     "def": 1,
-    "gold": 251,
+    "gold": 272,
     "inventory": [],
     "updatedAt": {
-      "$date": "2025-05-17T09:52:39.312Z"
+      "$date": "2025-05-18T07:55:04.479Z"
     },
     "__v": 4,
-    "dexExp": 3.1526999999999337,
+    "dexExp": 7.362899999999932,
     "dexExpMax": 64,
     "equipArmor": {
       "name": "철갑옷",
@@ -32596,7 +32478,7 @@
     },
     "intExp": 0,
     "intExpMax": 10,
-    "strExp": 34.30539999999992,
+    "strExp": 42.72579999999992,
     "strExpMax": 96
   },
   {
@@ -32609,20 +32491,32 @@
     "name": "에스트",
     "world": 2,
     "position": {
-      "x": 6,
-      "y": 5
+      "x": 1,
+      "y": 7
     },
-    "hp": 145,
+    "hp": 151,
     "maxHp": 30,
     "mp": 10,
     "maxMp": 10,
-    "str": 39,
-    "dex": 35,
+    "str": 41,
+    "dex": 37,
     "int": 5,
     "atk": 3,
     "def": 1,
-    "gold": 8022,
+    "gold": 85673,
     "inventory": [
+      {
+        "name": "대형 물약",
+        "type": "잡화",
+        "perUse": 23,
+        "total": 228237,
+        "desc": "한 번에 23 회복, 총 10000회 사용 가능",
+        "price": 300,
+        "shopBuy": true,
+        "shopSell": true,
+        "drop": false,
+        "count": 23
+      },
       {
         "name": "환상의 검",
         "type": "무기",
@@ -32635,16 +32529,64 @@
         "drop": false
       },
       {
-        "name": "대형 물약",
-        "type": "잡화",
-        "perUse": 23,
-        "total": 247422,
-        "desc": "한 번에 23 회복, 총 10000회 사용 가능",
-        "price": 300,
-        "shopBuy": true,
+        "name": "플레임아머",
+        "desc": "불꽃의 힘이 깃든 갑옷",
+        "def": 22,
+        "str": 2,
+        "dex": 2,
+        "type": "방어구",
+        "price": 1400,
+        "shopBuy": false,
         "shopSell": true,
-        "drop": false,
-        "count": 25
+        "drop": true
+      },
+      {
+        "name": "용의 갑옷",
+        "desc": "드래곤의 힘이 깃든 갑옷",
+        "def": 28,
+        "str": 3,
+        "dex": 2,
+        "type": "방어구",
+        "price": 2600,
+        "shopBuy": false,
+        "shopSell": true,
+        "drop": true
+      },
+      {
+        "name": "서리갑옷",
+        "desc": "얼음의 힘이 깃든 갑옷",
+        "def": 18,
+        "str": 1,
+        "dex": 3,
+        "type": "방어구",
+        "price": 1500,
+        "shopBuy": false,
+        "shopSell": true,
+        "drop": true
+      },
+      {
+        "name": "플레임소드",
+        "desc": "불꽃의 힘이 깃든 검",
+        "atk": 28,
+        "str": 4,
+        "dex": 2,
+        "type": "무기",
+        "price": 1500,
+        "shopBuy": false,
+        "shopSell": true,
+        "drop": true
+      },
+      {
+        "name": "서리갑옷",
+        "desc": "얼음의 힘이 깃든 갑옷",
+        "def": 18,
+        "str": 1,
+        "dex": 3,
+        "type": "방어구",
+        "price": 1500,
+        "shopBuy": false,
+        "shopSell": true,
+        "drop": true
       },
       {
         "name": "용의 갑옷",
@@ -32660,11 +32602,11 @@
       }
     ],
     "updatedAt": {
-      "$date": "2025-05-18T05:34:58.800Z"
+      "$date": "2025-05-18T11:46:56.967Z"
     },
-    "__v": 14441,
-    "dexExp": 985.2093525497827,
-    "dexExpMax": 3232,
+    "__v": 18035,
+    "dexExp": 13.397927549651845,
+    "dexExpMax": 4359,
     "equipArmor": {
       "name": "용의 갑옷",
       "desc": "드래곤의 힘이 깃든 갑옷",
@@ -32678,21 +32620,21 @@
       "drop": true
     },
     "equipWeapon": {
-      "name": "플레임소드",
-      "desc": "불꽃의 힘이 깃든 검",
-      "atk": 28,
-      "str": 4,
-      "dex": 2,
+      "name": "암흑검",
+      "desc": "어둠의 힘이 깃든 검",
+      "atk": 32,
+      "str": 3,
+      "dex": 5,
       "type": "무기",
-      "price": 1500,
+      "price": 2100,
       "shopBuy": false,
       "shopSell": true,
       "drop": true
     },
     "intExp": 0,
     "intExpMax": 10,
-    "strExp": 4852.418705099688,
-    "strExpMax": 5875
+    "strExp": 4186.795855099527,
+    "strExpMax": 7915
   },
   {
     "_id": {
@@ -33135,43 +33077,29 @@
     "name": "궁녀",
     "world": 2,
     "position": {
-      "x": 6,
+      "x": 7,
       "y": 2
     },
-    "hp": 166,
+    "hp": 174,
     "maxHp": 30,
     "mp": 10,
     "maxMp": 10,
-    "str": 46,
-    "dex": 42,
+    "str": 49,
+    "dex": 44,
     "int": 5,
     "atk": 3,
     "def": 1,
-    "gold": 1681,
+    "gold": 9089,
     "inventory": [
       {
-        "name": "소형 물약",
-        "type": "잡화",
-        "perUse": 15,
-        "total": 38486,
-        "price": 25,
+        "name": "몽환의 검",
+        "type": "무기",
+        "price": 100,
+        "desc": "특수한 힘이 깃든 방치형 무기. 힘/민첩 경험치만 오름(HP 피해 없음)",
+        "atk": 0,
         "shopBuy": true,
         "shopSell": true,
-        "drop": false,
-        "desc": "HP 15 회복",
-        "count": 39
-      },
-      {
-        "name": "중형 물약",
-        "type": "잡화",
-        "perUse": 20,
-        "total": 100000,
-        "price": 60,
-        "shopBuy": true,
-        "shopSell": true,
-        "drop": false,
-        "desc": "HP 20 회복",
-        "count": 50
+        "drop": false
       },
       {
         "name": "플레임소드",
@@ -33184,14 +33112,38 @@
         "shopBuy": false,
         "shopSell": true,
         "drop": true
+      },
+      {
+        "name": "대형 물약",
+        "type": "잡화",
+        "perUse": 23,
+        "total": 69599,
+        "desc": "한 번에 23 회복, 총 10000회 사용 가능",
+        "price": 300,
+        "shopBuy": true,
+        "shopSell": true,
+        "drop": false,
+        "count": 7
+      },
+      {
+        "name": "암흑검",
+        "desc": "어둠의 힘이 깃든 검",
+        "atk": 32,
+        "str": 3,
+        "dex": 5,
+        "type": "무기",
+        "price": 2100,
+        "shopBuy": false,
+        "shopSell": true,
+        "drop": true
       }
     ],
     "updatedAt": {
-      "$date": "2025-05-18T05:35:08.154Z"
+      "$date": "2025-05-18T11:47:12.452Z"
     },
-    "__v": 42707,
-    "dexExp": 2548.522900001794,
-    "dexExpMax": 9186,
+    "__v": 61068,
+    "dexExp": 11597.28018300241,
+    "dexExpMax": 12370,
     "equipArmor": {
       "name": "플레임아머",
       "desc": "불꽃의 힘이 깃든 갑옷",
@@ -33205,19 +33157,20 @@
       "drop": true
     },
     "equipWeapon": {
-      "name": "몽환의 검",
+      "name": "환상의 검",
       "type": "무기",
-      "price": 100,
-      "desc": "특수한 힘이 깃든 방치형 무기. 힘/민첩 경험치만 오름(HP 피해 없음)",
+      "price": 40000,
+      "desc": "방치형 무기. 힘/민첩 경험치 5% 증가 (상점에서 판매 가능)",
       "atk": 0,
+      "expBonus": 1.05,
       "shopBuy": true,
       "shopSell": true,
       "drop": false
     },
     "intExp": 0,
     "intExpMax": 10,
-    "strExp": 14830.045800004045,
-    "strExpMax": 16655
+    "strExp": 14220.560366003281,
+    "strExpMax": 26012
   },
   {
     "_id": {
@@ -34879,32 +34832,20 @@
     "name": "도민기",
     "world": 1,
     "position": {
-      "x": 8,
-      "y": 6
+      "x": 4,
+      "y": 4
     },
-    "hp": 127,
+    "hp": 6,
     "maxHp": 30,
     "mp": 10,
     "maxMp": 10,
-    "str": 33,
-    "dex": 29,
+    "str": 39,
+    "dex": 35,
     "int": 5,
     "atk": 3,
     "def": 1,
     "gold": 921,
     "inventory": [
-      {
-        "name": "초소형 물약",
-        "type": "잡화",
-        "perUse": 10,
-        "total": 10989,
-        "price": 10,
-        "shopBuy": true,
-        "shopSell": true,
-        "drop": false,
-        "desc": "HP 10 회복",
-        "count": 22
-      },
       {
         "name": "철검",
         "type": "무기",
@@ -34918,11 +34859,11 @@
       }
     ],
     "updatedAt": {
-      "$date": "2025-05-18T05:35:07.569Z"
+      "$date": "2025-05-18T09:37:19.970Z"
     },
-    "__v": 6950,
-    "dexExp": 467.70269999995065,
-    "dexExpMax": 1310,
+    "__v": 17921,
+    "dexExp": 1051.1674999998315,
+    "dexExpMax": 3232,
     "equipArmor": {
       "name": "가죽갑옷",
       "type": "방어구",
@@ -34945,8 +34886,8 @@
     },
     "intExp": 0,
     "intExpMax": 10,
-    "strExp": 1715.4053999998982,
-    "strExpMax": 2394
+    "strExp": 4984.33499999966,
+    "strExpMax": 5875
   },
   {
     "_id": {
@@ -35295,31 +35236,19 @@
     "world": 1,
     "position": {
       "x": 4,
-      "y": 7
+      "y": 4
     },
-    "hp": 150,
+    "hp": 6,
     "maxHp": 30,
     "mp": 10,
     "maxMp": 10,
     "str": 41,
-    "dex": 36,
+    "dex": 37,
     "int": 5,
     "atk": 3,
     "def": 1,
     "gold": 148,
     "inventory": [
-      {
-        "name": "소형 물약",
-        "type": "잡화",
-        "perUse": 15,
-        "total": 1922,
-        "price": 25,
-        "shopBuy": true,
-        "shopSell": true,
-        "drop": false,
-        "desc": "HP 15 회복",
-        "count": 2
-      },
       {
         "name": "나무검",
         "type": "무기",
@@ -35354,11 +35283,11 @@
       }
     ],
     "updatedAt": {
-      "$date": "2025-05-18T05:35:07.466Z"
+      "$date": "2025-05-18T11:46:40.041Z"
     },
-    "__v": 21894,
-    "dexExp": 2103.680499999784,
-    "dexExpMax": 3754,
+    "__v": 23815,
+    "dexExp": 665.7620999997614,
+    "dexExpMax": 4359,
     "equipArmor": {
       "name": "은갑옷",
       "type": "방어구",
@@ -35383,7 +35312,7 @@
     },
     "intExp": 0,
     "intExpMax": 10,
-    "strExp": 859.3609999995728,
+    "strExp": 5491.524199999525,
     "strExpMax": 7915
   },
   {
@@ -35806,5 +35735,974 @@
     "intExpMax": 10,
     "strExp": 0,
     "strExpMax": 10
+  },
+  {
+    "_id": {
+      "$oid": "68297c5a986665302f8aaa0a"
+    },
+    "userId": {
+      "$oid": "68297c5a986665302f8aaa06"
+    },
+    "name": "콩커피",
+    "world": 1,
+    "position": {
+      "x": 4,
+      "y": 4
+    },
+    "hp": 30,
+    "maxHp": 30,
+    "mp": 10,
+    "maxMp": 10,
+    "str": 5,
+    "dex": 5,
+    "int": 5,
+    "atk": 3,
+    "def": 1,
+    "gold": 100,
+    "inventory": [],
+    "updatedAt": {
+      "$date": "2025-05-18T06:21:14.760Z"
+    },
+    "__v": 0,
+    "strExpMax": 10,
+    "dexExpMax": 10,
+    "intExpMax": 10
+  },
+  {
+    "_id": {
+      "$oid": "68298305986665302f94a94e"
+    },
+    "userId": {
+      "$oid": "68298305986665302f94a8e5"
+    },
+    "name": "1222224444",
+    "world": 1,
+    "position": {
+      "x": 4,
+      "y": 4
+    },
+    "hp": 30,
+    "maxHp": 30,
+    "mp": 10,
+    "maxMp": 10,
+    "str": 5,
+    "dex": 5,
+    "int": 5,
+    "atk": 3,
+    "def": 1,
+    "gold": 100,
+    "inventory": [],
+    "updatedAt": {
+      "$date": "2025-05-18T06:49:41.971Z"
+    },
+    "__v": 0,
+    "strExpMax": 10,
+    "dexExpMax": 10,
+    "intExpMax": 10
+  },
+  {
+    "_id": {
+      "$oid": "68298310986665302f94b92e"
+    },
+    "userId": {
+      "$oid": "68298310986665302f94b8c6"
+    },
+    "name": "999988887777",
+    "world": 1,
+    "position": {
+      "x": 4,
+      "y": 6
+    },
+    "hp": 6,
+    "maxHp": 30,
+    "mp": 10,
+    "maxMp": 10,
+    "str": 5,
+    "dex": 5,
+    "int": 5,
+    "atk": 3,
+    "def": 1,
+    "gold": 100,
+    "inventory": [],
+    "updatedAt": {
+      "$date": "2025-05-18T06:51:04.788Z"
+    },
+    "__v": 0,
+    "dexExp": 3.3642,
+    "dexExpMax": 10,
+    "equipArmor": null,
+    "equipWeapon": null,
+    "intExp": 0,
+    "intExpMax": 10,
+    "strExp": 6.7284,
+    "strExpMax": 10
+  },
+  {
+    "_id": {
+      "$oid": "68298327986665302f94daee"
+    },
+    "userId": {
+      "$oid": "68298327986665302f94daea"
+    },
+    "name": "hbys107",
+    "world": 1,
+    "position": {
+      "x": 4,
+      "y": 4
+    },
+    "hp": 30,
+    "maxHp": 30,
+    "mp": 10,
+    "maxMp": 10,
+    "str": 5,
+    "dex": 5,
+    "int": 5,
+    "atk": 3,
+    "def": 1,
+    "gold": 100,
+    "inventory": [],
+    "updatedAt": {
+      "$date": "2025-05-18T06:50:15.172Z"
+    },
+    "__v": 0,
+    "strExpMax": 10,
+    "dexExpMax": 10,
+    "intExpMax": 10
+  },
+  {
+    "_id": {
+      "$oid": "68298337986665302f94f31a"
+    },
+    "userId": {
+      "$oid": "68298337986665302f94f2b1"
+    },
+    "name": "김땡수",
+    "world": 1,
+    "position": {
+      "x": 4,
+      "y": 6
+    },
+    "hp": 66,
+    "maxHp": 30,
+    "mp": 10,
+    "maxMp": 10,
+    "str": 12,
+    "dex": 10,
+    "int": 5,
+    "atk": 3,
+    "def": 1,
+    "gold": 78,
+    "inventory": [],
+    "updatedAt": {
+      "$date": "2025-05-18T07:03:32.070Z"
+    },
+    "__v": 4,
+    "dexExp": 13.233299999999982,
+    "dexExpMax": 51,
+    "equipArmor": {
+      "name": "철갑옷",
+      "type": "방어구",
+      "def": 6,
+      "dex": 1,
+      "price": 180,
+      "shopBuy": true,
+      "shopSell": true,
+      "drop": false,
+      "desc": "무거운 철로 만든 갑옷"
+    },
+    "equipWeapon": {
+      "name": "청동검",
+      "type": "무기",
+      "atk": 4,
+      "price": 80,
+      "shopBuy": true,
+      "shopSell": true,
+      "drop": false,
+      "desc": "튼튼한 청동으로 만든 검"
+    },
+    "intExp": 0,
+    "intExpMax": 10,
+    "strExp": 31.466599999999993,
+    "strExpMax": 79
+  },
+  {
+    "_id": {
+      "$oid": "682984e9986665302f978b85"
+    },
+    "userId": {
+      "$oid": "682984e9986665302f978b1d"
+    },
+    "name": "zamt",
+    "world": 1,
+    "position": {
+      "x": 4,
+      "y": 4
+    },
+    "hp": 30,
+    "maxHp": 30,
+    "mp": 10,
+    "maxMp": 10,
+    "str": 5,
+    "dex": 5,
+    "int": 5,
+    "atk": 3,
+    "def": 1,
+    "gold": 100,
+    "inventory": [],
+    "updatedAt": {
+      "$date": "2025-05-18T06:57:45.444Z"
+    },
+    "__v": 0,
+    "strExpMax": 10,
+    "dexExpMax": 10,
+    "intExpMax": 10
+  },
+  {
+    "_id": {
+      "$oid": "682984fc986665302f97a946"
+    },
+    "userId": {
+      "$oid": "682984fc986665302f97a942"
+    },
+    "name": "미친곰",
+    "world": 1,
+    "position": {
+      "x": 4,
+      "y": 4
+    },
+    "hp": 52,
+    "maxHp": 30,
+    "mp": 10,
+    "maxMp": 10,
+    "str": 7,
+    "dex": 6,
+    "int": 5,
+    "atk": 3,
+    "def": 1,
+    "gold": 10,
+    "inventory": [],
+    "updatedAt": {
+      "$date": "2025-05-18T07:04:03.121Z"
+    },
+    "__v": 4,
+    "dexExp": 13.58179999999999,
+    "dexExpMax": 16,
+    "equipArmor": {
+      "name": "가죽갑옷",
+      "type": "방어구",
+      "def": 3,
+      "price": 70,
+      "shopBuy": true,
+      "shopSell": true,
+      "drop": false,
+      "desc": "튼튼한 가죽으로 만든 갑옷"
+    },
+    "equipWeapon": {
+      "name": "청동검",
+      "type": "무기",
+      "atk": 4,
+      "price": 80,
+      "shopBuy": true,
+      "shopSell": true,
+      "drop": false,
+      "desc": "튼튼한 청동으로 만든 검"
+    },
+    "intExp": 0,
+    "intExpMax": 10,
+    "strExp": 21.163599999999985,
+    "strExpMax": 23
+  },
+  {
+    "_id": {
+      "$oid": "68298515986665302f97d201"
+    },
+    "userId": {
+      "$oid": "68298515986665302f97d1fa"
+    },
+    "name": "씹승현",
+    "world": 1,
+    "position": {
+      "x": 2,
+      "y": 4
+    },
+    "hp": 43,
+    "maxHp": 30,
+    "mp": 10,
+    "maxMp": 10,
+    "str": 7,
+    "dex": 6,
+    "int": 5,
+    "atk": 3,
+    "def": 1,
+    "gold": 48,
+    "inventory": [
+      {
+        "name": "청동검",
+        "type": "무기",
+        "atk": 4,
+        "price": 80,
+        "shopBuy": true,
+        "shopSell": true,
+        "drop": false,
+        "desc": "튼튼한 청동으로 만든 검"
+      }
+    ],
+    "updatedAt": {
+      "$date": "2025-05-18T07:04:02.241Z"
+    },
+    "__v": 1,
+    "dexExp": 9.002599999999997,
+    "dexExpMax": 16,
+    "equipArmor": null,
+    "equipWeapon": null,
+    "intExp": 0,
+    "intExpMax": 10,
+    "strExp": 12.005199999999997,
+    "strExpMax": 23
+  },
+  {
+    "_id": {
+      "$oid": "68298583986665302f988313"
+    },
+    "userId": {
+      "$oid": "68298583986665302f98830d"
+    },
+    "name": "flower12",
+    "world": 1,
+    "position": {
+      "x": 3,
+      "y": 4
+    },
+    "hp": 24,
+    "maxHp": 30,
+    "mp": 10,
+    "maxMp": 10,
+    "str": 6,
+    "dex": 5,
+    "int": 5,
+    "atk": 3,
+    "def": 1,
+    "gold": 117,
+    "inventory": [],
+    "updatedAt": {
+      "$date": "2025-05-18T07:01:00.734Z"
+    },
+    "__v": 0,
+    "dexExp": 7.654499999999999,
+    "dexExpMax": 10,
+    "equipArmor": null,
+    "equipWeapon": null,
+    "intExp": 0,
+    "intExpMax": 10,
+    "strExp": 5.308999999999998,
+    "strExpMax": 16
+  },
+  {
+    "_id": {
+      "$oid": "682985c7986665302f98f0df"
+    },
+    "userId": {
+      "$oid": "682985c7986665302f98f076"
+    },
+    "name": "장쯔",
+    "world": 1,
+    "position": {
+      "x": 2,
+      "y": 3
+    },
+    "hp": 27,
+    "maxHp": 30,
+    "mp": 10,
+    "maxMp": 10,
+    "str": 8,
+    "dex": 7,
+    "int": 5,
+    "atk": 3,
+    "def": 1,
+    "gold": 165,
+    "inventory": [],
+    "updatedAt": {
+      "$date": "2025-05-18T07:23:59.928Z"
+    },
+    "__v": 0,
+    "dexExp": 3.982599999999998,
+    "dexExpMax": 23,
+    "equipArmor": null,
+    "equipWeapon": null,
+    "intExp": 0,
+    "intExpMax": 10,
+    "strExp": 10.965199999999989,
+    "strExpMax": 31
+  },
+  {
+    "_id": {
+      "$oid": "6829870d986665302f9afc0f"
+    },
+    "userId": {
+      "$oid": "6829870d986665302f9afc0b"
+    },
+    "name": "홍원기시발",
+    "world": 1,
+    "position": {
+      "x": 5,
+      "y": 4
+    },
+    "hp": 19,
+    "maxHp": 30,
+    "mp": 10,
+    "maxMp": 10,
+    "str": 7,
+    "dex": 6,
+    "int": 5,
+    "atk": 3,
+    "def": 1,
+    "gold": 122,
+    "inventory": [],
+    "updatedAt": {
+      "$date": "2025-05-18T07:08:09.621Z"
+    },
+    "__v": 0,
+    "dexExp": 4.2155,
+    "dexExpMax": 16,
+    "equipArmor": null,
+    "equipWeapon": null,
+    "intExp": 0,
+    "intExpMax": 10,
+    "strExp": 2.430999999999996,
+    "strExpMax": 23
+  },
+  {
+    "_id": {
+      "$oid": "68298918986665302f9e45ca"
+    },
+    "userId": {
+      "$oid": "68298918986665302f9e45c8"
+    },
+    "name": "쿠쿠",
+    "world": 1,
+    "position": {
+      "x": 4,
+      "y": 2
+    },
+    "hp": 30,
+    "maxHp": 30,
+    "mp": 10,
+    "maxMp": 10,
+    "str": 5,
+    "dex": 5,
+    "int": 5,
+    "atk": 3,
+    "def": 1,
+    "gold": 100,
+    "inventory": [],
+    "updatedAt": {
+      "$date": "2025-05-18T07:17:42.448Z"
+    },
+    "__v": 0,
+    "dexExp": 0,
+    "dexExpMax": 10,
+    "equipArmor": null,
+    "equipWeapon": null,
+    "intExp": 0,
+    "intExpMax": 10,
+    "strExp": 0,
+    "strExpMax": 10
+  },
+  {
+    "_id": {
+      "$oid": "68298952986665302f9ea29c"
+    },
+    "userId": {
+      "$oid": "68298952986665302f9ea232"
+    },
+    "name": "으악",
+    "world": 1,
+    "position": {
+      "x": 4,
+      "y": 4
+    },
+    "hp": 30,
+    "maxHp": 30,
+    "mp": 10,
+    "maxMp": 10,
+    "str": 5,
+    "dex": 5,
+    "int": 5,
+    "atk": 3,
+    "def": 1,
+    "gold": 100,
+    "inventory": [],
+    "updatedAt": {
+      "$date": "2025-05-18T07:16:34.146Z"
+    },
+    "__v": 0,
+    "strExpMax": 10,
+    "dexExpMax": 10,
+    "intExpMax": 10
+  },
+  {
+    "_id": {
+      "$oid": "68298a1a986665302f9fe231"
+    },
+    "userId": {
+      "$oid": "68298a1a986665302f9fe22c"
+    },
+    "name": "193",
+    "world": 1,
+    "position": {
+      "x": 4,
+      "y": 4
+    },
+    "hp": 30,
+    "maxHp": 30,
+    "mp": 10,
+    "maxMp": 10,
+    "str": 5,
+    "dex": 5,
+    "int": 5,
+    "atk": 3,
+    "def": 1,
+    "gold": 100,
+    "inventory": [],
+    "updatedAt": {
+      "$date": "2025-05-18T07:19:54.547Z"
+    },
+    "__v": 0,
+    "strExpMax": 10,
+    "dexExpMax": 10,
+    "intExpMax": 10
+  },
+  {
+    "_id": {
+      "$oid": "68298ac1986665302fa0ee97"
+    },
+    "userId": {
+      "$oid": "68298ac1986665302fa0ee2b"
+    },
+    "name": "소케2",
+    "world": 1,
+    "position": {
+      "x": 4,
+      "y": 4
+    },
+    "hp": 26,
+    "maxHp": 30,
+    "mp": 10,
+    "maxMp": 10,
+    "str": 6,
+    "dex": 5,
+    "int": 5,
+    "atk": 3,
+    "def": 1,
+    "gold": 113,
+    "inventory": [],
+    "updatedAt": {
+      "$date": "2025-05-18T07:25:59.880Z"
+    },
+    "__v": 0,
+    "dexExp": 6.278399999999999,
+    "dexExpMax": 10,
+    "equipArmor": null,
+    "equipWeapon": null,
+    "intExp": 0,
+    "intExpMax": 10,
+    "strExp": 2.5567999999999973,
+    "strExpMax": 16
+  },
+  {
+    "_id": {
+      "$oid": "68298b21986665302fa187c4"
+    },
+    "userId": {
+      "$oid": "68298b21986665302fa1875b"
+    },
+    "name": "JUN",
+    "world": 1,
+    "position": {
+      "x": 4,
+      "y": 4
+    },
+    "hp": 30,
+    "maxHp": 30,
+    "mp": 10,
+    "maxMp": 10,
+    "str": 5,
+    "dex": 5,
+    "int": 5,
+    "atk": 3,
+    "def": 1,
+    "gold": 100,
+    "inventory": [],
+    "updatedAt": {
+      "$date": "2025-05-18T07:37:19.915Z"
+    },
+    "__v": 0,
+    "dexExp": 0,
+    "dexExpMax": 10,
+    "equipArmor": null,
+    "equipWeapon": null,
+    "intExp": 0,
+    "intExpMax": 10,
+    "strExp": 0,
+    "strExpMax": 10
+  },
+  {
+    "_id": {
+      "$oid": "68298e5c986665302fa6f8fd"
+    },
+    "userId": {
+      "$oid": "68298e5b986665302fa6f8f5"
+    },
+    "name": "Alalqpqp",
+    "world": 1,
+    "position": {
+      "x": 7,
+      "y": 3
+    },
+    "hp": 30,
+    "maxHp": 30,
+    "mp": 10,
+    "maxMp": 10,
+    "str": 5,
+    "dex": 5,
+    "int": 5,
+    "atk": 3,
+    "def": 1,
+    "gold": 100,
+    "inventory": [],
+    "updatedAt": {
+      "$date": "2025-05-18T07:38:39.881Z"
+    },
+    "__v": 0,
+    "dexExp": 0,
+    "dexExpMax": 10,
+    "equipArmor": null,
+    "equipWeapon": null,
+    "intExp": 0,
+    "intExpMax": 10,
+    "strExp": 0,
+    "strExpMax": 10
+  },
+  {
+    "_id": {
+      "$oid": "682990cb986665302fab1e97"
+    },
+    "userId": {
+      "$oid": "682990cb986665302fab1e94"
+    },
+    "name": "purmir",
+    "world": 1,
+    "position": {
+      "x": 4,
+      "y": 4
+    },
+    "hp": 30,
+    "maxHp": 30,
+    "mp": 10,
+    "maxMp": 10,
+    "str": 5,
+    "dex": 5,
+    "int": 5,
+    "atk": 3,
+    "def": 1,
+    "gold": 100,
+    "inventory": [],
+    "updatedAt": {
+      "$date": "2025-05-18T07:48:27.376Z"
+    },
+    "__v": 0,
+    "strExpMax": 10,
+    "dexExpMax": 10,
+    "intExpMax": 10
+  },
+  {
+    "_id": {
+      "$oid": "682991d8986665302face581"
+    },
+    "userId": {
+      "$oid": "682991d7986665302face518"
+    },
+    "name": "steinilee",
+    "world": 1,
+    "position": {
+      "x": 3,
+      "y": 4
+    },
+    "hp": 17,
+    "maxHp": 30,
+    "mp": 10,
+    "maxMp": 10,
+    "str": 7,
+    "dex": 6,
+    "int": 5,
+    "atk": 3,
+    "def": 1,
+    "gold": 164,
+    "inventory": [],
+    "updatedAt": {
+      "$date": "2025-05-18T08:29:19.946Z"
+    },
+    "__v": 0,
+    "dexExp": 11.916799999999991,
+    "dexExpMax": 16,
+    "equipArmor": null,
+    "equipWeapon": null,
+    "intExp": 0,
+    "intExpMax": 10,
+    "strExp": 17.83359999999999,
+    "strExpMax": 23
+  },
+  {
+    "_id": {
+      "$oid": "68299a66986665302fbab6ce"
+    },
+    "userId": {
+      "$oid": "68299a66986665302fbab665"
+    },
+    "name": "badr",
+    "world": 1,
+    "position": {
+      "x": 5,
+      "y": 4
+    },
+    "hp": 30,
+    "maxHp": 30,
+    "mp": 10,
+    "maxMp": 10,
+    "str": 5,
+    "dex": 5,
+    "int": 5,
+    "atk": 3,
+    "def": 1,
+    "gold": 100,
+    "inventory": [],
+    "updatedAt": {
+      "$date": "2025-05-18T08:30:19.345Z"
+    },
+    "__v": 0,
+    "dexExp": 0,
+    "dexExpMax": 10,
+    "equipArmor": null,
+    "equipWeapon": null,
+    "intExp": 0,
+    "intExpMax": 10,
+    "strExp": 0,
+    "strExpMax": 10
+  },
+  {
+    "_id": {
+      "$oid": "6829aa32986665302fd37db6"
+    },
+    "userId": {
+      "$oid": "6829aa32986665302fd37db2"
+    },
+    "name": "Dora",
+    "world": 1,
+    "position": {
+      "x": 3,
+      "y": 4
+    },
+    "hp": 24,
+    "maxHp": 30,
+    "mp": 10,
+    "maxMp": 10,
+    "str": 6,
+    "dex": 5,
+    "int": 5,
+    "atk": 3,
+    "def": 1,
+    "gold": 118,
+    "inventory": [],
+    "updatedAt": {
+      "$date": "2025-05-18T09:37:26.071Z"
+    },
+    "__v": 0,
+    "dexExp": 7.654499999999999,
+    "dexExpMax": 10,
+    "equipArmor": null,
+    "equipWeapon": null,
+    "intExp": 0,
+    "intExpMax": 10,
+    "strExp": 5.308999999999998,
+    "strExpMax": 16
+  },
+  {
+    "_id": {
+      "$oid": "6829b500986665302fe4df2e"
+    },
+    "userId": {
+      "$oid": "6829b500986665302fe4df27"
+    },
+    "name": "a12344",
+    "world": 1,
+    "position": {
+      "x": 4,
+      "y": 4
+    },
+    "hp": 6,
+    "maxHp": 30,
+    "mp": 10,
+    "maxMp": 10,
+    "str": 5,
+    "dex": 5,
+    "int": 5,
+    "atk": 3,
+    "def": 1,
+    "gold": 20,
+    "inventory": [
+      {
+        "name": "청동검",
+        "type": "무기",
+        "atk": 4,
+        "price": 80,
+        "shopBuy": true,
+        "shopSell": true,
+        "drop": false,
+        "desc": "튼튼한 청동으로 만든 검"
+      }
+    ],
+    "updatedAt": {
+      "$date": "2025-05-18T10:25:26.006Z"
+    },
+    "__v": 1,
+    "dexExp": 1.5083999999999997,
+    "dexExpMax": 10,
+    "equipArmor": null,
+    "equipWeapon": null,
+    "intExp": 0,
+    "intExpMax": 10,
+    "strExp": 3.0167999999999995,
+    "strExpMax": 10
+  },
+  {
+    "_id": {
+      "$oid": "6829c151986665302ff69279"
+    },
+    "userId": {
+      "$oid": "6829c151986665302ff69272"
+    },
+    "name": "ㅂㅈㄷ",
+    "world": 1,
+    "position": {
+      "x": 4,
+      "y": 4
+    },
+    "hp": 6,
+    "maxHp": 30,
+    "mp": 10,
+    "maxMp": 10,
+    "str": 5,
+    "dex": 5,
+    "int": 5,
+    "atk": 3,
+    "def": 1,
+    "gold": 70,
+    "inventory": [
+      {
+        "name": "나무검",
+        "type": "무기",
+        "atk": 2,
+        "price": 30,
+        "shopBuy": true,
+        "shopSell": true,
+        "drop": false,
+        "desc": "초보자용 나무로 만든 검"
+      }
+    ],
+    "updatedAt": {
+      "$date": "2025-05-18T11:16:39.998Z"
+    },
+    "__v": 1,
+    "dexExp": 3.7547999999999995,
+    "dexExpMax": 10,
+    "equipArmor": null,
+    "equipWeapon": null,
+    "intExp": 0,
+    "intExpMax": 10,
+    "strExp": 7.509599999999999,
+    "strExpMax": 10
+  },
+  {
+    "_id": {
+      "$oid": "6829c341986665302ff919e7"
+    },
+    "userId": {
+      "$oid": "6829c341986665302ff919e2"
+    },
+    "name": "개씹병신새끼들",
+    "world": 1,
+    "position": {
+      "x": 4,
+      "y": 4
+    },
+    "hp": 6,
+    "maxHp": 30,
+    "mp": 10,
+    "maxMp": 10,
+    "str": 14,
+    "dex": 12,
+    "int": 5,
+    "atk": 3,
+    "def": 1,
+    "gold": 546,
+    "inventory": [],
+    "updatedAt": {
+      "$date": "2025-05-18T11:44:39.994Z"
+    },
+    "__v": 2,
+    "dexExp": 17.146699999999907,
+    "dexExpMax": 79,
+    "equipArmor": null,
+    "equipWeapon": {
+      "name": "몽환의 검",
+      "type": "무기",
+      "price": 100,
+      "desc": "특수한 힘이 깃든 방치형 무기. 힘/민첩 경험치만 오름(HP 피해 없음)",
+      "atk": 0,
+      "shopBuy": true,
+      "shopSell": true,
+      "drop": false
+    },
+    "intExp": 0,
+    "intExpMax": 10,
+    "strExp": 94.29339999999983,
+    "strExpMax": 116
+  },
+  {
+    "_id": {
+      "$oid": "6829c81d986665302fff7b83"
+    },
+    "userId": {
+      "$oid": "6829c81d986665302fff7b79"
+    },
+    "name": "미나리",
+    "world": 1,
+    "position": {
+      "x": 4,
+      "y": 5
+    },
+    "hp": 52,
+    "maxHp": 30,
+    "mp": 10,
+    "maxMp": 10,
+    "str": 7,
+    "dex": 6,
+    "int": 5,
+    "atk": 3,
+    "def": 1,
+    "gold": 117,
+    "inventory": [],
+    "updatedAt": {
+      "$date": "2025-05-18T11:47:11.709Z"
+    },
+    "__v": 0,
+    "dexExp": 12.967099999999995,
+    "dexExpMax": 16,
+    "equipArmor": null,
+    "equipWeapon": null,
+    "intExp": 0,
+    "intExpMax": 10,
+    "strExp": 19.934199999999997,
+    "strExpMax": 23
   }
 ]
