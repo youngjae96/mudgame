@@ -62,9 +62,8 @@ function PasswordChangeModal({ open, onClose, onSubmit }) {
           ...(accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {})
         },
         body: JSON.stringify({
-          currentPassword,
+          oldPassword: currentPassword,
           newPassword,
-          newPasswordConfirm,
         }),
       });
       const result = await res.json();

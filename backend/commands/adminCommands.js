@@ -116,6 +116,32 @@ class AdminCommand {
       }
       adminPlayer.world = targetPlayer.world;
       adminPlayer.position = { ...targetPlayer.position };
+      // 사냥(자동전투) 중 안내 메시지
+      const playersInRoom = Object.values(players).filter(
+        p => p.position && p.position.x === adminPlayer.position.x && p.position.y === adminPlayer.position.y && p.world === adminPlayer.world && p.name !== adminPlayer.name
+      );
+      const huntingPlayers = playersInRoom.filter(p => global.battleIntervals && global.battleIntervals[p.name]);
+      if (huntingPlayers.length > 0) {
+        const names = huntingPlayers.map(p => p.name).join(', ');
+        // 방의 모든 플레이어에게 안내
+        playersInRoom.forEach(p => {
+          if (p.ws && p.ws.readyState === 1) {
+            p.ws.send(JSON.stringify({
+              type: 'system',
+              subtype: 'alert',
+              message: `⚠️ 이 방에서 ${names}님이 사냥(자동전투) 중입니다!`
+            }));
+          }
+        });
+        // 운영자 본인에게도 안내
+        if (adminPlayer.ws && adminPlayer.ws.readyState === 1) {
+          adminPlayer.ws.send(JSON.stringify({
+            type: 'system',
+            subtype: 'alert',
+            message: `⚠️ 이 방에서 ${names}님이 사냥(자동전투) 중입니다!`
+          }));
+        }
+      }
       ws.send(JSON.stringify({ type: 'system', message: `[운영자] ${target}님 위치로 텔레포트 완료!` }));
       if (adminPlayer.ws && adminPlayer.ws.readyState === 1) {
         adminPlayer.ws.send(JSON.stringify({ type: 'system', message: `[운영자] ${target}님 위치로 텔레포트 되었습니다.` }));

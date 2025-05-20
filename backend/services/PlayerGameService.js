@@ -18,8 +18,8 @@ const PlayerGameService = {
       nx >= 0 && ny >= 0 && nx < maxSize && ny < maxSize
     ) {
       const destRoom = getRoom(player.world, nx, ny);
-      if (destRoom && destRoom.type === 'cave_wall') {
-        ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '두꺼운 암벽이 길을 막고 있습니다.' }));
+      if (destRoom && (destRoom.type === 'cave_wall' || destRoom.type === 'pyramid_wall')) {
+        ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '두꺼운 벽이 길을 막고 있습니다.' }));
         return;
       }
       player.position = { x: nx, y: ny };
@@ -508,6 +508,42 @@ const PlayerGameService = {
       sendRoomInfoToAllInRoom(PlayerManager.getAllPlayers(), prevWorld, prevX, prevY, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
     }
     ws.close();
+  },
+  async handleEnterPyramid({ ws, playerName, getRoom, getPlayersInRoom, RoomManager, sendRoomInfo, sendInventory, sendCharacterInfo }) {
+    const player = PlayerManager.getPlayer(playerName);
+    if (!player) return;
+    const { x, y } = player.position;
+    // 피라미드 입구 좌표와 월드5(사막)인지 확인
+    if (player.world === 5 && x === 5 && y === 2) {
+      RoomManager.removePlayerFromRoom(playerName, player.world, x, y);
+      player.world = 6; // 피라미드 내부 월드
+      player.position = { x: 0, y: 0 };
+      RoomManager.addPlayerToRoom(playerName, player.world, 0, 0);
+      sendRoomInfo(player, getRoom, getPlayersInRoom, 15, { x: 0, y: 0 });
+      sendInventory(player);
+      sendCharacterInfo(player);
+      ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '피라미드 내부로 입장합니다!' }));
+    } else {
+      ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '여기는 피라미드 입구가 아닙니다.' }));
+    }
+  },
+  async handleExitPyramid({ ws, playerName, getRoom, getPlayersInRoom, RoomManager, sendRoomInfo, sendInventory, sendCharacterInfo }) {
+    const player = PlayerManager.getPlayer(playerName);
+    if (!player) return;
+    const { x, y } = player.position;
+    // 피라미드 내부 출구(월드6, 0,0)인지 확인
+    if (player.world === 6 && x === 0 && y === 0) {
+      RoomManager.removePlayerFromRoom(playerName, player.world, x, y);
+      player.world = 5; // 사막 월드
+      player.position = { x: 5, y: 2 };
+      RoomManager.addPlayerToRoom(playerName, player.world, 5, 2);
+      sendRoomInfo(player, getRoom, getPlayersInRoom, 7, { x: 5, y: 2 });
+      sendInventory(player);
+      sendCharacterInfo(player);
+      ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '사막(피라미드 입구)로 나갑니다!' }));
+    } else {
+      ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '여기는 피라미드 출구가 아닙니다.' }));
+    }
   }
 };
 

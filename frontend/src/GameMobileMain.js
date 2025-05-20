@@ -127,29 +127,6 @@ const MobileContent = styled(MobilePanel)`
   padding: 6px 4px 4px 4px;
 `;
 
-// 명령어 목록을 상단에 상수로 선언하여 중복을 방지
-const commandList = [
-  { cmd: '/전 <메시지>', desc: '전체 채팅(축약)' },
-  { cmd: '<메시지>', desc: '지역 채팅(명령어 없이 입력)' },
-  { cmd: '/동 /서 /남 /북', desc: '방향 이동(오른쪽/왼쪽/아래/위, 또는 맵 터치)' },
-  { cmd: '/누구', desc: '현재 접속중인 플레이어 목록 보기' },
-  { cmd: '/장착 <아이템명>', desc: '장비 장착' },
-  { cmd: '/해제 무기, /해제 방어구', desc: '장비 해제' },
-  { cmd: '/정보', desc: '내 능력치 확인' },
-  { cmd: '/정보 <닉네임>', desc: '다른 유저 능력치 확인' },
-  { cmd: '/귓 <닉네임> <메시지>', desc: '귓속말(비공개 메시지)' },
-  { cmd: '/귀환', desc: '1번 마을(마을 광장)으로 귀환' },
-  { cmd: '/장비', desc: '내 장비 정보' },
-  { cmd: '/지도', desc: '전체 맵 보기' },
-  { cmd: '/텔포 <지역>', desc: '월드 이동(예: 무인도, 마을)' },
-  { cmd: '/길 <메시지>', desc: '길드 채팅' },
-  { cmd: '/길드 <생성|가입|수락|탈퇴|추방|공지|정보|목록|해체(길드장)> ...', desc: '길드 관련 명령어' },
-  { cmd: '/랭킹', desc: 'TOP 10 스탯 랭킹' },
-  { cmd: '/방명록', desc: '방명록(글 목록/쓰기)' },
-  { cmd: '/비밀번호변경', desc: '비밀번호 변경' },
-  { cmd: '/도움말', desc: '명령어 전체 안내' },
-];
-
 export default function GameMobileMain({
   room, mapSize, mapInfo, handleMove, nearbyRooms,
   chatLogMessages, guildChatLogMessages, chatEndRef, handleSend, input, setInput,
@@ -164,6 +141,19 @@ export default function GameMobileMain({
   const [showPasswordChange, setShowPasswordChange] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [showMobileInventory, setShowMobileInventory] = useState(false);
+  const [commandList, setCommandList] = useState([]);
+
+  useEffect(() => {
+    fetch('/api/commands')
+      .then(res => res.json())
+      .then(setCommandList)
+      .catch(() => {
+        setCommandList([
+          { cmd: '/전 <메시지>', desc: '전체 채팅(축약)' },
+          { cmd: '<메시지>', desc: '지역 채팅(명령어 없이 입력)' }
+        ]);
+      });
+  }, []);
 
   // 방 아이템/몬스터 렌더 함수
   const renderRoomItems = () => <RoomItems room={room} onPickup={handlePickup} />;
@@ -241,14 +231,20 @@ export default function GameMobileMain({
             </>
           )}
           {tab === 'chat' && <ChatOnlyBox
-            messages={chatTab === 'guild' ? guildChatLogMessages : chatLogMessages}
+            messages={
+              chatTab === 'guild'
+                ? guildChatLogMessages
+                : chatTab === 'battle'
+                  ? allMessages
+                  : chatLogMessages
+            }
             tab={chatTab}
             setTab={setChatTab}
           />}
         </MobileContent>
         <MobileChat>
           <MobileChatMessages>
-            <ChatBox messages={allMessages} chatEndRef={chatEndRef} expEventActive={expEventActive} />
+            <ChatBox messages={allMessages.filter(msg => msg.type !== 'battle')} chatEndRef={chatEndRef} expEventActive={expEventActive} />
           </MobileChatMessages>
           <MobileChatInput onSubmit={handleSendWithPasswordChange} autoComplete="off">
             <Input

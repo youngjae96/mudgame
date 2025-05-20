@@ -24,7 +24,7 @@ function parseStat(str) {
  */
 function useWebSocket(onDisconnect) {
   const [connected, setConnected] = useState(false);
-  const [name, setName] = useState('');
+  const [name, setName] = useState(localStorage.getItem('nickname') || '');
   const [input, setInput] = useState('');
   const [allMessages, setAllMessages] = useState([]);
   const [players, setPlayers] = useState([]);

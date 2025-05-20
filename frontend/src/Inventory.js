@@ -57,6 +57,7 @@ function Inventory({ inventory, gold, onItemCommandClick }) {
   // 아이템별 명령어 매핑
   const itemCommandMap = {
     '클랜힐 스크롤': '/클랜힐',
+    '텔레포트 스크롤': '/텔레포트수동',
     // 필요시 다른 아이템도 추가
   };
 
@@ -72,6 +73,7 @@ function Inventory({ inventory, gold, onItemCommandClick }) {
         <InventoryUl>
           {inventory.map((item, idx) => {
             const name = typeof item === 'string' ? item : item.name;
+            // 기존 매핑만 사용
             let command = itemCommandMap[name];
             // 무기/방어구 자동 명령어
             if (!command && typeof item === 'object' && item.type && (item.type === '무기' || item.type === '방어구')) {
@@ -83,9 +85,8 @@ function Inventory({ inventory, gold, onItemCommandClick }) {
             }
             return (
               <InventoryLi key={idx}
-                style={command ? { cursor: 'pointer', background: '#23293a', borderRadius: 6, transition: 'background 0.15s' } : {}}
+                style={command ? { cursor: 'pointer', background: '#23293a', borderRadius: 6, transition: '0.2s' } : {}}
                 onClick={command && onItemCommandClick ? () => onItemCommandClick(command) : undefined}
-                title={command ? `${command} 명령어 자동입력` : undefined}
               >
                 {typeof item === 'string' ? item : (
                   <>

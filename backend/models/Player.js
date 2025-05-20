@@ -59,7 +59,11 @@ class Player {
   }
 
   gainStrExp(amount = 1, extraBonus = 1) {
-    const realAmount = amount * this.getExpBonus('str', extraBonus);
+    const weaponBonus = this.equipWeapon && this.equipWeapon.expBonus ? this.equipWeapon.expBonus : 1;
+    const eventBonus = global && global.EVENT_EXP_BONUS ? global.EVENT_EXP_BONUS : 1;
+    const candyActive = this.expCandyBuffUntil && Date.now() < this.expCandyBuffUntil;
+    const candyBonus = candyActive ? 1.1 : 1;
+    const realAmount = amount * weaponBonus * eventBonus * candyBonus * (extraBonus || 1);
     this.strExp += realAmount;
     let levelUp = 0;
     while (this.strExp >= this.strExpMax) {
@@ -74,7 +78,11 @@ class Player {
   }
 
   gainDexExp(amount = 1, extraBonus = 1) {
-    const realAmount = amount * this.getExpBonus('dex', extraBonus);
+    const weaponBonus = this.equipWeapon && this.equipWeapon.expBonus ? this.equipWeapon.expBonus : 1;
+    const eventBonus = global && global.EVENT_EXP_BONUS ? global.EVENT_EXP_BONUS : 1;
+    const candyActive = this.expCandyBuffUntil && Date.now() < this.expCandyBuffUntil;
+    const candyBonus = candyActive ? 1.1 : 1;
+    const realAmount = amount * weaponBonus * eventBonus * candyBonus * (extraBonus || 1);
     this.dexExp += realAmount;
     let levelUp = 0;
     while (this.dexExp >= this.dexExpMax) {
@@ -89,7 +97,11 @@ class Player {
   }
 
   gainIntExp(amount = 1, extraBonus = 1) {
-    const realAmount = amount * this.getExpBonus('int', extraBonus);
+    const weaponBonus = this.equipWeapon && this.equipWeapon.expBonus ? this.equipWeapon.expBonus : 1;
+    const eventBonus = global && global.EVENT_EXP_BONUS ? global.EVENT_EXP_BONUS : 1;
+    const candyActive = this.expCandyBuffUntil && Date.now() < this.expCandyBuffUntil;
+    const candyBonus = candyActive ? 1.1 : 1;
+    const realAmount = amount * weaponBonus * eventBonus * candyBonus * (extraBonus || 1);
     this.intExp += realAmount;
     let levelUp = 0;
     while (this.intExp >= this.intExpMax) {
@@ -97,8 +109,6 @@ class Player {
       this.int++;
       levelUp++;
       this.intExpMax = calcNextStatExp(this.intExpMax);
-      this.maxMp += 2;
-      this.hp = Math.min(this.hp, this.getRealMaxHp());
     }
     if (levelUp > 0) {
       console.log(`[LEVEL UP] int +${levelUp} (현재 int: ${this.int})`);
@@ -215,7 +225,7 @@ class Player {
         return true;
       }
       item.count = item.count || 1;
-      this.inventory.push(item);
+      this.inventory.push({ ...item });
       return true;
     }
     // 중첩 소모품(잡화/consumable)일 경우 count 50개 제한
@@ -249,7 +259,7 @@ class Player {
       }
       return false;
     }
-    this.inventory.push(item);
+    this.inventory.push({ ...item });
     return true;
   }
 

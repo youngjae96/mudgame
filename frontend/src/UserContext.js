@@ -20,6 +20,7 @@ export function UserProvider({ children }) {
       const res = await apiLogin(username, password);
       if (res.data.success && res.data.accessToken) {
         localStorage.setItem('jwtToken', res.data.accessToken);
+        localStorage.setItem('nickname', username);
         setToken(res.data.accessToken);
         setIsLoggedIn(true);
         setUser({ name: username });
@@ -52,6 +53,10 @@ export function UserProvider({ children }) {
   // 로그아웃
   const logout = () => {
     localStorage.removeItem('jwtToken');
+    localStorage.removeItem('nickname');
+    localStorage.removeItem('username');
+    localStorage.removeItem('userId');
+    // 필요시 추가로 사용자 관련 key 삭제
     setToken('');
     setIsLoggedIn(false);
     setUser(null);

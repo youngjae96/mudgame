@@ -1,6 +1,8 @@
 const Room = require('../utils/Room');
 const Monster = require('../models/Monster');
 const { FIELD_MONSTERS, FOREST_MONSTERS, CAVE_MONSTERS, ISLAND_MONSTERS, CAVE_BOSS_MONSTERS, ISLAND2_MONSTERS, DESERT_MONSTERS } = require('./items');
+const PYRAMID_MONSTERS = require('./monsters/pyramid.json');
+const RoomManager = require('../roomManager');
 
 const MAP_SIZE = 9;
 const VILLAGE_POS = { x: 4, y: 4 };
@@ -19,6 +21,7 @@ const ROOM_TYPE = {
   OASIS: 'oasis',
   ROCK: 'rock',
   DESERTCAVE: 'desertcave',
+  PYRAMID: 'pyramid',
 };
 
 const FIELD_TYPES = [
@@ -63,6 +66,8 @@ for (let y = 0; y < MAP_SIZE; y++) {
     }
     const room = new Room(x, y, type, name, description, 1);
     for (const m of monsters) room.monsters.push(m);
+    rooms.push(room);
+    registerRoomToManager(room, 1);
     if (monsters.length === 0 && monsterChance) {
       let pool = FIELD_MONSTERS;
       if (type === ROOM_TYPE.FOREST) pool = FOREST_MONSTERS;
@@ -70,7 +75,6 @@ for (let y = 0; y < MAP_SIZE; y++) {
       const m = new Monster(pool[Math.floor(Math.random() * pool.length)], x, y);
       room.monsters.push(m);
     }
-    rooms.push(room);
   }
 }
 
@@ -124,6 +128,7 @@ for (let y = 0; y < MAP_SIZE; y++) {
     const room = new Room(x, y, type, name, description, 2);
     for (const m of monsters) room.monsters.push(m);
     roomsIsland.push(room);
+    registerRoomToManager(room, 2);
   }
 }
 
@@ -177,6 +182,7 @@ for (let y = 0; y < MAP_SIZE; y++) {
     const room = new Room(x, y, type, name, description, 4);
     for (const m of monsters) room.monsters.push(m);
     roomsIsland2.push(room);
+    registerRoomToManager(room, 4);
   }
 }
 
@@ -242,6 +248,7 @@ for (let y = 0; y < MAP_SIZE_CAVE; y++) {
     if (x === 0 && y === 9) {
       const room = new Room(x, y, 'ladder', '사다리', '지상으로 올라가는 사다리가 있다. 여기서 "/나가기" 명령어를 입력하면 무인도 동굴 입구로 나갈 수 있습니다.', 3);
       roomsCave.push(room);
+      registerRoomToManager(room, 3);
       continue;
     }
     // 미로 벽: 20% 확률로 벽 생성 (입구/출구/가장자리/보스 위치 제외)
@@ -252,6 +259,7 @@ for (let y = 0; y < MAP_SIZE_CAVE; y++) {
     if (isWall) {
       const room = new Room(x, y, 'cave_wall', '동굴 벽', '두꺼운 암벽이 길을 막고 있습니다.', 3);
       roomsCave.push(room);
+      registerRoomToManager(room, 3);
       continue;
     }
     // 강한 몬스터 배치
@@ -285,6 +293,7 @@ for (let y = 0; y < MAP_SIZE_CAVE; y++) {
     const room = new Room(x, y, type, name, description, 3);
     for (const m of monsters) room.monsters.push(m);
     roomsCave.push(room);
+    registerRoomToManager(room, 3);
   }
 }
 
@@ -299,17 +308,21 @@ if (caveEntrance) {
 // 사막맵(월드5)
 const MAP_SIZE_DESERT = 7;
 const DESERT_VILLAGE_POS = { x: 3, y: 3 };
+const PYRAMID_ENTRANCE_POS = { x: 5, y: 2 };
 const roomsDesert = [];
 for (let y = 0; y < MAP_SIZE_DESERT; y++) {
   for (let x = 0; x < MAP_SIZE_DESERT; x++) {
     let type, name, description;
     let monsters = [];
-    // 오브젝트 랜덤
     const rand = Math.random();
     if (x === DESERT_VILLAGE_POS.x && y === DESERT_VILLAGE_POS.y) {
       type = ROOM_TYPE.VILLAGE;
       name = '사막 마을';
       description = '사막 한가운데의 작은 오아시스 마을입니다. 야자수와 우물이 보입니다.';
+    } else if (x === PYRAMID_ENTRANCE_POS.x && y === PYRAMID_ENTRANCE_POS.y) {
+      type = 'pyramid_entrance';
+      name = '피라미드 입구';
+      description = '고대 피라미드의 입구가 보입니다. "/입장" 명령어로 들어갈 수 있습니다.';
     } else if ((x === 0 || x === MAP_SIZE_DESERT-1 || y === 0 || y === MAP_SIZE_DESERT-1)) {
       type = ROOM_TYPE.DESERT;
       name = '사막 외곽';
@@ -345,14 +358,78 @@ for (let y = 0; y < MAP_SIZE_DESERT; y++) {
     const room = new Room(x, y, type, name, description, 5);
     for (const m of monsters) room.monsters.push(m);
     roomsDesert.push(room);
+    registerRoomToManager(room, 5);
+  }
+}
+
+// 피라미드 내부 맵(월드6)
+const MAP_SIZE_PYRAMID = 15;
+const roomsPyramid = [];
+// (5,2)~(0,0)까지 x축→y축 직선 경로를 통로로 지정
+const pyramidPath = [];
+for (let x = 5; x >= 0; x--) pyramidPath.push([x, 2]);
+for (let y = 1; y >= 0; y--) pyramidPath.push([0, y]);
+for (let y = 0; y < MAP_SIZE_PYRAMID; y++) {
+  for (let x = 0; x < MAP_SIZE_PYRAMID; x++) {
+    let type = ROOM_TYPE.PYRAMID;
+    let name = '피라미드 내부';
+    let description = '고대 피라미드의 미로 같은 내부입니다.';
+    let monsters = [];
+    // (0,0)은 사막으로 나가는 입구로 지정
+    if (x === 0 && y === 0) {
+      type = 'pyramid_exit';
+      name = '피라미드 출구';
+      description = '사막(피라미드 입구)로 나가는 출구입니다. "/나가기" 명령어로 사막으로 나갈 수 있습니다.';
+    } else {
+      // (5,2)~(0,0) 경로는 통로로 보장, 그 외에만 벽돌 생성
+      const isPath = pyramidPath.some(([px, py]) => px === x && py === y);
+      if (!isPath && Math.random() < 0.20) {
+        type = 'pyramid_wall';
+        name = '피라미드 벽';
+        description = '두꺼운 벽돌이 길을 막고 있습니다. 통과할 수 없습니다.';
+      }
+    }
+    // 피라미드 전용 몬스터/보스 배치
+    if (type === ROOM_TYPE.PYRAMID) {
+      // 피라미드 몬스터만 스폰 (20% 확률)
+      if (Math.random() < 0.2) {
+        monsters.push(new Monster(PYRAMID_MONSTERS[Math.floor(Math.random() * PYRAMID_MONSTERS.length)], x, y));
+      }
+    }
+    const room = new Room(x, y, type, name, description, 6);
+    for (const m of monsters) room.monsters.push(m);
+    roomsPyramid.push(room);
+    registerRoomToManager(room, 6);
   }
 }
 
 // worlds 객체를 모든 맵 생성 이후에 선언
-const worlds = { 1: rooms, 2: roomsIsland, 3: roomsCave, 4: roomsIsland2, 5: roomsDesert };
+const worlds = { 1: rooms, 2: roomsIsland, 3: roomsCave, 4: roomsIsland2, 5: roomsDesert, 6: roomsPyramid };
 function getRoom(world, x, y) {
   const arr = worlds[world] || rooms;
   return arr.find(r => r.x === x && r.y === y);
+}
+
+// respawnMonster 래퍼 함수: getRoom을 항상 첫 인자로 넘겨줌
+function respawnMonsterWithDeps(world, x, y) {
+  if (world === 6) {
+    // 피라미드 내부는 피라미드 몬스터만 리스폰
+    respawnMonster(
+      world, x, y,
+      getRoom,
+      PYRAMID_MONSTERS, PYRAMID_MONSTERS, PYRAMID_MONSTERS, Monster,
+      getPlayersInRoom, sendRoomInfo, 15, { x: 0, y: 0 }, PlayerManager.getAllPlayers()
+    );
+    return;
+  }
+  // ... 기존 분기 ...
+}
+
+// RoomManager에 Room 자동 등록 함수
+function registerRoomToManager(room, worldNum) {
+  if (!RoomManager.rooms[worldNum]) RoomManager.rooms[worldNum] = {};
+  if (!RoomManager.rooms[worldNum][room.x]) RoomManager.rooms[worldNum][room.x] = {};
+  RoomManager.rooms[worldNum][room.x][room.y] = room;
 }
 
 module.exports = { MAP_SIZE, VILLAGE_POS, rooms, getRoom, worlds, ISLAND_VILLAGE_POS, ROOM_TYPE, roomsIsland2, ISLAND2_VILLAGE_POS }; 

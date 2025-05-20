@@ -36,6 +36,8 @@ const PlayerGameService = require('./services/PlayerGameService');
 const Guild = require('./models/Guild');
 const ChatLog = require('./models/ChatLog');
 const authRouter = require('./routes/auth');
+const commandsRouter = require('./routes/commands');
+const boardRouter = require('./routes/board');
 
 const app = express();
 app.use(cors());
@@ -45,6 +47,8 @@ app.use('/api/player', playerRouter);
 app.use('/api/shop', shopRouter);
 app.use('/api/battle', battleRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/commands', commandsRouter);
+app.use('/api/board', boardRouter);
 require('./routes/docs')(app);
 app.use(errorHandler);
 const server = http.createServer(app);
@@ -353,10 +357,17 @@ async function handleChat({ ws, data, playerName, PlayerManager, RoomManager, ge
       sendInventory(PlayerManager.getPlayer(playerName));
       sendCharacterInfo(PlayerManager.getPlayer(playerName));
       ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '[동굴] 동굴로 입장합니다!' }));
-    } else {
-      ws.send(JSON.stringify({ type: 'system', subtype: 'guide', message: '[동굴] 무인도 동굴 입구(2,6)에서만 입장할 수 있습니다.' }));
+      return;
     }
-    return;
+    // 사막 피라미드 입구(월드5, 5,2)에서 피라미드 내부로 입장
+    if (PlayerManager.getPlayer(playerName).world === 5 && PlayerManager.getPlayer(playerName).position.x === 5 && PlayerManager.getPlayer(playerName).position.y === 2) {
+      await PlayerGameService.handleEnterPyramid({ ws, playerName, getRoom, getPlayersInRoom, RoomManager, sendRoomInfo, sendInventory, sendCharacterInfo });
+      return;
+    }
+    else {
+      ws.send(JSON.stringify({ type: 'system', subtype: 'guide', message: '[동굴/피라미드] 입구에서만 입장할 수 있습니다.' }));
+      return;
+    }
   }
   // 동굴 나가기
   if (msg === '/나가기') {
@@ -371,10 +382,17 @@ async function handleChat({ ws, data, playerName, PlayerManager, RoomManager, ge
       sendInventory(PlayerManager.getPlayer(playerName));
       sendCharacterInfo(PlayerManager.getPlayer(playerName));
       ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '[동굴] 무인도 동굴 입구로 나갑니다!' }));
-    } else {
-      ws.send(JSON.stringify({ type: 'system', subtype: 'guide', message: '[동굴] 동굴 사다리방(0,9)에서만 나갈 수 있습니다.' }));
+      return;
     }
-    return;
+    // 피라미드 내부 출구(월드6, 0,0)에서 사막(5,2)로 나감
+    if (PlayerManager.getPlayer(playerName).world === 6 && PlayerManager.getPlayer(playerName).position.x === 0 && PlayerManager.getPlayer(playerName).position.y === 0) {
+      await PlayerGameService.handleExitPyramid({ ws, playerName, getRoom, getPlayersInRoom, RoomManager, sendRoomInfo, sendInventory, sendCharacterInfo });
+      return;
+    }
+    else {
+      ws.send(JSON.stringify({ type: 'system', subtype: 'guide', message: '[동굴/피라미드] 출구에서만 나갈 수 있습니다.' }));
+      return;
+    }
   }
   // 나머지 채팅/명령어/이동은 PlayerGameService로 위임
   await PlayerGameService.handleChat({

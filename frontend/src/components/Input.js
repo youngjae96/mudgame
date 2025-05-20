@@ -31,6 +31,31 @@ const StyledInput = styled.input`
   }
 `;
 
+// Levenshtein distance 계산 함수
+function levenshtein(a, b) {
+  if (a === b) return 0;
+  const alen = a.length, blen = b.length;
+  if (alen === 0) return blen;
+  if (blen === 0) return alen;
+  const matrix = [];
+  for (let i = 0; i <= blen; i++) matrix[i] = [i];
+  for (let j = 0; j <= alen; j++) matrix[0][j] = j;
+  for (let i = 1; i <= blen; i++) {
+    for (let j = 1; j <= alen; j++) {
+      if (b.charAt(i - 1) === a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1,
+          matrix[i][j - 1] + 1,
+          matrix[i - 1][j] + 1
+        );
+      }
+    }
+  }
+  return matrix[blen][alen];
+}
+
 /**
  * 공통 Input 컴포넌트
  * @param {object} props - 컴포넌트 props
@@ -48,19 +73,36 @@ function Input({ value, onChange, placeholder = '', type = 'text', className = '
   const [focused, setFocused] = useState(false);
   // 추천 명령어 필터링
   const suggestions = useMemo(() => {
-    if (!focused || !value || !value.startsWith('/')) return [];
+    if (!focused || !value) return [];
     const v = value.toLowerCase();
-    if (v === '/') {
-      // /만 입력 시 '/귀환', '/정보', '/해제', '/전', '<메시지>'만 추천
-      return commandList.filter(c =>
+    let filtered = [];
+    // exact match로 1개만 추천하지 않고, 항상 여러 추천을 보여줌
+    if (v === '/' || v === '') {
+      filtered = commandList.filter(c =>
         c.cmd.startsWith('/귀환') ||
         c.cmd.startsWith('/정보') ||
         c.cmd.startsWith('/해제') ||
         c.cmd.startsWith('/전') ||
         c.cmd.startsWith('<메시지>')
-      ).slice(0, 5);
+      );
+    } else {
+      // 1) 앞부분 일치
+      let starts = commandList.filter(c => c.cmd.toLowerCase().startsWith(v));
+      // 2) 포함(부분일치)
+      let includes = commandList.filter(c => !starts.includes(c) && c.cmd.toLowerCase().includes(v));
+      // 3) 유사도(Levenshtein distance 2 이하)
+      let similar = commandList.filter(c =>
+        !starts.includes(c) && !includes.includes(c) && levenshtein(c.cmd.toLowerCase(), v) <= 2
+      );
+      filtered = [...starts, ...includes, ...similar];
     }
-    return commandList.filter(c => c.cmd.toLowerCase().includes(v)).slice(0, 5);
+    // cmd 기준 중복 제거
+    const seen = new Set();
+    return filtered.filter(c => {
+      if (seen.has(c.cmd)) return false;
+      seen.add(c.cmd);
+      return true;
+    }).slice(0, 5);
   }, [value, commandList, focused]);
 
   return (

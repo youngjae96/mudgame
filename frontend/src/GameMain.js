@@ -134,37 +134,19 @@ function GameMain({
   const [showPatchNote, setShowPatchNote] = useState(false);
   const [chatTab, setChatTab] = useState('all'); // all, local, guild, whisper, battle
   const [showPasswordChange, setShowPasswordChange] = useState(false);
+  const [commandList, setCommandList] = useState([]);
 
-  const commandList = [
-    { cmd: '/전 <메시지>', desc: '전체 채팅(축약)' },
-    { cmd: '<메시지>', desc: '지역 채팅(명령어 없이 입력)' },
-    { cmd: '/동 /서 /남 /북', desc: '방향 이동(오른쪽/왼쪽/아래/위, 또는 맵 터치)' },
-    { cmd: '/누구', desc: '현재 접속중인 플레이어 목록 보기' },
-    { cmd: '/장착 <아이템명>', desc: '장비 장착' },
-    { cmd: '/해제 무기, /해제 방어구', desc: '장비 해제' },
-    { cmd: '/정보', desc: '내 능력치 확인' },
-    { cmd: '/정보 <닉네임>', desc: '다른 유저 능력치 확인' },
-    { cmd: '/귓 <닉네임> <메시지>', desc: '귓속말(비공개 메시지)' },
-    { cmd: '/귀환', desc: '1번 마을(마을 광장)으로 귀환' },
-    { cmd: '/장비', desc: '내 장비 정보' },
-    { cmd: '/지도', desc: '전체 맵 보기' },
-    { cmd: '/텔포 <지역>', desc: '월드 이동(예: 무인도, 마을)' },
-    { cmd: '/상점', desc: '상점 열기' },
-    { cmd: '/상점판매', desc: '상점 판매' },
-    { cmd: '/여관', desc: '여관(회복)' },
-    { cmd: '/구매 <아이템명>', desc: '아이템 구매' },
-    { cmd: '/판매 <아이템명>', desc: '아이템 판매' },
-    { cmd: '/착용 <아이템명>', desc: '아이템 착용' },
-    { cmd: '/사용 <아이템명>', desc: '아이템 사용' },
-    { cmd: '/사용사탕', desc: '사탕 사용' },
-    { cmd: '/클랜힐', desc: '클랜힐 스크롤 사용' },
-    { cmd: '/길 <메시지>', desc: '길드 채팅' },
-    { cmd: '/길드 <생성|가입|수락|탈퇴|추방|공지|정보|목록|해체(길드장)> ...', desc: '길드 관련 명령어' },
-    { cmd: '/랭킹', desc: 'TOP 10 스탯 랭킹' },
-    { cmd: '/방명록', desc: '방명록(글 목록/쓰기)' },
-    { cmd: '/비밀번호변경', desc: '비밀번호 변경' },
-    { cmd: '/도움말', desc: '명령어 전체 안내' },
-  ];
+  useEffect(() => {
+    fetch('/api/commands')
+      .then(res => res.json())
+      .then(setCommandList)
+      .catch(() => {
+        setCommandList([
+          { cmd: '/전 <메시지>', desc: '전체 채팅(축약)' },
+          { cmd: '<메시지>', desc: '지역 채팅(명령어 없이 입력)' }
+        ]);
+      });
+  }, []);
 
   // 방 아이템 UI 분리
   const renderRoomItems = useCallback(() => <RoomItems room={room} onPickup={handlePickup} />, [room, handlePickup]);

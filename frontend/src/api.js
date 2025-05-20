@@ -5,6 +5,12 @@ const api = axios.create({
   baseURL: process.env.REACT_APP_API_URL || '',
 });
 
+api.interceptors.request.use(config => {
+  const token = localStorage.getItem('jwtToken');
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
 /**
  * REST API: 플레이어 정보 조회
  * @param {string} token - JWT 토큰
@@ -62,8 +68,10 @@ api.interceptors.response.use(
   err => {
     if (err.response && err.response.status === 401) {
       localStorage.removeItem('jwtToken');
-      window.location.reload();
+      alert('로그인이 필요합니다. 다시 로그인 해주세요.');
     }
     return Promise.reject(err);
   }
-); 
+);
+
+export default api; 

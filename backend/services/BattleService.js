@@ -31,22 +31,17 @@ class BattleService {
       text: `${monster.name}을(를) 공격!`,
     });
 
-    // 골드 기반 expBonus 계산
+    // 경험치 지급 방식 분기 및 로그 (exp/gold 모두 같은 공식)
+    let expBase = monster.exp !== undefined ? monster.exp : monster.gold;
+    let expSource = monster.exp !== undefined ? 'exp' : 'gold';
     let expBonus = 1.0;
-    if (monster.gold !== undefined) {
-      expBonus = calcExpBonus(monster.gold);
+    if (expBase !== undefined) {
+      expBonus = 1.0 + Math.sqrt(expBase) / 18;
     }
-    // 인벤토리 내 모든 무기의 expBonus를 곱해서 추가 보정
-    if (typeof player.getTotalExpBonus === 'function') {
-      expBonus *= player.getTotalExpBonus();
-    }
-    // 경험치 1.2배 이벤트 적용
-    if (global.expDoubleEvent) {
-      expBonus *= 1.2;
-    }
-
-    if (player.gainStrExp) player.gainStrExp(1.5 * expBonus);
-    if (player.gainDexExp) player.gainDexExp(0.75 * expBonus);
+    let strExp = 1.5 * expBonus;
+    let dexExp = 0.75 * expBonus;
+    if (player.gainStrExp) player.gainStrExp(strExp);
+    if (player.gainDexExp) player.gainDexExp(dexExp);
 
     let monsterDead = false;
     let playerDead = false;

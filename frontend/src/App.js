@@ -19,6 +19,8 @@ import { UserProvider, useUserContext } from './UserContext';
 import { GameStateProvider, useGameStateContext } from './GameStateContext';
 import ResponsiveLayout from './layout/ResponsiveLayout';
 import Alert from './components/Alert';
+import BoardModal from './components/BoardModal';
+import Button from './components/Button';
 
 const Container = styled.div`
   max-width: 1100px;
@@ -44,7 +46,8 @@ function isMobileDevice() {
 function AppInner() {
   const {
     isLoggedIn, login, register, logout, authError,
-    loading, setAuthError
+    loading, setAuthError,
+    name
   } = useUserContext();
   const [showMap, setShowMap] = useState(false);
   const [isLoginMode, setIsLoginMode] = useState(true);
@@ -66,7 +69,6 @@ function AppInner() {
 
   const {
     connected,
-    name,
     setName,
     input,
     setInput,
@@ -131,6 +133,19 @@ function AppInner() {
 
   const bannerHeight = isMobile ? 56 : 54;
 
+  const [boardOpen, setBoardOpen] = useState(false);
+
+  // 게시판 명령어로 열기
+  function handleSendWithBoard(cmd) {
+    const value = typeof cmd === 'string' ? cmd : input;
+    if (value.trim() === '/게시판') {
+      setBoardOpen(true);
+      setInput('');
+      return;
+    }
+    handleSend(cmd);
+  }
+
   if (!isLoggedIn) {
     return (
       <AuthForm
@@ -169,6 +184,7 @@ function AppInner() {
           />
         )}
         {showMap && <MapModal mapSize={mapSize} mapInfo={mapInfo} onClose={() => setShowMap(false)} />}
+        <BoardModal open={boardOpen} onClose={()=>setBoardOpen(false)} user={{nickname: localStorage.getItem('nickname')}} />
         <ResponsiveLayout
           isMobile={isMobile}
           desktop={
@@ -185,7 +201,7 @@ function AppInner() {
                 chatLogMessages={chatLogMessages}
                 guildChatLogMessages={guildChatLogMessages}
                 chatEndRef={chatEndRef}
-                handleSend={handleSend}
+                handleSend={handleSendWithBoard}
                 input={input}
                 setInput={setInput}
                 UI_LABELS={UI_LABELS}
@@ -211,7 +227,7 @@ function AppInner() {
                 guildChatLogMessages={guildChatLogMessages}
                 allMessages={allMessages}
                 chatEndRef={chatEndRef}
-                handleSend={handleSend}
+                handleSend={handleSendWithBoard}
                 input={input}
                 setInput={setInput}
                 UI_LABELS={UI_LABELS}
