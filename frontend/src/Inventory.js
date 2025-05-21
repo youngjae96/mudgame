@@ -57,7 +57,7 @@ function Inventory({ inventory, gold, onItemCommandClick }) {
   // 아이템별 명령어 매핑
   const itemCommandMap = {
     '클랜힐 스크롤': '/클랜힐',
-    '텔레포트 스크롤': '/텔레포트수동',
+    '텔레포트 스크롤': '/텔레포트',
     // 필요시 다른 아이템도 추가
   };
 

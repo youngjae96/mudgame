@@ -77,6 +77,12 @@ const GaugeLabel = styled.div`
   text-shadow: 0 1px 2px #000a;
 `;
 
+function formatNumber(n) {
+  if (n >= 1e6) return (n/1e6).toFixed(1).replace(/\.0$/, '') + 'M';
+  if (n >= 1e3) return (n/1e3).toFixed(1).replace(/\.0$/, '') + 'K';
+  return Math.floor(n);
+}
+
 function CharacterInfo({ name, room, character }) {
   if (!character) return null;
   // 다양한 key에서 장비 정보 추출
@@ -105,8 +111,20 @@ function CharacterInfo({ name, room, character }) {
         </div>
         {/* 스탯 정보 */}
         <StatRow><span>힘</span><span>{character.str}</span></StatRow>
+        <GaugeBar>
+          <GaugeFill style={{ width: `${(character.strExp / character.strExpMax) * 100}%`, background: 'linear-gradient(90deg, #4caf50 60%, #b2ff59 100%)' }} />
+          <GaugeLabel>EXP {formatNumber(character.strExp)} / {formatNumber(character.strExpMax)}</GaugeLabel>
+        </GaugeBar>
         <StatRow><span>민첩</span><span>{character.dex}</span></StatRow>
+        <GaugeBar>
+          <GaugeFill style={{ width: `${(character.dexExp / character.dexExpMax) * 100}%`, background: 'linear-gradient(90deg, #43e97b 60%, #38f9d7 100%)' }} />
+          <GaugeLabel>EXP {formatNumber(character.dexExp)} / {formatNumber(character.dexExpMax)}</GaugeLabel>
+        </GaugeBar>
         <StatRow><span>지능</span><span>{character.int}</span></StatRow>
+        <GaugeBar>
+          <GaugeFill style={{ width: `${(character.intExp / character.intExpMax) * 100}%`, background: 'linear-gradient(90deg, #00c853 60%, #b2ff59 100%)' }} />
+          <GaugeLabel>EXP {formatNumber(character.intExp)} / {formatNumber(character.intExpMax)}</GaugeLabel>
+        </GaugeBar>
         <StatRow><span>공격력</span><span>{character.atk}</span></StatRow>
         <StatRow><span>방어력</span><span>{character.def}</span></StatRow>
         {/* 장비 정보 */}
