@@ -62,6 +62,9 @@ global.wss = wss;
 // 한 계정당 하나의 WebSocket만 허용
 const activeSockets = {}; // username: ws
 
+// 저장 쿨타임 관리 객체
+const playerSaveCooldown = {}; // { [playerName]: timestamp }
+
 function getPlayersInRoom(world, x, y) {
   return Object.values(PlayerManager.getAllPlayers())
     .filter((p) => p.world === world && p.position && p.position.x === x && p.position.y === y)
@@ -181,11 +184,17 @@ function respawnMonsterWithDeps(world, x, y) {
 
 // PlayerData 저장 함수
 async function savePlayerData(playerName) {
-  const player = PlayerManager.getPlayer(playerName);
-  if (!player) return;
+  // 저장 쿨타임: 5초
+  const now = Date.now();
+  if (playerSaveCooldown[playerName] && now - playerSaveCooldown[playerName] < 5000) {
+    return; // 5초 이내 중복 저장 방지
+  }
+  playerSaveCooldown[playerName] = now;
   try {
     const pdata = await PlayerData.findOne({ name: playerName });
     if (!pdata) return;
+    const player = PlayerManager.getPlayer(playerName);
+    if (!player) return;
     pdata.world = player.world;
     pdata.position = player.position;
     pdata.hp = player.hp;
@@ -209,7 +218,28 @@ async function savePlayerData(playerName) {
     pdata.equipArmor = player.equipArmor;
     pdata.expCandyBuffUntil = player.expCandyBuffUntil;
     pdata.updatedAt = new Date();
-    await pdata.save();
+    // VersionError 발생 시 최대 3회까지 재시도
+    let retries = 0;
+    while (retries < 3) {
+      try {
+        await pdata.save();
+        break;
+      } catch (err) {
+        if (err.name === 'VersionError') {
+          retries++;
+          if (retries < 3) {
+            // 100~300ms 랜덤 딜레이 후 재시도
+            await new Promise(res => setTimeout(res, 100 + Math.random() * 200));
+            continue;
+          } else {
+            console.warn('[경고] VersionError 발생, 3회 재시도 후 저장 무시:', err.message);
+            break;
+          }
+        } else {
+          throw err;
+        }
+      }
+    }
   } catch (err) {
     if (err.name === 'VersionError') {
       console.warn('[경고] VersionError 발생, 저장 무시:', err.message);

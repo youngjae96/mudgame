@@ -89,6 +89,7 @@ function AppInner() {
     ws,
     notice,
     allMessages,
+    battleMessages,
     chatLogMessages,
     guildChatLogMessages
   } = useWebSocket(handleDisconnect);
@@ -198,6 +199,7 @@ function AppInner() {
                 handleMove={handleMove}
                 nearbyRooms={nearbyRooms}
                 allMessages={allMessages}
+                battleMessages={battleMessages}
                 chatLogMessages={chatLogMessages}
                 guildChatLogMessages={guildChatLogMessages}
                 chatEndRef={chatEndRef}
@@ -223,9 +225,10 @@ function AppInner() {
                 mapInfo={mapInfo}
                 handleMove={handleMove}
                 nearbyRooms={nearbyRooms}
+                allMessages={allMessages}
+                battleMessages={battleMessages}
                 chatLogMessages={chatLogMessages}
                 guildChatLogMessages={guildChatLogMessages}
-                allMessages={allMessages}
                 chatEndRef={chatEndRef}
                 handleSend={handleSendWithBoard}
                 input={input}

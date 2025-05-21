@@ -132,6 +132,7 @@ export default function GameMobileMain({
   room, mapSize, mapInfo, handleMove, nearbyRooms,
   chatLogMessages, guildChatLogMessages, chatEndRef, handleSend, input, setInput,
   allMessages,
+  battleMessages,
   UI_LABELS, name, character, inventory, handlePickup, handleAttack, handleLogout,
   expEventActive
 }) {
@@ -224,7 +225,7 @@ export default function GameMobileMain({
               chatTab === 'guild'
                 ? guildChatLogMessages
                 : chatTab === 'battle'
-                  ? allMessages
+                  ? battleMessages
                   : chatLogMessages
             }
             tab={chatTab}

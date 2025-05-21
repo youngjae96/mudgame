@@ -75,6 +75,7 @@ class Player {
     if (levelUp > 0) {
       console.log(`[LEVEL UP] str +${levelUp} (현재 str: ${this.str})`);
     }
+    return realAmount;
   }
 
   gainDexExp(amount = 1, extraBonus = 1) {
@@ -94,6 +95,7 @@ class Player {
     if (levelUp > 0) {
       console.log(`[LEVEL UP] dex +${levelUp} (현재 dex: ${this.dex})`);
     }
+    return realAmount;
   }
 
   gainIntExp(amount = 1, extraBonus = 1) {
@@ -113,6 +115,7 @@ class Player {
     if (levelUp > 0) {
       console.log(`[LEVEL UP] int +${levelUp} (현재 int: ${this.int})`);
     }
+    return realAmount;
   }
 
   equipItem(item) {

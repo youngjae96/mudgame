@@ -42,6 +42,7 @@ function useWebSocket(onDisconnect) {
   const [wsError, setWsError] = useState(null);
   const [chatLogMessages, setChatLogMessages] = useState([]);
   const [guildChatLogMessages, setGuildChatLogMessages] = useState([]);
+  const [battleMessages, setBattleMessages] = useState([]);
 
   useEffect(() => {
     if (connected && ws.current) {
@@ -104,7 +105,7 @@ function useWebSocket(onDisconnect) {
             if (Object.keys(stat).length > 0) setCharacter((prev) => ({ ...prev, ...stat }));
           }
         } else if (data.type === 'battle') {
-          setAllMessages(msgs => {
+          setBattleMessages(msgs => {
             if (Array.isArray(data.log)) {
               const logs = data.log.map((log) => ({ ...log }));
               const next = [...msgs.flat(), ...logs];
@@ -114,6 +115,7 @@ function useWebSocket(onDisconnect) {
               return next.length > 100 ? next.slice(next.length - 100) : next;
             }
           });
+          return;
         } else if (data.type === 'notice') {
           setNotice(data.notice);
         }
@@ -232,7 +234,7 @@ function useWebSocket(onDisconnect) {
           if (Object.keys(stat).length > 0) setCharacter((prev) => ({ ...prev, ...stat }));
         }
       } else if (data.type === 'battle') {
-        setAllMessages(msgs => {
+        setBattleMessages(msgs => {
           if (Array.isArray(data.log)) {
             const logs = data.log.map((log) => ({ ...log }));
             const next = [...msgs.flat(), ...logs];
@@ -242,6 +244,7 @@ function useWebSocket(onDisconnect) {
             return next.length > 100 ? next.slice(next.length - 100) : next;
           }
         });
+        return;
       } else if (data.type === 'notice') {
         setNotice(data.notice);
       }
@@ -354,7 +357,8 @@ function useWebSocket(onDisconnect) {
     notice,
     wsError,
     chatLogMessages,
-    guildChatLogMessages
+    guildChatLogMessages,
+    battleMessages
   };
 }
 

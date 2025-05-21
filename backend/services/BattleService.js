@@ -40,21 +40,13 @@ class BattleService {
     }
     let strExp = 1.5 * expBonus;
     let dexExp = 0.75 * expBonus;
-    if (player.gainStrExp) player.gainStrExp(strExp);
-    if (player.gainDexExp) player.gainDexExp(dexExp);
-    // 경험치 지급 내역 로그 추가
-    log.push({
-      type: 'battle',
-      subtype: 'exp',
-      actor: player.name,
-      action: 'gainExp',
-      strExp,
-      dexExp,
-      expSource,
-      expBase,
-      expBonus,
-      text: `[경험치] ${expSource}(${expBase})로 strExp: ${strExp.toFixed(2)}, dexExp: ${dexExp.toFixed(2)} (보너스: ${expBonus.toFixed(2)})`
-    });
+    let realStrExp = strExp;
+    let realDexExp = dexExp;
+    if (player.gainStrExp) realStrExp = player.gainStrExp(strExp) || realStrExp;
+    if (player.gainDexExp) realDexExp = player.gainDexExp(dexExp) || realDexExp;
+    // 모든 보너스(무기, 이벤트, 사탕 등) 계산값도 로그에 추가
+    const strExpBonus = player.getExpBonus('str');
+    const dexExpBonus = player.getExpBonus('dex');
 
     let monsterDead = false;
     let playerDead = false;

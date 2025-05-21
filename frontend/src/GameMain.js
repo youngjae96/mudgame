@@ -90,6 +90,7 @@ const PlayerListPanel = styled.div`
  * @param {function} props.handleMove - 이동 핸들러
  * @param {Array} props.nearbyRooms - 주변 방 정보
  * @param {Array} props.allMessages - 전체 채팅 메시지 목록
+ * @param {Array} props.battleMessages - 전체 전투 메시지 목록
  * @param {Array} props.chatLogMessages - 채팅 로그 메시지 목록
  * @param {Array} props.guildChatLogMessages - 길드 채팅 로그 메시지 목록
  * @param {object} props.chatEndRef - 채팅 스크롤 ref
@@ -115,6 +116,7 @@ function GameMain({
   handleMove,
   nearbyRooms,
   allMessages,
+  battleMessages,
   chatLogMessages,
   guildChatLogMessages,
   chatEndRef,
@@ -216,7 +218,7 @@ function GameMain({
                 <PatchNoteTabs />
               </Modal>
             )}
-            {showChatOnly && <ChatOnlyBox messages={chatTab === 'guild' ? guildChatLogMessages : chatTab === 'battle' ? allMessages.filter(msg => msg.type === 'battle') : chatLogMessages} tab={chatTab} setTab={setChatTab} />}
+            {showChatOnly && <ChatOnlyBox messages={chatTab === 'guild' ? guildChatLogMessages : chatTab === 'battle' ? battleMessages : chatLogMessages} tab={chatTab} setTab={setChatTab} />}
             <ChatBox messages={allMessages.filter(msg => msg.type !== 'battle')} chatEndRef={chatEndRef} expEventActive={expEventActive} />
             <form className="input-form" onSubmit={handleSendWithPasswordChange} style={{ display: 'flex', alignItems: 'center' }}>
               <Input
