@@ -13,6 +13,7 @@ import Modal from './components/Modal';
 import ExpEventBanner from './components/ExpEventBanner';
 import PasswordChangeModal from './components/PasswordChangeModal';
 import InventoryPanel from './components/InventoryPanel';
+import { COMMAND_LIST } from './constants';
 
 const MobileRoot = styled.div`
   width: 100vw;
@@ -141,19 +142,7 @@ export default function GameMobileMain({
   const [showPasswordChange, setShowPasswordChange] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [showMobileInventory, setShowMobileInventory] = useState(false);
-  const [commandList, setCommandList] = useState([]);
-
-  useEffect(() => {
-    fetch('/api/commands')
-      .then(res => res.json())
-      .then(setCommandList)
-      .catch(() => {
-        setCommandList([
-          { cmd: '/전 <메시지>', desc: '전체 채팅(축약)' },
-          { cmd: '<메시지>', desc: '지역 채팅(명령어 없이 입력)' }
-        ]);
-      });
-  }, []);
+  const [commandList, setCommandList] = useState(COMMAND_LIST);
 
   // 방 아이템/몬스터 렌더 함수
   const renderRoomItems = () => <RoomItems room={room} onPickup={handlePickup} />;

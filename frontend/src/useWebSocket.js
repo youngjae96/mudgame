@@ -104,29 +104,6 @@ function useWebSocket(onDisconnect) {
             if (Object.keys(stat).length > 0) setCharacter((prev) => ({ ...prev, ...stat }));
           }
         } else if (data.type === 'battle') {
-          // 디버깅: battle log에 exp subtype이 있는지 콘솔에 출력
-          if (Array.isArray(data.log)) {
-            const expLogs = data.log.filter(l => l.subtype === 'exp');
-            if (expLogs.length > 0) {
-              setAllMessages(msgs => [
-                ...msgs,
-                {
-                  type: 'system',
-                  message: `[DEBUG] 경험치 로그 감지: ${expLogs.map(e => e.text).join(' | ')}`
-                }
-              ]);
-            }
-          } else {
-            if (data.log && data.log.subtype === 'exp') {
-              setAllMessages(msgs => [
-                ...msgs,
-                {
-                  type: 'system',
-                  message: `[DEBUG] 경험치 로그 감지: ${data.log.text}`
-                }
-              ]);
-            }
-          }
           setAllMessages(msgs => {
             if (Array.isArray(data.log)) {
               const logs = data.log.map((log) => ({ ...log }));
@@ -255,29 +232,6 @@ function useWebSocket(onDisconnect) {
           if (Object.keys(stat).length > 0) setCharacter((prev) => ({ ...prev, ...stat }));
         }
       } else if (data.type === 'battle') {
-        // 디버깅: battle log에 exp subtype이 있는지 콘솔에 출력
-        if (Array.isArray(data.log)) {
-          const expLogs = data.log.filter(l => l.subtype === 'exp');
-          if (expLogs.length > 0) {
-            setAllMessages(msgs => [
-              ...msgs,
-              {
-                type: 'system',
-                message: `[DEBUG] 경험치 로그 감지: ${expLogs.map(e => e.text).join(' | ')}`
-              }
-            ]);
-          }
-        } else {
-          if (data.log && data.log.subtype === 'exp') {
-            setAllMessages(msgs => [
-              ...msgs,
-              {
-                type: 'system',
-                message: `[DEBUG] 경험치 로그 감지: ${data.log.text}`
-              }
-            ]);
-          }
-        }
         setAllMessages(msgs => {
           if (Array.isArray(data.log)) {
             const logs = data.log.map((log) => ({ ...log }));

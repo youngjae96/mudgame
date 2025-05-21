@@ -11,6 +11,7 @@ import Button from './components/Button';
 import Input from './components/Input';
 import Modal from './components/Modal';
 import PasswordChangeModal from './components/PasswordChangeModal';
+import { COMMAND_LIST } from './constants';
 
 const Container = styled.div`
   max-width: 1100px;
@@ -134,19 +135,7 @@ function GameMain({
   const [showPatchNote, setShowPatchNote] = useState(false);
   const [chatTab, setChatTab] = useState('all'); // all, local, guild, whisper, battle
   const [showPasswordChange, setShowPasswordChange] = useState(false);
-  const [commandList, setCommandList] = useState([]);
-
-  useEffect(() => {
-    fetch('/api/commands')
-      .then(res => res.json())
-      .then(setCommandList)
-      .catch(() => {
-        setCommandList([
-          { cmd: '/전 <메시지>', desc: '전체 채팅(축약)' },
-          { cmd: '<메시지>', desc: '지역 채팅(명령어 없이 입력)' }
-        ]);
-      });
-  }, []);
+  const [commandList, setCommandList] = useState(COMMAND_LIST);
 
   // 방 아이템 UI 분리
   const renderRoomItems = useCallback(() => <RoomItems room={room} onPickup={handlePickup} />, [room, handlePickup]);
