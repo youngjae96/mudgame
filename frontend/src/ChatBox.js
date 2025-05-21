@@ -218,6 +218,9 @@ function BattleMessage({ msg }) {
     case 'death':
       detail = <>{icon} {text}</>;
       break;
+    case 'exp':
+      detail = <>{text}</>;
+      break;
     default:
       detail = <>{text}</>;
   }

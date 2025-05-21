@@ -89,19 +89,36 @@ const extraExamples = [
 ];
 
 router.get('/', (req, res) => {
-  const commands = Object.keys(commandHandlers)
-    .filter(cmd => cmd !== '/운영자') // 운영자 명령어 제외
+  // 1. commandHandlers 기반 명령어
+  const handlerCommands = Object.keys(commandHandlers)
+    .filter(cmd => cmd !== '/운영자')
     .map(cmd => ({
       cmd,
       desc: commandDescriptions[cmd] || '',
     }));
-  // 추가로 지역채팅, 전체채팅 등도 넣을 수 있음
-  commands.unshift(
+  // 2. commandDescriptions에만 있는 명령어
+  const descOnlyCommands = Object.keys(commandDescriptions)
+    .filter(cmd => cmd !== '/운영자' && !handlerCommands.find(c => c.cmd === cmd))
+    .map(cmd => ({
+      cmd,
+      desc: commandDescriptions[cmd] || '',
+    }));
+  // 3. extraExamples에 있는 명령어
+  const allCmdsSet = new Set([...handlerCommands.map(c => c.cmd), ...descOnlyCommands.map(c => c.cmd)]);
+  const extraOnly = extraExamples.filter(e => !allCmdsSet.has(e.cmd));
+  // 4. 지역채팅/전체채팅 안내 추가
+  const baseExamples = [
     { cmd: '/전 <메시지>', desc: '전체 채팅(축약)' },
     { cmd: '<메시지>', desc: '지역 채팅(명령어 없이 입력)' }
-  );
-  // 예시 명령어 추가
-  res.json([...commands, ...extraExamples]);
+  ];
+  // 5. 최종 합치기 (중복 없이)
+  const commands = [
+    ...baseExamples,
+    ...handlerCommands,
+    ...descOnlyCommands,
+    ...extraOnly
+  ];
+  res.json(commands);
 });
 
 module.exports = router; 

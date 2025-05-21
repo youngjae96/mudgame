@@ -42,6 +42,19 @@ class BattleService {
     let dexExp = 0.75 * expBonus;
     if (player.gainStrExp) player.gainStrExp(strExp);
     if (player.gainDexExp) player.gainDexExp(dexExp);
+    // 경험치 지급 내역 로그 추가
+    log.push({
+      type: 'battle',
+      subtype: 'exp',
+      actor: player.name,
+      action: 'gainExp',
+      strExp,
+      dexExp,
+      expSource,
+      expBase,
+      expBonus,
+      text: `[경험치] ${expSource}(${expBase})로 strExp: ${strExp.toFixed(2)}, dexExp: ${dexExp.toFixed(2)} (보너스: ${expBonus.toFixed(2)})`
+    });
 
     let monsterDead = false;
     let playerDead = false;
