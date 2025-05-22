@@ -290,23 +290,22 @@ process.on('uncaughtException', (err) => {
 });
 
 async function handleJoin({ ws, data, wss, PlayerManager, RoomManager, PlayerData, Guild, broadcast, sendPlayerList, sendInventory, sendCharacterInfo, sendRoomInfo, MAP_SIZE, VILLAGE_POS, ChatLog, global }) {
-  const { name, token } = data;
-  if (process.env.DEBUG === 'true') console.log('[서버] join 요청:', { name, token });
-  if (!token) {
-    ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '인증 토큰이 필요합니다.' }));
+  const { name, password } = data;
+  if (process.env.DEBUG === 'true') console.log('[서버] join 요청:', { name, password: !!password });
+  if (!name || !password) {
+    ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '닉네임/비번 필요' }));
     ws.close();
     return;
   }
-  let decoded;
-  try {
-    decoded = jwt.verify(token, SECRET);
-    if (decoded.username !== name) {
-      ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '토큰 정보가 일치하지 않습니다.' }));
-      ws.close();
-      return;
-    }
-  } catch (e) {
-    ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '유효하지 않은 토큰입니다.' }));
+  const user = await User.findOne({ username: name });
+  if (!user) {
+    ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '존재하지 않는 계정' }));
+    ws.close();
+    return;
+  }
+  const ok = await require('bcrypt').compare(password, user.password);
+  if (!ok) {
+    ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '비번 불일치' }));
     ws.close();
     return;
   }
@@ -323,10 +322,10 @@ async function handleJoin({ ws, data, wss, PlayerManager, RoomManager, PlayerDat
   }
   if (global.activeSockets) global.activeSockets[name] = ws;
   // playerName = name; // playerName은 상위 스코프에서 처리 필요
-  let pdata = await PlayerData.findOne({ userId: decoded.userId });
+  let pdata = await PlayerData.findOne({ userId: user.id });
   if (!pdata) {
     pdata = await PlayerData.create({
-      userId: decoded.userId,
+      userId: user.id,
       name: name,
       world: 1,
       position: { x: 4, y: 4 },
@@ -410,6 +409,32 @@ async function handleChat({ ws, data, playerName, PlayerManager, RoomManager, ge
     // 사막 피라미드 입구(월드5, 5,2)에서 피라미드 내부로 입장
     if (PlayerManager.getPlayer(playerName).world === 5 && PlayerManager.getPlayer(playerName).position.x === 5 && PlayerManager.getPlayer(playerName).position.y === 2) {
       await PlayerGameService.handleEnterPyramid({ ws, playerName, getRoom, getPlayersInRoom, RoomManager, sendRoomInfo, sendInventory, sendCharacterInfo });
+      return;
+    }
+    // 피라미드1→피라미드2 입구(월드6, 0,0)
+    if (PlayerManager.getPlayer(playerName).world === 6 && PlayerManager.getPlayer(playerName).position.x === 0 && PlayerManager.getPlayer(playerName).position.y === 0) {
+      RoomManager.removePlayerFromRoom(playerName, 6, 0, 0);
+      PlayerManager.getPlayer(playerName).world = 7;
+      PlayerManager.getPlayer(playerName).position = { x: 0, y: 0 };
+      RoomManager.addPlayerToRoom(playerName, 7, 0, 0);
+      PlayerManager.addPlayer(playerName, PlayerManager.getPlayer(playerName));
+      sendRoomInfo(PlayerManager.getPlayer(playerName), getRoom, getPlayersInRoom, 7, { x: 0, y: 0 });
+      sendInventory(PlayerManager.getPlayer(playerName));
+      sendCharacterInfo(PlayerManager.getPlayer(playerName));
+      ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '[피라미드2] 더 깊은 피라미드로 입장합니다!' }));
+      return;
+    }
+    // 피라미드2→피라미드1 입구(월드7, 0,0)
+    if (PlayerManager.getPlayer(playerName).world === 7 && PlayerManager.getPlayer(playerName).position.x === 0 && PlayerManager.getPlayer(playerName).position.y === 0) {
+      RoomManager.removePlayerFromRoom(playerName, 7, 0, 0);
+      PlayerManager.getPlayer(playerName).world = 6;
+      PlayerManager.getPlayer(playerName).position = { x: 0, y: 0 };
+      RoomManager.addPlayerToRoom(playerName, 6, 0, 0);
+      PlayerManager.addPlayer(playerName, PlayerManager.getPlayer(playerName));
+      sendRoomInfo(PlayerManager.getPlayer(playerName), getRoom, getPlayersInRoom, 6, { x: 0, y: 0 });
+      sendInventory(PlayerManager.getPlayer(playerName));
+      sendCharacterInfo(PlayerManager.getPlayer(playerName));
+      ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '[피라미드1] 피라미드1로 돌아갑니다.' }));
       return;
     }
     else {

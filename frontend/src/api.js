@@ -5,44 +5,42 @@ const api = axios.create({
   baseURL: process.env.REACT_APP_API_URL || '',
 });
 
-api.interceptors.request.use(config => {
-  const token = localStorage.getItem('jwtToken');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
-
 /**
  * REST API: 플레이어 정보 조회
- * @param {string} token - JWT 토큰
+ * @param {string} username
+ * @param {string} password
  * @returns {Promise<object>}
  */
-export const getPlayerInfo = (token) =>
-  api.get('/api/player/me', { headers: { Authorization: `Bearer ${token}` } });
+export const getPlayerInfo = (username, password) =>
+  api.get('/api/player/me', { params: { username, password } });
 
 /**
  * REST API: 인벤토리 조회
- * @param {string} token - JWT 토큰
+ * @param {string} username
+ * @param {string} password
  * @returns {Promise<object>}
  */
-export const getInventory = (token) =>
-  api.get('/api/player/inventory', { headers: { Authorization: `Bearer ${token}` } });
+export const getInventory = (username, password) =>
+  api.get('/api/player/inventory', { params: { username, password } });
 
 /**
  * REST API: 상점 아이템 목록 조회
- * @param {string} token - JWT 토큰
+ * @param {string} username
+ * @param {string} password
  * @returns {Promise<object>}
  */
-export const getShopItems = (token) =>
-  api.get('/api/shop/items', { headers: { Authorization: `Bearer ${token}` } });
+export const getShopItems = (username, password) =>
+  api.get('/api/shop/items', { params: { username, password } });
 
 /**
  * REST API: 몬스터 공격
- * @param {string} token - JWT 토큰
+ * @param {string} username
+ * @param {string} password
  * @param {object} data - 공격 데이터
  * @returns {Promise<object>}
  */
-export const attackMonster = (token, data) =>
-  api.post('/api/battle/attack', data, { headers: { Authorization: `Bearer ${token}` } });
+export const attackMonster = (username, password, data) =>
+  api.post('/api/battle/attack', { ...data, username, password });
 
 /**
  * REST API: 로그인

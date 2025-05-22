@@ -4,8 +4,7 @@ import { login as apiLogin, register as apiRegister, getPlayerInfo, getInventory
 const UserContext = createContext();
 
 export function UserProvider({ children }) {
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('jwtToken'));
-  const [token, setToken] = useState(localStorage.getItem('jwtToken') || '');
+  const [isLoggedIn, setIsLoggedIn] = useState(!!(localStorage.getItem('username') && localStorage.getItem('password')));
   const [user, setUser] = useState(null); // { name, ... }
   const [inventory, setInventory] = useState([]);
   const [authError, setAuthError] = useState('');
@@ -18,14 +17,14 @@ export function UserProvider({ children }) {
     setLoading(true);
     try {
       const res = await apiLogin(username, password);
-      if (res.data.success && res.data.accessToken) {
-        localStorage.setItem('jwtToken', res.data.accessToken);
+      if (res.data.success) {
+        localStorage.setItem('username', username);
+        localStorage.setItem('password', password);
         localStorage.setItem('nickname', username);
-        setToken(res.data.accessToken);
         setIsLoggedIn(true);
         setUser({ name: username });
-        await fetchUserInfo(res.data.accessToken);
-        await fetchInventory(res.data.accessToken);
+        await fetchUserInfo(username, password);
+        await fetchInventory(username, password);
       }
     } catch (e) {
       setAuthError(e.response?.data?.error || '로그인 실패');
@@ -52,50 +51,50 @@ export function UserProvider({ children }) {
 
   // 로그아웃
   const logout = () => {
-    localStorage.removeItem('jwtToken');
-    localStorage.removeItem('nickname');
     localStorage.removeItem('username');
+    localStorage.removeItem('password');
+    localStorage.removeItem('nickname');
     localStorage.removeItem('userId');
-    // 필요시 추가로 사용자 관련 key 삭제
-    setToken('');
     setIsLoggedIn(false);
     setUser(null);
     setInventory([]);
   };
 
   // 유저 정보 불러오기
-  const fetchUserInfo = useCallback(async (tk = token) => {
-    if (!tk) return;
+  const fetchUserInfo = useCallback(async (username, password) => {
+    if (!username || !password) return;
     try {
-      const res = await getPlayerInfo(tk);
+      const res = await getPlayerInfo(username, password);
       setUser(res.data);
     } catch {
       // 무시
     }
-  }, [token]);
+  }, []);
 
   // 인벤토리 불러오기
-  const fetchInventory = useCallback(async (tk = token) => {
-    if (!tk) return;
+  const fetchInventory = useCallback(async (username, password) => {
+    if (!username || !password) return;
     try {
-      const res = await getInventory(tk);
+      const res = await getInventory(username, password);
       setInventory(res.data.inventory || []);
     } catch {
       // 무시
     }
-  }, [token]);
+  }, []);
 
-  // 최초 마운트 시 토큰 있으면 유저 정보/인벤토리 불러오기
+  // 최초 마운트 시 username, password 있으면 유저 정보/인벤토리 불러오기
   useEffect(() => {
-    if (token) {
-      fetchUserInfo(token);
-      fetchInventory(token);
+    const username = localStorage.getItem('username');
+    const password = localStorage.getItem('password');
+    if (username && password) {
+      fetchUserInfo(username, password);
+      fetchInventory(username, password);
     }
-  }, [token, fetchUserInfo, fetchInventory]);
+  }, [fetchUserInfo, fetchInventory]);
 
   return (
     <UserContext.Provider value={{
-      isLoggedIn, token, user, inventory, authError, loading,
+      isLoggedIn, user, inventory, authError, loading,
       login, register, logout, fetchUserInfo, fetchInventory, setAuthError,
       registerPasswordConfirm, setRegisterPasswordConfirm
     }}>

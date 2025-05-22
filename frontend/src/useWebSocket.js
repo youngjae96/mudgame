@@ -151,16 +151,15 @@ function useWebSocket(onDisconnect) {
     ws.current.onopen = () => {
       reconnectAttempts.current = 0;
       setWsError(null);
-      const token = localStorage.getItem('jwtToken');
-      let username = '';
-      try { username = jwtDecode(token).username; } catch (e) {/* ignore error */}
-      if (process.env.REACT_APP_DEBUG === 'true') console.log('[WebSocket] onopen, join 전송:', { name: username, token });
+      const username = localStorage.getItem('username');
+      const password = localStorage.getItem('password');
+      if (process.env.REACT_APP_DEBUG === 'true') console.log('[WebSocket] onopen, join 전송:', { name: username, password: !!password });
       if (ws.current.readyState === WebSocket.OPEN) {
-        ws.current.send(JSON.stringify({ type: 'join', name: username, token }));
+        ws.current.send(JSON.stringify({ type: 'join', name: username, password }));
         setConnected(true);
       } else {
         ws.current.addEventListener('open', () => {
-          ws.current.send(JSON.stringify({ type: 'join', name: username, token }));
+          ws.current.send(JSON.stringify({ type: 'join', name: username, password }));
           setConnected(true);
         }, { once: true });
       }
