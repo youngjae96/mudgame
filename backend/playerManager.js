@@ -95,9 +95,8 @@ async function clanHealTick(PlayerManager, Guild) {
         message: `클랜힐: ${healAmount} 회복 | 대상: ${targets.map(t => t.name).join(', ')} | 힐러: ${healer.name}`
       }));
     }
-    // 인트 경험치 소량 증가 (이벤트 시 1.2배)
-    let intExpAmount = 1.3;
-    if (global.expDoubleEvent) intExpAmount *= 1.2;
+    // 인트 경험치: 회복량의 절반만큼 증가
+    let intExpAmount = healAmount * 0.5;
     if (typeof healer.gainIntExp === 'function') {
       healer.gainIntExp(intExpAmount);
     } else {

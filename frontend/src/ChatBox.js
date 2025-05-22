@@ -175,7 +175,7 @@ function SystemMessage({ msg }) {
     message = JSON.stringify(message);
   }
   if (
-    msg.subtype === 'error' &&
+    (msg.subtype === 'error' || msg.subtype === 'event') &&
     typeof message === 'string' &&
     message.includes('획득했습니다!')
   ) {

@@ -3,7 +3,7 @@ const http = require('http');
 const { WebSocketServer } = require('ws');
 const cors = require('cors');
 const Player = require('./models/Player');
-const { ITEM_POOL, FIELD_MONSTERS, FOREST_MONSTERS, CAVE_MONSTERS, SHOP_ITEMS, ISLAND_MONSTERS, ISLAND2_MONSTERS, DESERT_MONSTERS } = require('./data/items');
+const { ITEM_POOL, FIELD_MONSTERS, FOREST_MONSTERS, CAVE_MONSTERS, SHOP_ITEMS, ISLAND_MONSTERS, ISLAND2_MONSTERS, DESERT_MONSTERS, PYRAMID_MONSTERS } = require('./data/items');
 const { MAP_SIZE, VILLAGE_POS, rooms, getRoom, roomsIsland, ISLAND_VILLAGE_POS, roomsCave, MAP_SIZE_CAVE, roomsIsland2, ISLAND2_VILLAGE_POS } = require('./data/map');
 const Monster = require('./models/Monster');
 const {
@@ -64,6 +64,8 @@ const activeSockets = {}; // username: ws
 
 // 저장 쿨타임 관리 객체
 const playerSaveCooldown = {}; // { [playerName]: timestamp }
+// 저장 큐잉 관리 객체
+const playerSaveQueue = {}; // { [playerName]: Promise }
 
 function getPlayersInRoom(world, x, y) {
   return Object.values(PlayerManager.getAllPlayers())
@@ -144,7 +146,14 @@ function parseChatCommand(msg) {
 
 // respawnMonster 래퍼 함수: getRoom을 항상 첫 인자로 넘겨줌
 function respawnMonsterWithDeps(world, x, y) {
-  if (world === 2) {
+  if (world === 6) {
+    respawnMonster(
+      world, x, y,
+      getRoom,
+      PYRAMID_MONSTERS, PYRAMID_MONSTERS, PYRAMID_MONSTERS, Monster,
+      getPlayersInRoom, sendRoomInfo, 15, { x: 0, y: 0 }, PlayerManager.getAllPlayers()
+    );
+  } else if (world === 2) {
     respawnMonster(
       world, x, y,
       getRoom,
@@ -248,6 +257,15 @@ async function savePlayerData(playerName) {
       console.error('[에러] PlayerData 저장 실패:', err);
     }
   }
+}
+
+function savePlayerDataQueued(playerName) {
+  if (!playerSaveQueue[playerName]) {
+    playerSaveQueue[playerName] = Promise.resolve();
+  }
+  // 이전 저장이 끝난 뒤에 다음 저장 실행
+  playerSaveQueue[playerName] = playerSaveQueue[playerName].then(() => savePlayerData(playerName));
+  return playerSaveQueue[playerName];
 }
 
 // 서비스 인스턴스 생성 및 의존성 주입
@@ -670,7 +688,7 @@ wss.on('connection', (ws) => {
 // 40초마다 전체 플레이어 자동저장
 setInterval(() => {
   Object.keys(PlayerManager.getAllPlayers()).forEach(playerName => {
-    savePlayerData(playerName).catch(() => {}); // 예외 무시
+    savePlayerDataQueued(playerName).catch(() => {}); // 예외 무시
   });
 }, 40000); // 40초마다
 
@@ -733,7 +751,7 @@ module.exports = {
   server,
   wss,
   parseChatCommand,
-  savePlayerData,
+  savePlayerData: savePlayerDataQueued,
   respawnMonsterWithDeps,
   // ... 기존 내보내는 것들 ...
 };

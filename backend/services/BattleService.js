@@ -98,6 +98,9 @@ class BattleService {
                   subtype: 'error',
                   message: `${itemName}을(를) 획득했습니다!`
                 });
+                if (player.ws && player.ws.readyState === 1) {
+                  player.ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: `${itemName}을(를) 획득했습니다!` }));
+                }
               } else {
                 log.push({
                   type: 'system',
@@ -152,6 +155,12 @@ class BattleService {
         playerDead = true;
       }
     }
+    // 경험치 합산 로그 추가 (한 대 때릴 때마다, 최종 적용치만)
+    log.push({
+      type: 'battle',
+      subtype: 'exp',
+      text: `경험치 획득: 힘 +${realStrExp.toFixed(2)}, 민첩 +${realDexExp.toFixed(2)}`
+    });
     return { log, monsterDead, playerDead, goldDrop, playerDmg };
   }
 }

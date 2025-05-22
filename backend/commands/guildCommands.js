@@ -348,4 +348,29 @@ class GuildCommand {
   }
 }
 
+// 길드장 자동 위임 함수 (매뉴얼 호출용)
+async function autoDelegateGuildMaster(Guild, User) {
+  const now = new Date();
+  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const oneDayAgo = new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000);
+  const guilds = await Guild.find({});
+  for (const guild of guilds) {
+    const masterUser = await User.findOne({ username: guild.master });
+    if (!masterUser || !masterUser.lastLoginAt || masterUser.lastLoginAt > sevenDaysAgo) continue;
+    // 최근 1일 내 로그인한 멤버 찾기
+    const candidates = await User.find({
+      username: { $in: guild.members.filter(n => n !== guild.master) },
+      lastLoginAt: { $gte: oneDayAgo }
+    });
+    if (candidates.length > 0) {
+      const rand = Math.floor(Math.random() * candidates.length);
+      const newMaster = candidates[rand].username;
+      guild.master = newMaster;
+      guild.lastMasterChange = now;
+      await guild.save();
+      // 알림 메시지 등 필요시 추가 가능
+    }
+  }
+}
+
 module.exports = { GuildCommand }; 
