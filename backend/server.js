@@ -648,7 +648,37 @@ async function handleClose({ ws, playerName, PlayerManager, wss, sendPlayerList,
   await PlayerGameService.handleClose({ ws, playerName, PlayerManager, wss, sendPlayerList, broadcast, sendRoomInfoToAllInRoom, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS });
 }
 
-wss.on('connection', (ws) => {
+wss.on('connection', async (ws, req) => {
+  // --- IP 차단 체크 추가 시작 ---
+  let ip = req?.headers['x-forwarded-for']?.split(',')[0]?.trim() || ws._socket?.remoteAddress;
+  if (ip && ip.startsWith('::ffff:')) ip = ip.replace('::ffff:', '');
+  try {
+    const BannedIp = require('./models/BannedIp');
+    const bannedIp = await BannedIp.findOne({ ip });
+    if (bannedIp) {
+      ws.close();
+      return;
+    }
+  } catch (e) {
+    console.error('[WebSocket 차단 체크 에러]', e);
+  }
+  // --- IP 차단 체크 추가 끝 ---
+
+  // --- 반복 재접속(테러) 방지: 동일 User-Agent+쿠키 조합 1분 내 5회 이상 접속 시 차단 ---
+  const userAgent = req.headers['user-agent'] || '';
+  const cookie = req.headers['cookie'] || '';
+  global.recentConnections = global.recentConnections || [];
+  const now = Date.now();
+  // 1분 내 기록만 유지
+  global.recentConnections = global.recentConnections.filter(c => now - c.time < 60000);
+  const same = global.recentConnections.filter(c => c.userAgent === userAgent && c.cookie === cookie);
+  if (same.length >= 5) {
+    ws.close();
+    return;
+  }
+  global.recentConnections.push({ userAgent, cookie, time: now });
+  // --- 반복 재접속 방지 끝 ---
+
   ws.isAlive = true;
   ws.on('pong', () => {
     ws.isAlive = true;
