@@ -186,6 +186,8 @@ function useWebSocket(onDisconnect) {
   }, []);
 
   useEffect(() => {
+    // 연결이 끊기거나 새로 연결될 때 자동전투 플래그 초기화
+    sentAutoBattleRef.current = false;
     if (!connected) {
       if (reconnectTimeout.current) clearTimeout(reconnectTimeout.current);
       reconnectTimeout.current = setTimeout(() => {
