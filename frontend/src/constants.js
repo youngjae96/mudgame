@@ -56,6 +56,9 @@ export const MAP_EMOJI = {
   pyramid_entrance: '🔺', // 피라미드 입구
   pyramid_exit: '🚪', // 피라미드 출구
   pyramid_wall: '🧱', // 피라미드 내부 벽돌 장애물
+  pyramid2_entrance: '🌀', // 피라미드2 입구
+  pyramid1_exit: '🌀', // 피라미드1 출구(피라미드2에서)
+  pyramid2_wall: '🧱', // 피라미드2 내부 벽돌 장애물
 };
 
 export const WORLDS = {

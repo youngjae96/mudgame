@@ -18,7 +18,7 @@ const PlayerGameService = {
       nx >= 0 && ny >= 0 && nx < maxSize && ny < maxSize
     ) {
       const destRoom = getRoom(player.world, nx, ny);
-      if (destRoom && (destRoom.type === 'cave_wall' || destRoom.type === 'pyramid_wall')) {
+      if (destRoom && (destRoom.type === 'cave_wall' || destRoom.type === 'pyramid_wall' || destRoom.type === 'pyramid2_wall')) {
         ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '두꺼운 벽이 길을 막고 있습니다.' }));
         return;
       }

@@ -24,6 +24,9 @@ const MinimapCell = styled.div`
     if ($cellType === 'forest') return '#4e944f';
     if ($cellType === 'cave') return '#888';
     if ($cellType === 'village') return '#ffe066';
+    if ($cellType === 'pyramid') return '#bca16b';
+    if ($cellType === 'pyramid_wall' || $cellType === 'pyramid2_wall') return '#888';
+    if ($cellType === 'pyramid_entrance' || $cellType === 'pyramid2_entrance' || $cellType === 'pyramid_exit' || $cellType === 'pyramid1_exit') return '#ffe066';
     return '#181c24';
   }};
   border-radius: 6px;

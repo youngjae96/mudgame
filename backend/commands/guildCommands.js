@@ -107,6 +107,12 @@ class GuildCommand {
         ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[길드] 가입할 길드 이름을 입력하세요.' }));
         return;
       }
+      // 이미 다른 길드에 소속되어 있는지 체크 (중복 가입 방지)
+      const already = await Guild.findOne({ members: playerName });
+      if (already) {
+        ws.send(JSON.stringify({ type: 'system', message: '[길드] 이미 다른 길드에 소속되어 있습니다. 탈퇴 후 다시 시도하세요.' }));
+        return;
+      }
       const guild = await Guild.findOne({ name: guildName });
       if (!guild) {
         ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[길드] 해당 이름의 길드가 없습니다.' }));

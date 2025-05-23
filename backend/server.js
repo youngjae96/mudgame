@@ -3,7 +3,7 @@ const http = require('http');
 const { WebSocketServer } = require('ws');
 const cors = require('cors');
 const Player = require('./models/Player');
-const { ITEM_POOL, FIELD_MONSTERS, FOREST_MONSTERS, CAVE_MONSTERS, SHOP_ITEMS, ISLAND_MONSTERS, ISLAND2_MONSTERS, DESERT_MONSTERS, PYRAMID_MONSTERS } = require('./data/items');
+const { ITEM_POOL, FIELD_MONSTERS, FOREST_MONSTERS, CAVE_MONSTERS, SHOP_ITEMS, ISLAND_MONSTERS, ISLAND2_MONSTERS, DESERT_MONSTERS, PYRAMID_MONSTERS, PYRAMID2_MONSTERS } = require('./data/items');
 const { MAP_SIZE, VILLAGE_POS, rooms, getRoom, roomsIsland, ISLAND_VILLAGE_POS, roomsCave, MAP_SIZE_CAVE, roomsIsland2, ISLAND2_VILLAGE_POS } = require('./data/map');
 const Monster = require('./models/Monster');
 const {
@@ -155,6 +155,13 @@ function respawnMonsterWithDeps(world, x, y) {
       world, x, y,
       getRoom,
       PYRAMID_MONSTERS, PYRAMID_MONSTERS, PYRAMID_MONSTERS, Monster,
+      getPlayersInRoom, sendRoomInfo, 15, { x: 0, y: 0 }, PlayerManager.getAllPlayers()
+    );
+  } else if (world === 7) {
+    respawnMonster(
+      world, x, y,
+      getRoom,
+      PYRAMID2_MONSTERS, PYRAMID2_MONSTERS, PYRAMID2_MONSTERS, Monster,
       getPlayersInRoom, sendRoomInfo, 15, { x: 0, y: 0 }, PlayerManager.getAllPlayers()
     );
   } else if (world === 2) {
@@ -415,9 +422,9 @@ async function handleChat({ ws, data, playerName, PlayerManager, RoomManager, ge
       await PlayerGameService.handleEnterPyramid({ ws, playerName, getRoom, getPlayersInRoom, RoomManager, sendRoomInfo, sendInventory, sendCharacterInfo });
       return;
     }
-    // 피라미드1→피라미드2 입구(월드6, 0,0)
-    if (PlayerManager.getPlayer(playerName).world === 6 && PlayerManager.getPlayer(playerName).position.x === 0 && PlayerManager.getPlayer(playerName).position.y === 0) {
-      RoomManager.removePlayerFromRoom(playerName, 6, 0, 0);
+    // 피라미드1→피라미드2 입구(월드6, 5,2)
+    if (PlayerManager.getPlayer(playerName).world === 6 && PlayerManager.getPlayer(playerName).position.x === 5 && PlayerManager.getPlayer(playerName).position.y === 2) {
+      RoomManager.removePlayerFromRoom(playerName, 6, 5, 2);
       PlayerManager.getPlayer(playerName).world = 7;
       PlayerManager.getPlayer(playerName).position = { x: 0, y: 0 };
       RoomManager.addPlayerToRoom(playerName, 7, 0, 0);
@@ -432,10 +439,10 @@ async function handleChat({ ws, data, playerName, PlayerManager, RoomManager, ge
     if (PlayerManager.getPlayer(playerName).world === 7 && PlayerManager.getPlayer(playerName).position.x === 0 && PlayerManager.getPlayer(playerName).position.y === 0) {
       RoomManager.removePlayerFromRoom(playerName, 7, 0, 0);
       PlayerManager.getPlayer(playerName).world = 6;
-      PlayerManager.getPlayer(playerName).position = { x: 0, y: 0 };
-      RoomManager.addPlayerToRoom(playerName, 6, 0, 0);
+      PlayerManager.getPlayer(playerName).position = { x: 5, y: 2 };
+      RoomManager.addPlayerToRoom(playerName, 6, 5, 2);
       PlayerManager.addPlayer(playerName, PlayerManager.getPlayer(playerName));
-      sendRoomInfo(PlayerManager.getPlayer(playerName), getRoom, getPlayersInRoom, 6, { x: 0, y: 0 });
+      sendRoomInfo(PlayerManager.getPlayer(playerName), getRoom, getPlayersInRoom, 6, { x: 5, y: 2 });
       sendInventory(PlayerManager.getPlayer(playerName));
       sendCharacterInfo(PlayerManager.getPlayer(playerName));
       ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '[피라미드1] 피라미드1로 돌아갑니다.' }));
@@ -464,6 +471,19 @@ async function handleChat({ ws, data, playerName, PlayerManager, RoomManager, ge
     // 피라미드 내부 출구(월드6, 0,0)에서 사막(5,2)로 나감
     if (PlayerManager.getPlayer(playerName).world === 6 && PlayerManager.getPlayer(playerName).position.x === 0 && PlayerManager.getPlayer(playerName).position.y === 0) {
       await PlayerGameService.handleExitPyramid({ ws, playerName, getRoom, getPlayersInRoom, RoomManager, sendRoomInfo, sendInventory, sendCharacterInfo });
+      return;
+    }
+    // 피라미드2(월드7, 0,0)에서 피라미드1(월드6, 5,2)로 나감
+    if (PlayerManager.getPlayer(playerName).world === 7 && PlayerManager.getPlayer(playerName).position.x === 0 && PlayerManager.getPlayer(playerName).position.y === 0) {
+      RoomManager.removePlayerFromRoom(playerName, 7, 0, 0);
+      PlayerManager.getPlayer(playerName).world = 6;
+      PlayerManager.getPlayer(playerName).position = { x: 5, y: 2 };
+      RoomManager.addPlayerToRoom(playerName, 6, 5, 2);
+      PlayerManager.addPlayer(playerName, PlayerManager.getPlayer(playerName));
+      sendRoomInfo(PlayerManager.getPlayer(playerName), getRoom, getPlayersInRoom, 6, { x: 5, y: 2 });
+      sendInventory(PlayerManager.getPlayer(playerName));
+      sendCharacterInfo(PlayerManager.getPlayer(playerName));
+      ws.send(JSON.stringify({ type: 'system', subtype: 'event', message: '[피라미드1] 피라미드1로 돌아갑니다.' }));
       return;
     }
     else {

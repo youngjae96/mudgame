@@ -12,7 +12,7 @@ class AdminCommand {
     }
     const args = message.trim().split(' ');
     if (args.length < 2) {
-      ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[운영자] 사용법: /운영자 <공지|골드지급|아이템지급|텔포|서버저장|차단|경험치|경험치해제> ...' }));
+      ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[운영자] 사용법: /운영자 <공지|골드지급|아이템지급|텔포|서버저장|차단|경험치|경험치해제|사탕지급> ...' }));
       return;
     }
     const subcmd = args[1];
@@ -218,6 +218,39 @@ class AdminCommand {
         Object.values(PlayerManager.getAllPlayers()).forEach(p => sendCharacterInfo(p));
       }
       ws.send(JSON.stringify({ type: 'system', message: '[운영자] 경험치 1.2배 이벤트가 종료되었습니다.' }));
+      return;
+    }
+    if (subcmd === '사탕지급') {
+      const count = parseInt(args[2], 10);
+      if (isNaN(count) || count <= 0) {
+        ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[운영자] 사용법: /운영자 사탕지급 개수' }));
+        return;
+      }
+      let success = 0;
+      Object.values(players).forEach(player => {
+        if (!player) return;
+        // 사탕 아이템 찾기
+        let candy = player.inventory.find(i => i.name === '사탕');
+        if (candy) {
+          // 최대 50개 제한
+          const curCount = candy.count || 1;
+          const addCount = Math.min(count, 50 - curCount);
+          if (addCount > 0) {
+            candy.count = curCount + addCount;
+            success++;
+          }
+        } else {
+          // 새로 추가
+          const addCount = Math.min(count, 50);
+          player.inventory.push({ name: '사탕', type: '잡화', count: addCount, desc: '먹으면 30분 동안 경험치 +10%. 중첩 사용 시 최대 12시간까지 연장.' });
+          success++;
+        }
+        if (player.ws && player.ws.readyState === 1) {
+          player.ws.send(JSON.stringify({ type: 'system', message: `[운영자] 사탕 ${count}개가 지급되었습니다!` }));
+        }
+        if (typeof sendInventory === 'function') sendInventory(player);
+      });
+      ws.send(JSON.stringify({ type: 'system', message: `[운영자] 접속 중인 ${success}명에게 사탕 ${count}개씩 지급 완료!` }));
       return;
     }
     ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '[운영자] 지원하지 않는 서브명령어입니다.' }));

@@ -3,6 +3,7 @@ const Monster = require('../models/Monster');
 const { FIELD_MONSTERS, FOREST_MONSTERS, CAVE_MONSTERS, ISLAND_MONSTERS, CAVE_BOSS_MONSTERS, ISLAND2_MONSTERS, DESERT_MONSTERS } = require('./items');
 const PYRAMID_MONSTERS = require('./monsters/pyramid.json');
 const RoomManager = require('../roomManager');
+const PYRAMID2_MONSTERS = require('./monsters/pyramid2.json');
 
 const MAP_SIZE = 9;
 const VILLAGE_POS = { x: 4, y: 4 };
@@ -403,8 +404,63 @@ for (let y = 0; y < MAP_SIZE_PYRAMID; y++) {
   }
 }
 
+// === 피라미드2(월드7) 맵 추가 ===
+const MAP_SIZE_PYRAMID2 = 15;
+const roomsPyramid2 = [];
+// 피라미드2 전체 방 좌표 수집 (벽/입구/출구 제외)
+let pyramid2SpawnableRooms = [];
+for (let y = 0; y < MAP_SIZE_PYRAMID2; y++) {
+  for (let x = 0; x < MAP_SIZE_PYRAMID2; x++) {
+    let type = ROOM_TYPE.PYRAMID;
+    let name = '피라미드2 내부';
+    let description = '더 깊은 피라미드의 미로 같은 내부입니다.';
+    let monsters = [];
+    if (x === 0 && y === 0) {
+      type = 'pyramid1_exit';
+      name = '피라미드1 출구';
+      description = '피라미드1(상위층)으로 나가는 출구입니다. "/나가기" 명령어로 이동.';
+    } else if (x === 14 && y === 14) {
+      type = 'pyramid2_entrance';
+      name = '피라미드2 입구';
+      description = '더 깊은 피라미드로 들어가는 입구입니다. "/입장" 명령어로 이동.';
+    } else if (Math.random() < 0.12) {
+      type = 'pyramid2_wall';
+      name = '피라미드2 벽';
+      description = '두꺼운 벽돌이 길을 막고 있습니다.';
+    } else {
+      pyramid2SpawnableRooms.push({ x, y });
+    }
+    const room = new Room(x, y, type, name, description, 7);
+    for (const m of monsters) room.monsters.push(m);
+    roomsPyramid2.push(room);
+    registerRoomToManager(room, 7);
+  }
+}
+// 피라미드2 전체에서 무작위로 45개 방에만 몬스터 1마리씩 스폰
+const SHUFFLE = arr => arr.sort(() => Math.random() - 0.5);
+SHUFFLE(pyramid2SpawnableRooms).slice(0, 45).forEach(({ x, y }) => {
+  const room = roomsPyramid2.find(r => r.x === x && r.y === y);
+  if (room && room.type === ROOM_TYPE.PYRAMID) {
+    room.monsters.push(new Monster(PYRAMID2_MONSTERS[Math.floor(Math.random() * PYRAMID2_MONSTERS.length)], x, y));
+  }
+});
+// 피라미드1 내부(월드6) (5,2)에 피라미드2 입구 방 이모지 추가
+const pyramid2Entrance = roomsPyramid.find(r => r.x === 5 && r.y === 2);
+if (pyramid2Entrance) {
+  pyramid2Entrance.type = 'pyramid2_entrance';
+  pyramid2Entrance.name = '🌀 피라미드2 입구';
+  pyramid2Entrance.description = '더 깊은 피라미드로 들어가는 입구입니다. "/입장" 명령어로 이동.';
+}
+// 피라미드2(월드7) (0,0) 출구도 이모지 추가
+const pyramid1Exit = roomsPyramid2.find(r => r.x === 0 && r.y === 0);
+if (pyramid1Exit) {
+  pyramid1Exit.type = 'pyramid1_exit';
+  pyramid1Exit.name = '🌀 피라미드1 출구';
+  pyramid1Exit.description = '피라미드1(상위층)으로 나가는 출구입니다. "/나가기" 명령어로 이동.';
+}
+
 // worlds 객체를 모든 맵 생성 이후에 선언
-const worlds = { 1: rooms, 2: roomsIsland, 3: roomsCave, 4: roomsIsland2, 5: roomsDesert, 6: roomsPyramid };
+const worlds = { 1: rooms, 2: roomsIsland, 3: roomsCave, 4: roomsIsland2, 5: roomsDesert, 6: roomsPyramid, 7: roomsPyramid2 };
 function getRoom(world, x, y) {
   const arr = worlds[world] || rooms;
   return arr.find(r => r.x === x && r.y === y);

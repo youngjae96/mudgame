@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import './App.css';
 import ChatBox from './ChatBox';
@@ -179,6 +179,28 @@ function AppInner() {
 
   return (
     <>
+      {/* 상단 UI/헤더 */}
+      {/* 기존 상단 UI(로그아웃 버튼 등) 렌더링 */}
+      {/* 공지 오버레이: 상단 UI 바로 아래에 */}
+      {notice && (
+        <div
+          style={{
+            width: '100%',
+            background: 'rgba(0,0,0,0.85)',
+            color: '#fff',
+            fontSize: isMobile ? '1.1rem' : '1.5rem',
+            fontWeight: 'bold',
+            textAlign: 'center',
+            padding: '1.2rem 0',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+            wordBreak: 'break-all',
+            pointerEvents: 'none',
+            position: 'relative',
+          }}
+        >
+          {notice}
+        </div>
+      )}
       <div>
         {showAlert && notice && (
           <Alert

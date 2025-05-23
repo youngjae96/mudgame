@@ -49,6 +49,8 @@ function useWebSocket(onDisconnect) {
     return saved ? JSON.parse(saved) : null;
   });
   const sentAutoBattleRef = useRef(false);
+  const justJoinedRef = useRef(false);
+  const justJoinedTimeout = useRef(null);
 
   useEffect(() => {
     if (connected && ws.current) {
@@ -89,7 +91,19 @@ function useWebSocket(onDisconnect) {
         } else if (data.type === 'inventory') {
           setInventory(data.inventory);
         } else if (data.type === 'character') {
+          justJoinedRef.current = true;
+          if (justJoinedTimeout.current) clearTimeout(justJoinedTimeout.current);
+          justJoinedTimeout.current = setTimeout(() => {
+            justJoinedRef.current = false;
+          }, 1000); // 1초 후 자동 해제
           setCharacter(data.info);
+          if (data.info && data.info.autoBattleTarget) {
+            setAutoBattleTarget(data.info.autoBattleTarget);
+            localStorage.setItem('autoBattleTarget', JSON.stringify(data.info.autoBattleTarget));
+            if (ws.current && ws.current.readyState === 1) {
+              ws.current.send(JSON.stringify({ type: 'autobattle', monsterId: data.info.autoBattleTarget }));
+            }
+          }
         } else if (data.type === 'stat') {
           setAllMessages(msgs => [...msgs, { type: 'stat', text: data.text }]);
           if (typeof data.text === 'string') {
@@ -123,17 +137,9 @@ function useWebSocket(onDisconnect) {
           });
           // 자동전투 종료 조건 감지: 몬스터 사망, 플레이어 사망, 자동전투 중단 등
           let shouldClearAutoBattle = false;
+          let killedByOther = false;
           if (data.log && Array.isArray(data.log)) {
-            shouldClearAutoBattle = data.log.some(l =>
-              l.subtype === 'kill' ||
-              l.subtype === 'death' ||
-              l.subtype === 'autobattle_end' ||
-              l.subtype === 'playerDead' ||
-              l.subtype === 'monsterDead' ||
-              l.text?.includes('자동전투를 종료') ||
-              l.text?.includes('자동전투가 종료') ||
-              l.text?.includes('자동전투가 중단')
-            );
+            killedByOther = data.log.some(l => typeof l.text === 'string' && l.text.includes('처치!'));
           }
           if (
             shouldClearAutoBattle ||
@@ -148,6 +154,13 @@ function useWebSocket(onDisconnect) {
               data.text.includes('자동전투가 중단')
             ))
           ) {
+            if (!justJoinedRef.current) {
+              setAutoBattleTarget(null);
+              localStorage.removeItem('autoBattleTarget');
+            }
+          }
+          // 다른 플레이어가 몬스터를 처치한 경우는 justJoinedRef와 무관하게 즉시 삭제
+          if (killedByOther || (typeof data.text === 'string' && data.text.includes('처치!'))) {
             setAutoBattleTarget(null);
             localStorage.removeItem('autoBattleTarget');
           }
@@ -263,7 +276,19 @@ function useWebSocket(onDisconnect) {
       } else if (data.type === 'inventory') {
         setInventory(data.inventory);
       } else if (data.type === 'character') {
+        justJoinedRef.current = true;
+        if (justJoinedTimeout.current) clearTimeout(justJoinedTimeout.current);
+        justJoinedTimeout.current = setTimeout(() => {
+          justJoinedRef.current = false;
+        }, 1000); // 1초 후 자동 해제
         setCharacter(data.info);
+        if (data.info && data.info.autoBattleTarget) {
+          setAutoBattleTarget(data.info.autoBattleTarget);
+          localStorage.setItem('autoBattleTarget', JSON.stringify(data.info.autoBattleTarget));
+          if (ws.current && ws.current.readyState === 1) {
+            ws.current.send(JSON.stringify({ type: 'autobattle', monsterId: data.info.autoBattleTarget }));
+          }
+        }
       } else if (data.type === 'stat') {
         setAllMessages(msgs => [...msgs, { type: 'stat', text: data.text }]);
         if (typeof data.text === 'string') {
@@ -297,17 +322,9 @@ function useWebSocket(onDisconnect) {
         });
         // 자동전투 종료 조건 감지: 몬스터 사망, 플레이어 사망, 자동전투 중단 등
         let shouldClearAutoBattle = false;
+        let killedByOther = false;
         if (data.log && Array.isArray(data.log)) {
-          shouldClearAutoBattle = data.log.some(l =>
-            l.subtype === 'kill' ||
-            l.subtype === 'death' ||
-            l.subtype === 'autobattle_end' ||
-            l.subtype === 'playerDead' ||
-            l.subtype === 'monsterDead' ||
-            l.text?.includes('자동전투를 종료') ||
-            l.text?.includes('자동전투가 종료') ||
-            l.text?.includes('자동전투가 중단')
-          );
+          killedByOther = data.log.some(l => typeof l.text === 'string' && l.text.includes('처치!'));
         }
         if (
           shouldClearAutoBattle ||
@@ -322,6 +339,13 @@ function useWebSocket(onDisconnect) {
             data.text.includes('자동전투가 중단')
           ))
         ) {
+          if (!justJoinedRef.current) {
+            setAutoBattleTarget(null);
+            localStorage.removeItem('autoBattleTarget');
+          }
+        }
+        // 다른 플레이어가 몬스터를 처치한 경우는 justJoinedRef와 무관하게 즉시 삭제
+        if (killedByOther || (typeof data.text === 'string' && data.text.includes('처치!'))) {
           setAutoBattleTarget(null);
           localStorage.removeItem('autoBattleTarget');
         }
@@ -417,8 +441,10 @@ function useWebSocket(onDisconnect) {
       const monsterId = typeof autoBattleTarget === 'string' ? autoBattleTarget : String(autoBattleTarget);
       const hasMonster = room.monsters && room.monsters.some(m => String(m.id) === monsterId);
       if (!hasMonster) {
-        setAutoBattleTarget(null);
-        localStorage.removeItem('autoBattleTarget');
+        if (!justJoinedRef.current) {
+          setAutoBattleTarget(null);
+          localStorage.removeItem('autoBattleTarget');
+        }
       }
     }
   }, [room]);
