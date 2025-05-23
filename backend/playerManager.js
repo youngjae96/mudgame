@@ -7,6 +7,11 @@ class PlayerManager {
     this.players[name] = playerObj;
   }
   removePlayer(name) {
+    // 자동전투 interval 등도 함께 정리 (메모리 누수 방지)
+    if (typeof global !== 'undefined' && global.battleIntervals && global.battleIntervals[name]) {
+      clearInterval(global.battleIntervals[name]);
+      delete global.battleIntervals[name];
+    }
     delete this.players[name];
   }
   getPlayer(name) {

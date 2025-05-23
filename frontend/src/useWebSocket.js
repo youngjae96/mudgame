@@ -43,6 +43,12 @@ function useWebSocket(onDisconnect) {
   const [chatLogMessages, setChatLogMessages] = useState([]);
   const [guildChatLogMessages, setGuildChatLogMessages] = useState([]);
   const [battleMessages, setBattleMessages] = useState([]);
+  const [autoBattleTarget, setAutoBattleTarget] = useState(() => {
+    // 마운트 시 localStorage에서 복구
+    const saved = localStorage.getItem('autoBattleTarget');
+    return saved ? JSON.parse(saved) : null;
+  });
+  const sentAutoBattleRef = useRef(false);
 
   useEffect(() => {
     if (connected && ws.current) {
@@ -115,6 +121,36 @@ function useWebSocket(onDisconnect) {
               return next.length > 100 ? next.slice(next.length - 100) : next;
             }
           });
+          // 자동전투 종료 조건 감지: 몬스터 사망, 플레이어 사망, 자동전투 중단 등
+          let shouldClearAutoBattle = false;
+          if (data.log && Array.isArray(data.log)) {
+            shouldClearAutoBattle = data.log.some(l =>
+              l.subtype === 'kill' ||
+              l.subtype === 'death' ||
+              l.subtype === 'autobattle_end' ||
+              l.subtype === 'playerDead' ||
+              l.subtype === 'monsterDead' ||
+              l.text?.includes('자동전투를 종료') ||
+              l.text?.includes('자동전투가 종료') ||
+              l.text?.includes('자동전투가 중단')
+            );
+          }
+          if (
+            shouldClearAutoBattle ||
+            data.subtype === 'kill' ||
+            data.subtype === 'death' ||
+            data.subtype === 'autobattle_end' ||
+            data.subtype === 'playerDead' ||
+            data.subtype === 'monsterDead' ||
+            (typeof data.text === 'string' && (
+              data.text.includes('자동전투를 종료') ||
+              data.text.includes('자동전투가 종료') ||
+              data.text.includes('자동전투가 중단')
+            ))
+          ) {
+            setAutoBattleTarget(null);
+            localStorage.removeItem('autoBattleTarget');
+          }
           return;
         } else if (data.type === 'notice') {
           setNotice(data.notice);
@@ -135,6 +171,18 @@ function useWebSocket(onDisconnect) {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, []);
+
+  useEffect(() => {
+    if (!connected) {
+      if (reconnectTimeout.current) clearTimeout(reconnectTimeout.current);
+      reconnectTimeout.current = setTimeout(() => {
+        handleConnect();
+      }, 3000); // 3초 후 자동 재연결
+    }
+    return () => {
+      if (reconnectTimeout.current) clearTimeout(reconnectTimeout.current);
+    };
+  }, [connected]);
 
   const handleConnect = () => {
     // 기존 연결이 있으면 정리
@@ -157,6 +205,10 @@ function useWebSocket(onDisconnect) {
       if (ws.current.readyState === WebSocket.OPEN) {
         ws.current.send(JSON.stringify({ type: 'join', name: username, password }));
         setConnected(true);
+        // 자동전투 등 상태 복구
+        if (autoBattleTarget) {
+          ws.current.send(JSON.stringify({ type: 'autobattle', monsterId: autoBattleTarget }));
+        }
       } else {
         ws.current.addEventListener('open', () => {
           ws.current.send(JSON.stringify({ type: 'join', name: username, password }));
@@ -243,19 +295,42 @@ function useWebSocket(onDisconnect) {
             return next.length > 100 ? next.slice(next.length - 100) : next;
           }
         });
+        // 자동전투 종료 조건 감지: 몬스터 사망, 플레이어 사망, 자동전투 중단 등
+        let shouldClearAutoBattle = false;
+        if (data.log && Array.isArray(data.log)) {
+          shouldClearAutoBattle = data.log.some(l =>
+            l.subtype === 'kill' ||
+            l.subtype === 'death' ||
+            l.subtype === 'autobattle_end' ||
+            l.subtype === 'playerDead' ||
+            l.subtype === 'monsterDead' ||
+            l.text?.includes('자동전투를 종료') ||
+            l.text?.includes('자동전투가 종료') ||
+            l.text?.includes('자동전투가 중단')
+          );
+        }
+        if (
+          shouldClearAutoBattle ||
+          data.subtype === 'kill' ||
+          data.subtype === 'death' ||
+          data.subtype === 'autobattle_end' ||
+          data.subtype === 'playerDead' ||
+          data.subtype === 'monsterDead' ||
+          (typeof data.text === 'string' && (
+            data.text.includes('자동전투를 종료') ||
+            data.text.includes('자동전투가 종료') ||
+            data.text.includes('자동전투가 중단')
+          ))
+        ) {
+          setAutoBattleTarget(null);
+          localStorage.removeItem('autoBattleTarget');
+        }
         return;
       } else if (data.type === 'notice') {
         setNotice(data.notice);
       }
     };
   };
-
-  useEffect(() => {
-    // 언마운트 시 타임아웃 정리
-    return () => {
-      if (reconnectTimeout.current) clearTimeout(reconnectTimeout.current);
-    };
-  }, []);
 
   const handleSend = (e) => {
     e.preventDefault();
@@ -328,10 +403,52 @@ function useWebSocket(onDisconnect) {
 
   const handleAttack = (monsterId) => {
     ws.current.send(JSON.stringify({ type: 'autobattle', monsterId }));
+    setAutoBattleTarget(monsterId);
+    localStorage.setItem('autoBattleTarget', JSON.stringify(monsterId));
     setTimeout(() => {
       ws.current.send(JSON.stringify({ type: 'stat' }));
     }, 200);
   };
+
+  // 방 이동 등 room 정보가 바뀔 때 자동전투 상태 초기화
+  useEffect(() => {
+    if (autoBattleTarget && room) {
+      // 현재 방에 autoBattleTarget 몬스터가 없으면 자동전투 종료
+      const monsterId = typeof autoBattleTarget === 'string' ? autoBattleTarget : String(autoBattleTarget);
+      const hasMonster = room.monsters && room.monsters.some(m => String(m.id) === monsterId);
+      if (!hasMonster) {
+        setAutoBattleTarget(null);
+        localStorage.removeItem('autoBattleTarget');
+      }
+    }
+  }, [room]);
+
+  // WebSocket 연결 후 자동전투 복구: autoBattleTarget이 남아있고, 방에 몬스터가 하나라도 있으면 그 몬스터로 자동전투
+  useEffect(() => {
+    // monsters가 1개 이상일 때만 자동전투 명령 전송
+    if (
+      connected &&
+      autoBattleTarget &&
+      room &&
+      Array.isArray(room.monsters) &&
+      room.monsters.length > 0 &&
+      !sentAutoBattleRef.current
+    ) {
+      const monsterId = room.monsters[0].id;
+      ws.current && ws.current.send(JSON.stringify({ type: 'autobattle', monsterId }));
+      setAutoBattleTarget(monsterId);
+      localStorage.setItem('autoBattleTarget', JSON.stringify(monsterId));
+      sentAutoBattleRef.current = true;
+    }
+    // monsters가 비어있으면 플래그 초기화(방 이동 등)
+    if (!room || !Array.isArray(room.monsters) || room.monsters.length === 0) {
+      sentAutoBattleRef.current = false;
+    }
+    // 연결이 끊기거나 autoBattleTarget이 없으면 플래그 초기화
+    if (!connected || !autoBattleTarget) {
+      sentAutoBattleRef.current = false;
+    }
+  }, [connected, autoBattleTarget, room && room.monsters && room.monsters.length]);
 
   return {
     connected,

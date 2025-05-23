@@ -65,7 +65,7 @@ function AppInner() {
     messages, addMessage, clearMessages
   } = useGameStateContext();
 
-  const handleDisconnect = () => { logout(); };
+  const handleDisconnect = () => {};
 
   const {
     connected,
@@ -168,6 +168,10 @@ function AppInner() {
         loading={loading}
       />
     );
+  }
+
+  if (!connected) {
+    return <div style={{textAlign:'center',marginTop:'30vh',fontSize:'1.5rem',color:'#7ecfff'}}>서버 연결 복구 중... 잠시만 기다려주세요.</div>;
   }
 
   const renderRoomItems = () => <RoomItems room={room} onPickup={handlePickup} />;

@@ -67,6 +67,10 @@ const playerSaveCooldown = {}; // { [playerName]: timestamp }
 // 저장 큐잉 관리 객체
 const playerSaveQueue = {}; // { [playerName]: Promise }
 
+// === WebSocket ping/pong 감시 및 타임아웃 정리 ===
+const PING_INTERVAL = 30000; // 30초
+let pingInterval = null;
+
 function getPlayersInRoom(world, x, y) {
   return Object.values(PlayerManager.getAllPlayers())
     .filter((p) => p.world === world && p.position && p.position.x === x && p.position.y === y)
@@ -625,6 +629,10 @@ async function handleClose({ ws, playerName, PlayerManager, wss, sendPlayerList,
 }
 
 wss.on('connection', (ws) => {
+  ws.isAlive = true;
+  ws.on('pong', () => {
+    ws.isAlive = true;
+  });
   let playerName = '';
 
   ws.on('message', async (message) => {
@@ -763,6 +771,21 @@ setInterval(() => {
     }
   }
 }, 5000); // 5초마다 체크
+
+pingInterval = setInterval(() => {
+  wss.clients.forEach((ws) => {
+    if (ws.isAlive === false) {
+      ws.terminate();
+      return;
+    }
+    ws.isAlive = false;
+    ws.ping();
+  });
+}, PING_INTERVAL);
+
+wss.on('close', () => {
+  if (pingInterval) clearInterval(pingInterval);
+});
 
 if (require.main === module) {
   global.wss = wss;
