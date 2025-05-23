@@ -138,6 +138,16 @@ const PlayerGameService = {
     }
   },
   async handleCommand({ ws, playerName, command, args, RoomManager, getRoom, getPlayersInRoom, sendRoomInfoToAllInRoom, savePlayerData, sendInventory, sendCharacterInfo, broadcast, SHOP_ITEMS, MAP_SIZE, VILLAGE_POS, commandHandlers, sendRoomInfo, battleIntervals }) {
+    // --- 명령어 쿨타임(1초) 적용 시작 ---
+    if (!global.commandCooldown) global.commandCooldown = {};
+    const now = Date.now();
+    const last = global.commandCooldown[playerName] || 0;
+    if (now - last < 1000) {
+      ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '명령어는 1초에 1번만 입력할 수 있습니다.' }));
+      return;
+    }
+    global.commandCooldown[playerName] = now;
+    // --- 명령어 쿨타임 끝 ---
     if (!commandHandlers) {
       ws.send(JSON.stringify({ type: 'system', subtype: 'error', message: '명령어 핸들러가 정의되어 있지 않습니다.' }));
       return;
@@ -504,7 +514,7 @@ const PlayerGameService = {
       const prevY = PlayerManager.getPlayer(playerName).position.y;
       PlayerManager.removePlayer(playerName);
       sendPlayerList(wss, PlayerManager.getAllPlayers());
-      broadcast(wss, { type: 'system', subtype: 'event', message: `${playerName}님이 퇴장했습니다.` });
+      // broadcast(wss, { type: 'system', subtype: 'event', message: `${playerName}님이 퇴장했습니다.` });
       sendRoomInfoToAllInRoom(PlayerManager.getAllPlayers(), prevWorld, prevX, prevY, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
     }
     ws.close();

@@ -376,7 +376,7 @@ async function handleJoin({ ws, data, wss, PlayerManager, RoomManager, PlayerDat
     player.guildName = undefined;
   }
   PlayerManager.addPlayer(name, player);
-  broadcast(wss, { type: 'system', subtype: 'event', message: `${name}님이 입장했습니다.` });
+  // broadcast(wss, { type: 'system', subtype: 'event', message: `${name}님이 입장했습니다.` });
   sendPlayerList(wss, PlayerManager.getAllPlayers());
   RoomManager.addPlayerToRoom(name, player.world, player.position.x, player.position.y);
   sendInventory(PlayerManager.getPlayer(name));
@@ -758,7 +758,7 @@ wss.on('connection', async (ws, req) => {
       const prevY = player.position.y;
       PlayerManager.removePlayer(playerName);
       sendPlayerList(wss, PlayerManager.getAllPlayers());
-      broadcast(wss, { type: 'system', subtype: 'event', message: `${playerName}님이 퇴장했습니다.` });
+      // broadcast(wss, { type: 'system', subtype: 'event', message: `${playerName}님이 퇴장했습니다.` });
       sendRoomInfoToAllInRoom(PlayerManager.getAllPlayers(), prevWorld, prevX, prevY, getRoom, getPlayersInRoom, MAP_SIZE, VILLAGE_POS);
     }
     if (battleIntervals[playerName]) {
