@@ -664,7 +664,7 @@ wss.on('connection', async (ws, req) => {
   }
   // --- IP 차단 체크 추가 끝 ---
 
-  // --- 반복 재접속(테러) 방지: 동일 User-Agent+쿠키 조합 1분 내 5회 이상 접속 시 차단 ---
+  // --- 반복 재접속(테러) 방지: 동일 User-Agent+쿠키 조합 1분 내 10회 이상 접속 시 차단 ---
   const userAgent = req.headers['user-agent'] || '';
   const cookie = req.headers['cookie'] || '';
   global.recentConnections = global.recentConnections || [];
@@ -672,7 +672,7 @@ wss.on('connection', async (ws, req) => {
   // 1분 내 기록만 유지
   global.recentConnections = global.recentConnections.filter(c => now - c.time < 60000);
   const same = global.recentConnections.filter(c => c.userAgent === userAgent && c.cookie === cookie);
-  if (same.length >= 5) {
+  if (same.length >= 10) {
     ws.close();
     return;
   }
