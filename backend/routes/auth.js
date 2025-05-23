@@ -7,8 +7,16 @@ const router = express.Router();
 const SECRET = 'your_jwt_secret';
 const auth = require('../middlewares/auth');
 
+// --- 로그인/회원가입 시도 제한 미들웨어 추가 ---
+const rateLimit = require('express-rate-limit');
+const authLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1분
+  max: 5, // 1분에 5회
+  message: { error: '너무 많은 시도입니다. 잠시 후 다시 시도하세요.' }
+});
+
 // 회원가입
-router.post('/register', async (req, res) => {
+router.post('/register', authLimiter, async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) return res.status(400).json({ error: '필수 입력값 누락' });
 
@@ -37,7 +45,7 @@ router.post('/register', async (req, res) => {
 });
 
 // 로그인
-router.post('/login', async (req, res) => {
+router.post('/login', authLimiter, async (req, res) => {
   const { username, password } = req.body;
   const user = await User.findOne({ username });
   if (!user) return res.status(400).json({ error: '존재하지 않는 계정입니다.' });
